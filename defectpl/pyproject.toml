@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "defectpl"
+version = "0.1.0"
+description = "A unified package for optical properties of point defects."
+authors = ["Shibu Meher <shibumeher@iisc.ac.in>"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/Shibu778/defectpl"
+repository = "https://github.com/Shibu778/defectpl"
+documentation = "https://defectpl.readthedocs.io/en/latest/"
+keywords = ["defects", "optical properties", "point defects", "DFT", "VASP", "pymatgen"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+PyYAML = "^6.0.2"
+numpy = "^2.1.2"
+pymatgen = "2024.10.3"
+pathlib = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
