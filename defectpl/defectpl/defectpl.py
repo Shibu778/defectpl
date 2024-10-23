@@ -177,27 +177,6 @@ class DefectPl:
             "nq": self.nq,
         }
 
-    def gaussian(self, omega, omega_k, sigma):
-        """This gaussian function is used to approximate the delta function.
-
-        Parameters:
-        =================
-        omega: float or np.array
-            The frequency at which the gaussian is evaluated.
-        omega_k: float
-            The frequency of the mode k. Mean of the gaussian.
-        sigma: float
-            The width of the gaussian.
-
-        Returns:
-        =================
-        float or np.array
-            The value of the gaussian at the frequency omega.
-        """
-        return (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(
-            -0.5 * ((omega - omega_k) / sigma) ** 2
-        )
-
     def calc_dR(self, constcar_gs, contcar_es):
         """This function calculates the difference in R between the excited state
         and ground state structures.
@@ -369,6 +348,27 @@ class DefectPl:
         frequencies = np.array(frequencies)
         Sks = frequencies * qks**2 / (2 * HBAR_Js * HBAR_eVs)
         return Sks
+
+    def gaussian(self, omega, omega_k, sigma):
+        """This gaussian function is used to approximate the delta function.
+
+        Parameters:
+        =================
+        omega: float or np.array
+            The frequency at which the gaussian is evaluated.
+        omega_k: float
+            The frequency of the mode k. Mean of the gaussian.
+        sigma: float
+            The width of the gaussian.
+
+        Returns:
+        =================
+        float or np.array
+            The value of the gaussian at the frequency omega.
+        """
+        return (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(
+            -0.5 * ((omega - omega_k) / sigma) ** 2
+        )
 
     def calc_S_omega(self, frequencies, Sks, omega_range, sigma=6e-3):
         """Calculate the S(omega) function.
