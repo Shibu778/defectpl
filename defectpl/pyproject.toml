@@ -7,7 +7,7 @@ readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/Shibu778/defectpl"
 repository = "https://github.com/Shibu778/defectpl"
-documentation = "https://defectpl.readthedocs.io/en/latest/"
+documentation = "https://Shibu778.github.io/defectpl/"
 keywords = ["defects", "optical properties", "point defects", "DFT", "VASP", "pymatgen"]
 
 classifiers = [

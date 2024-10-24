@@ -4,9 +4,6 @@ A unified package to calculate and plot optical properties of point defects in i
 #### Purpose of the Package
 The purpose of this package is to calculate the intensity of photoluminescence from point defects in solids with method described in New J. Phys. 16 (2014) 073026. It also calculates and plot other relevant quantities like partial Huang Rhys factor, inverse participation ratio etc.
 
-### Documentation
-For documentation check : https://Shibu778.github.io/defectpl/
-
 ### Getting Started
 The package can be found in pypi. You can install it using `pip`.
 

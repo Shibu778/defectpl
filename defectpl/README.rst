@@ -13,6 +13,11 @@ New J. Phys. 16 (2014) 073026. It also calculates and plot other
 relevant quantities like partial Huang Rhys factor, inverse
 participation ratio etc.
 
+Documentation
+-------------
+The documentation can be found at https://Shibu778.github.io/defectpl/.
+
+
 Getting Started
 ---------------
 
