@@ -4,6 +4,9 @@ DefectPl
 A unified package to calculate and plot optical properties of point
 defects in insulators and semiconductors.
 
+|image| |Downloads| |Conda Recipe| |Anaconda| |image1| |Conda Downloads|
+|image2|
+
 Purpose of the Package
 ----------------------
 
@@ -15,8 +18,8 @@ participation ratio etc.
 
 Documentation
 -------------
-The documentation can be found at https://Shibu778.github.io/defectpl/.
 
+For documentation check : https://Shibu778.github.io/defectpl/
 
 Getting Started
 ---------------
@@ -29,6 +32,20 @@ Installation
 .. code:: bash
 
    pip install defectpl
+
+Using ``conda``
+
+.. code:: bash
+
+   conda install conda-forge::defectpl
+
+Using the GitHub clone
+
+.. code:: bash
+
+   git clone https://github.com/Shibu778/defectpl.git
+   cd defectpl/defectpl
+   pip install -e .
 
 Usage
 -----
@@ -60,11 +77,6 @@ NV center in diamond.
        out_dir=out_dir,
    )
 
-API
----
-
-TODO
-
 Contribution
 ------------
 
@@ -74,3 +86,18 @@ Author
 ------
 
 Main Maintainer: Shibu Meher
+
+.. |image| image:: https://img.shields.io/pypi/v/defectpl.svg
+   :target: https://pypi.python.org/pypi/defectpl
+.. |Downloads| image:: https://static.pepy.tech/badge/defectpl
+   :target: https://pepy.tech/project/defectpl
+.. |Conda Recipe| image:: https://img.shields.io/badge/recipe-defectpl-green.svg
+   :target: https://github.com/conda-forge/defectpl-feedstock
+.. |Anaconda| image:: https://anaconda.org/conda-forge/defectpl/badges/version.svg
+   :target: https://anaconda.org/conda-forge/defectpl
+.. |image1| image:: https://img.shields.io/conda/vn/conda-forge/defectpl.svg
+   :target: https://anaconda.org/conda-forge/defectpl
+.. |Conda Downloads| image:: https://img.shields.io/conda/dn/conda-forge/defectpl.svg
+   :target: https://anaconda.org/conda-forge/defectpl
+.. |image2| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT

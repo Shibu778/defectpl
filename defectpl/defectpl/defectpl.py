@@ -208,9 +208,9 @@ class DefectPl:
                 pbc_shortest_vectors(
                     lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i]
                 )
-                for i in range(len(poscar_gs.structure))
+                for i in range(length)
             ]
-        ).reshape(len(poscar_gs.structure), 3)
+        ).reshape(length, 3)
         return dR
 
     def calc_delR(self, dR):
@@ -416,7 +416,7 @@ class DefectPl:
         HR_factor: float
             Huang-Rhys factor.
         """
-        HR_factor = sum(Sks)
+        HR_factor = np.sum(Sks)
         return HR_factor
 
     def calc_IPR(self, eigenvectors):
