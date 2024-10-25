@@ -53,6 +53,8 @@
               </ul>
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Usage</a>
+    <ul class="current">
+    </ul>
                 </li>
               </ul>
               <ul>
@@ -86,7 +88,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                
+                <h3 id="usage">Usage</h3>
+<p>Following is an example usage with the data stored in <code>tests/data</code> for NV center in diamond.</p>
+<pre><code class="language-python">from defectpl.defectpl import DefectPl
+
+band_yaml = &quot;../tests/data/band.yaml&quot;
+contcar_gs = &quot;../tests/data/CONTCAR_gs&quot;
+contcar_es = &quot;../tests/data/CONTCAR_es&quot;
+out_dir = &quot;./plots&quot;
+EZPL = 1.95
+gamma = 2
+plot_all = True
+iplot_xlim = [1000, 2000]
+
+defctpl = DefectPl(
+    band_yaml,
+    contcar_gs,
+    contcar_es,
+    EZPL,
+    gamma,
+    iplot_xlim=iplot_xlim,
+    plot_all=plot_all,
+    out_dir=out_dir,
+)
+</code></pre>
               
             </div>
           </div><footer>
