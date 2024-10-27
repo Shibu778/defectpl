@@ -64,6 +64,27 @@ defctpl = DefectPl(
 )
 ```
 
+### Plots Gallery
+
+![Intensity vs Phonon Energy](./docs/plots/intensity_vs_photon_energy.png)
+
+![S_omega_pHR_loc_rat_vs_penergy.png](./docs/plots/S_omega_pHR_loc_rat_vs_penergy.png)
+
+![S_omega_pHR_ipr_vs_penergy.png](./docs/plots/S_omega_pHR_ipr_vs_penergy.png)
+
+![S_omega_pHR_vs_penergy.png](./docs/plots/S_omega_pHR_vs_penergy.png)
+
+![ipr_vs_phonon_energy.png](./docs/plots/ipr_vs_phonon_energy.png)
+
+![loc_rat_vs_phonon_energy.png](./docs/plots/loc_rat_vs_phonon_energy.png)
+
+![phonon_energy_vs_phonon_mode_index.png](./docs/plots/phonon_energy_vs_phonon_mode_index.png)
+
+![pHR_vs_phonon_energy.png](./docs/plots/pHR_vs_phonon_energy.png)
+
+![vibrational_dis_vs_phonon_energy.png](./docs/plots/vibrational_dis_vs_phonon_energy.png)
+
+
 ### Contribution
 Contributions are welcome.
 Notice a bug let us know. Thanks.

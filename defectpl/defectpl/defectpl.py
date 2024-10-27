@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 from pathlib import Path
 from defectpl.utils import *
+import json
 
 ## Use style file
 style_file = Path(__file__).parent / "defectpl.mplstyle"
@@ -39,6 +40,7 @@ class DefectPl:
         out_dir="./",
         plot_all=False,
         iplot_xlim=None,
+        dump_data=True,
     ):
         """
         Initialize the class with the required parameters
@@ -71,6 +73,8 @@ class DefectPl:
         iplot_xlim : list
             The x-axis limit for the intensity plot. Default is from
             ZPL-2000 to ZPL + 1000 meV. Give the range in meV.
+        dump_data : bool
+            If True, the data will be saved in the out_dir. If False, the data will not be saved.
         """
         self.band_yaml = band_yaml
         self.contcar_gs = contcar_gs
@@ -102,6 +106,9 @@ class DefectPl:
             else:
                 self.iplot_xlim = iplot_xlim
             self.plot_all(out_dir=self.out_dir, iplot_xlim=self.iplot_xlim)
+
+        if dump_data:
+            self.to_json(out_dir=self.out_dir)
 
     # Note: All the methods are written in such a way that
     # they can be used outside the class without depending on
@@ -1164,3 +1171,37 @@ class DefectPl:
             out_dir=out_dir,
         )
         print("All plots are saved in the output directory.")
+
+    def to_json(self, out_dir):
+        """Save all the properties to a json file.
+
+        Parameters:
+        =================
+        out_dir: str
+            Path to the output directory to save the json file.
+        """
+        out_path = Path(out_dir) / "properties.json"
+        data = {
+            "class": "@DefectPl",
+            "frequencies": self.frequencies.tolist(),
+            "iprs": self.iprs.tolist(),
+            "localization_ratio": self.localization_ratio.tolist(),
+            "qks": self.qks.tolist(),
+            "Sks": self.Sks.tolist(),
+            "S_omega": self.S_omega,
+            "omega_range": self.omega_range,
+            # "I": self.I.tolist(),
+            "resolution": self.resolution,
+            "delta_R": self.delR.tolist(),
+            "delta_Q": self.delQ,
+            "HR_factor": self.HR_factor,
+            "dR": self.dR.tolist(),
+            "EZPL": self.EZPL,
+            "gamma": self.gamma,
+            "natoms": self.natoms,
+            "masses": self.mlist,
+            "max_energy": self.max_energy,
+        }
+        with open(out_path, "w") as f:
+            json.dump(data, f)
+        print("Properties are saved in a json file.")
