@@ -5,6 +5,7 @@ nav:
   - "Getting Started": getting_started.md
   - "Installation": installation.md
   - "Usage": usage.md
+  - "Plots Gallery": plots_gallery.md
   - "Tutorials": tutorials.md
   - "API": api_reference.md
 
