@@ -105,7 +105,10 @@ class DefectPl:
                 self.iplot_xlim = [(self.EZPL - 2) * EV2mEV, (self.EZPL + 1) * EV2mEV]
             else:
                 self.iplot_xlim = iplot_xlim
-            self.plot_all(out_dir=self.out_dir, iplot_xlim=self.iplot_xlim)
+            try:
+                self.plot_all(out_dir=self.out_dir, iplot_xlim=self.iplot_xlim)
+            except Exception as e:
+                print(f"Error in plotting: {e}")
 
         if dump_data:
             self.to_json(out_dir=self.out_dir)

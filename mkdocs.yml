@@ -7,6 +7,15 @@ nav:
   - "Usage": usage.md
   - "Plots Gallery": plots_gallery.md
   - "Tutorials": tutorials.md
+  - "Theory": theory.md
   - "API": api_reference.md
 
 theme: readthedocs
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
