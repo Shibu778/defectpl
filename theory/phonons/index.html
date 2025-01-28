@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://github.com/Shibu778/defectpl/theory/phonons/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Understanding Phonons - defectpl</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Understanding Phonons";
+        var mkdocs_page_input_path = "theory\\phonons.md";
+        var mkdocs_page_url = "/Shibu778/defectpl/theory/phonons/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> defectpl
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../getting_started/">Getting Started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../usage/">Usage</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../plots_gallery/">Plots Gallery</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../tutorials/">Tutorials</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../">Theory</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api_reference/">API</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">defectpl</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Understanding Phonons</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="understanding-phonons">Understanding Phonons</h1>
+<p>Phonons are collective motion of atoms in the crystal. At absolute zero temperature, atoms in the crystal show zero point motion, however atoms vibrate at higher temperature results in presence of phonons. There are different experimental techniques to measure phonons. Raman and Infrared spectroscopies are used to study phonon spectra near the origin of reciprocal space, however, inelastic neutron and X-ray scattering can sample phonon spectra at general point in Brillouin zone. Phonons can also be studied from first principles and useful for many purposes because of its high predictability. Thermal properties such as heat capacity, thermal expansion, and thermal conductivity are studied through phonon calculations. In studying the optical properties of point defect, phonon calculations provide necessary vibronic information to calculate the full PL spectra, which include the sharp ZPL line and the phonon sidebands.</p>
+<p>There are two ways of doing first principles phonon calculations, i.e., finite-displacement supercell approach (FDM) and density functional perturbation theory (DFPT) approach.  In both the cases user friendly codes like VASP or Quantum Espresso to perform the first principles calculation to solve the Schrodinger equation. Further, Phonopy code can be used to calculate the force constants in supercell from the dataset of displacements and forces in FDM approach and interpolate the force constants in reciprocal space by Fourier transform in DFPT approach. </p>
+<h2 id="crystal-structure-and-potential">Crystal Structure and Potential</h2>
+<p>A crystal consists of many unit cell. The unit cell number is labelled as <span class="arithmatex">\(l\)</span> and the equilibrium position of an atom in the unitcell is labelled by <span class="arithmatex">\(\kappa\)</span>. The equilibrium position of atoms are denoted as <span class="arithmatex">\(\textbf{R}_{l\kappa}^0\)</span>. <span class="arithmatex">\(N\)</span> is the number of unitcell in a crystal and <span class="arithmatex">\(n_a\)</span> is the number of atoms in each unitcell. <span class="arithmatex">\(V_c\)</span> and <span class="arithmatex">\(NV_c\)</span> are the volume of unitcell and crystal, respectively. </p>
+<h1 id="references">References</h1>
+<ol>
+<li><a href="https://journals.jps.jp/doi/10.7566/JPSJ.92.012001">Togo, Atsushi. "First-principles phonon calculations with phonopy and phono3py." Journal of the Physical Society of Japan 92.1 (2023): 012001.</a></li>
+</ol>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
