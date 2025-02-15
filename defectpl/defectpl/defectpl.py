@@ -19,6 +19,7 @@ import matplotlib.style as style
 from pathlib import Path
 from defectpl.utils import *
 from phonopy.cui.load import load
+from tabulate import tabulate
 import json
 
 ## Use style file
@@ -1243,3 +1244,269 @@ def get_mass_array(mass_dict, natom_dict, atom_seq):
     for key in atom_seq:
         masses.extend([mass_dict[key]] * natom_dict[key])
     return masses
+
+
+def get_structure_info(filename):
+    """
+    Get the structure information from the POSCAR file.
+    """
+    poscar = Poscar.from_file(filename)
+    structure = poscar.structure
+    natoms = structure.num_sites
+    natoms_dict = {
+        key: int(value) for key, value in structure.composition.as_dict().items()
+    }
+    atom_seq = list(natoms_dict.keys())
+    if sum(natoms_dict.values()) != natoms:
+        raise Exception("Something wrong with atoms number in POSCAR file.")
+    return natoms_dict, atom_seq
+
+
+def get_isotope_info(species):
+    """
+    Get the isotope information for different species.
+    """
+    from data import atom_data, symbol_map, isotope_data
+
+    data = {}
+    for sp in species:
+        atomic_number = symbol_map[sp]
+        atomic_mass = atom_data[atomic_number][3]
+        print(f"Species: {atom_data[atomic_number][1]}({atom_data[atomic_number][2]})")
+        print(f"Atomic Number: {atomic_number}")
+        print(f"Mass: {atomic_mass}")
+        print(f"Isotopes Information:")
+        iso_data = isotope_data[sp]
+        table = [["Isotope", "Mass", "Fraction"]]
+        for iso in iso_data:
+            table.append([iso[0], iso[1], iso[2]])
+
+        print(tabulate(table, headers="firstrow", tablefmt="pretty"))
+        print("\n")
+        data[sp] = {"atomic_mass": atomic_mass, "iso_data": iso_data}
+    return data
+
+
+def get_atomic_mass_dict(species):
+    """
+    Get the atomic mass dictionary for the given species.
+    """
+    from data import atom_data, symbol_map
+
+    mass_dict = {}
+    comp_dict = {}
+    for sp in species:
+        atomic_number = symbol_map[sp]
+        atomic_mass = atom_data[atomic_number][3]
+        mass_dict[sp] = atomic_mass
+        comp_dict[sp] = round(atomic_mass)
+
+    return mass_dict, comp_dict
+
+
+def get_weighted_mass_dict(species, iso_data):
+    """
+    Get the weighted mass dictionary for the given species.
+
+    This is similar to the given natural mass. The atomic mass
+    is the weighted average of the isotopes in get_atomic_mass dict.
+    So no need to use this function.
+    """
+    mass_dict = {}
+    for sp in species:
+        iso_data1 = iso_data[sp]["iso_data"]
+        weighted_mass = 0
+        for iso in iso_data1:
+            weighted_mass += iso[1] * iso[2]
+        mass_dict[sp] = weighted_mass
+    return mass_dict
+
+
+def generate_possible_indices(species):
+    """
+    Generate all possible isotopic compositions for the given species.
+    """
+    from itertools import product
+
+    iso_data = get_isotope_info(species)
+    all_indices = []
+    for sp in species:
+        iso = iso_data[sp]["iso_data"]
+        all_indices.append(list(range(len(iso))))
+
+    all_possible_indices = list(product(*all_indices))
+    return all_possible_indices
+
+
+def dict_to_comp_str(composition):
+    """
+    Convert the composition dictionary to a string.
+    """
+    comp_str = ""
+    for key, value in composition.items():
+        comp_str += f"{key}{value}"
+    return comp_str
+
+
+def get_composition(species, index):
+    """
+    Get the composition for the given index.
+    """
+    iso_data = get_isotope_info(species)
+    composition = {}
+    for i, sp in enumerate(species):
+        iso_data1 = iso_data[sp]["iso_data"]
+        iso = iso_data1[index[i]]
+        composition[sp] = iso[0]
+    return composition, dict_to_comp_str(composition)
+
+
+def gen_all_possible_mass_dict(species):
+    """
+    Generate all possible mass dictionaries for the given species.
+    """
+    from itertools import product
+
+    iso_data = get_isotope_info(species)
+    all_mass_dict = {}
+    mass_dict, composition = get_atomic_mass_dict(species)
+    all_mass_dict["weighted_avg"] = {"composition": composition, "mass_dict": mass_dict}
+    all_possible_indices = generate_possible_indices(species)
+    for indices in all_possible_indices:
+        mass_dict = {}
+        for i, sp in enumerate(species):
+            iso_data1 = iso_data[sp]["iso_data"]
+            iso = iso_data1[indices[i]]
+            mass_dict[sp] = iso[1]
+        composition, comp_str = get_composition(species, indices)
+        all_mass_dict[comp_str] = {"composition": composition, "mass_dict": mass_dict}
+    return all_mass_dict
+
+
+def get_all_mass_arrays(species, natoms_dict):
+    """
+    Get all mass arrays for the given species and natoms dictionary.
+    """
+    all_mass_dict = gen_all_possible_mass_dict(species)
+    all_mass_arrays = {}
+    for key, value in all_mass_dict.items():
+        mass_dict = value["mass_dict"]
+        mass_array = get_mass_array(mass_dict, natoms_dict, species)
+        all_mass_arrays[key] = mass_array
+    return all_mass_arrays
+
+
+def read_properties(filename):
+    """
+    Read the properties from the json file.
+    """
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    intensity = np.array(
+        [complex(real, imag) for real, imag in data["I"]], dtype=np.complex128
+    )
+    properties = {
+        "frequencies": data["frequencies"],
+        "iprs": data["iprs"],
+        "localization_ratio": data["localization_ratio"],
+        "qks": data["qks"],
+        "Sks": data["Sks"],
+        "S_omega": data["S_omega"],
+        "omega_range": data["omega_range"],
+        "I": intensity,
+        "resolution": data["resolution"],
+        "delta_R": np.array(data["delta_R"]),
+        "delta_Q": data["delta_Q"],
+        "HR_factor": data["HR_factor"],
+        "dR": np.array(data["dR"]),
+        "EZPL": data["EZPL"],
+        "gamma": data["gamma"],
+        "natoms": data["natoms"],
+        "masses": data["masses"],
+        "max_energy": data["max_energy"],
+    }
+    return properties
+
+
+def plot_interactive_intensity(filename, xlim=None):
+    """
+    Plot the interactive intensity plot.
+    """
+    import plotly.graph_objects as go
+    import numpy as np
+
+    properties = read_properties(filename)
+    I = properties["I"]
+    if xlim is None:
+        xlim = properties["omega_range"]
+    else:
+        xlim = xlim
+    resolution = properties["resolution"]
+
+    # Assuming I, xlim, and resolution are already defined
+    I_abs = I.__abs__()
+    x_values = list(range(len(I_abs)))
+    labels = [float(x) / resolution for x in x_values]
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(x=x_values, y=I_abs, mode="lines", line=dict(color="black"))
+    )
+
+    fig.update_layout(
+        yaxis_title=r"$I(\hbar\omega)$",
+        xaxis_title="Photon energy (eV)",
+        xaxis=dict(
+            tickmode="array",
+            tickvals=x_values,
+            ticktext=labels,
+            range=[xlim[0], xlim[1]],
+        ),
+    )
+
+    fig.show()
+
+
+def comparepl(properties_files, xlim=None, legends=None):
+    """
+    Compare the PL of different isotopic compositions.
+    """
+    # out_path = Path(out_dir) / file_name
+    # plt.figure(figsize=(4, 4))
+    # plt.plot(I.__abs__(), "k")
+    # plt.ylabel(r"$I(\hbar\omega)$")
+    # plt.xlabel(r"Photon energy (eV)")
+    # plt.xlim(xlim[0], xlim[1])
+    # x_values, labels = plt.xticks()
+    # labels = [float(x) / resolution for x in x_values]
+    # plt.xticks(x_values, labels)
+
+    properties = []
+    for filename in properties_files:
+        properties.append(read_properties(filename))
+    I = [prop["I"] for prop in properties]
+    if xlim is None:
+        xlim = properties[0]["omega_range"]
+    else:
+        xlim = xlim
+    resolution = properties[0]["resolution"]
+
+    if legends is None:
+        legends = [f"Composition {i+1}" for i in range(len(properties_files))]
+    # Create a matplotlib figure for each intensity
+    fig, ax = plt.subplots(figsize=(6, 4))
+    for i, intensity in enumerate(I):
+        I_abs = intensity.__abs__()
+        ax.plot(I_abs, label=legends[i])
+    ax.set_ylabel(r"$I(\hbar\omega)$")
+    ax.set_xlabel("Photon energy (eV)")
+    ax.set_xlim(xlim[0], xlim[1])
+    x_values, labels = plt.xticks()
+    labels = [float(x) / resolution for x in x_values]
+    ax.set_xticks(x_values)
+    ax.set_xticklabels(labels)
+    ax.set_yticks([], [])
+    ax.legend(loc=0)
+    plt.show()
