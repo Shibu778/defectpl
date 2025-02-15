@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 from pathlib import Path
 from defectpl.utils import *
+from phonopy.cui.load import load
 import json
 
 ## Use style file
@@ -111,7 +112,7 @@ class DefectPl:
                 print(f"Error in plotting: {e}")
 
         if dump_data:
-            self.to_json(out_dir=self.out_dir)
+            data = self.to_json(out_dir=self.out_dir)
 
     # Note: All the methods are written in such a way that
     # they can be used outside the class without depending on
@@ -1184,6 +1185,9 @@ class DefectPl:
             Path to the output directory to save the json file.
         """
         out_path = Path(out_dir) / "properties.json"
+        intensity = [(complex_num.real, complex_num.imag) for complex_num in self.I]
+        # Use while reading intensity from json
+        # self.I = np.array([complex(real, imag) for real, imag in I_list], dtype=np.complex128)
         data = {
             "class": "@DefectPl",
             "frequencies": self.frequencies.tolist(),
@@ -1193,7 +1197,7 @@ class DefectPl:
             "Sks": self.Sks.tolist(),
             "S_omega": self.S_omega,
             "omega_range": self.omega_range,
-            # "I": self.I.tolist(),
+            "I": intensity,
             "resolution": self.resolution,
             "delta_R": self.delR.tolist(),
             "delta_Q": self.delQ,
@@ -1208,3 +1212,34 @@ class DefectPl:
         with open(out_path, "w") as f:
             json.dump(data, f)
         print("Properties are saved in a json file.")
+        return data
+
+
+def mass_transformed_bandyaml(
+    phonopy_yaml, force_sets_filename, masses, band_yaml="band.yaml"
+):
+    """
+    Calculate the frequency and eigenmodes of transformed phonon modes
+    due to isotopic substitution.
+    """
+    phonon = load(phonopy_yaml, force_sets_filename=force_sets_filename)
+    phonon.produce_force_constants()
+    phonon.save()
+    phonon = load("phonopy_params.yaml")
+    try:
+        phonon.set_masses(masses)
+    except:
+        Exception("Something wrong with provided masses!!")
+    phonon.run_band_structure([[[0, 0, 0]]], with_eigenvectors=True)
+    phonon.write_yaml_band_structure(filename=band_yaml)
+    return phonon
+
+
+def get_mass_array(mass_dict, natom_dict, atom_seq):
+    """
+    Get the mass array from the mass and natom dictionary.
+    """
+    masses = []
+    for key in atom_seq:
+        masses.extend([mass_dict[key]] * natom_dict[key])
+    return masses
