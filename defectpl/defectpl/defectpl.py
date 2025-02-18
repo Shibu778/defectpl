@@ -20,7 +20,9 @@ from pathlib import Path
 from defectpl.utils import *
 from phonopy.cui.load import load
 from tabulate import tabulate
+import plotly.graph_objects as go
 import json
+import os
 
 ## Use style file
 style_file = Path(__file__).parent / "defectpl.mplstyle"
@@ -1078,7 +1080,7 @@ class DefectPl:
         x_values, labels = plt.xticks()
         labels = [float(x) / resolution for x in x_values]
         plt.xticks(x_values, labels)
-        # plt.ylim(0, 1500)
+        plt.ylim(0, 3000)
         if plot:
             plt.show()
         else:
@@ -1216,21 +1218,21 @@ class DefectPl:
         return data
 
 
-def mass_transformed_bandyaml(
-    phonopy_yaml, force_sets_filename, masses, band_yaml="band.yaml"
-):
+def mass_transformed_bandyaml(phonopy_yaml, force_sets_filename, masses, out_path="./"):
     """
     Calculate the frequency and eigenmodes of transformed phonon modes
     due to isotopic substitution.
     """
+    band_yaml = Path(out_path) / "band.yaml"
+    phonopy_params = Path(out_path) / "phonopy_params.yaml"
     phonon = load(phonopy_yaml, force_sets_filename=force_sets_filename)
     phonon.produce_force_constants()
-    phonon.save()
-    phonon = load("phonopy_params.yaml")
+    # phonon = load("phonopy_params.yaml")
     try:
         phonon.set_masses(masses)
     except:
         Exception("Something wrong with provided masses!!")
+    phonon.save(filename=phonopy_params)
     phonon.run_band_structure([[[0, 0, 0]]], with_eigenvectors=True)
     phonon.write_yaml_band_structure(filename=band_yaml)
     return phonon
@@ -1396,6 +1398,27 @@ def get_all_mass_arrays(species, natoms_dict):
     return all_mass_arrays
 
 
+def poscar_to_masses(filename):
+    """
+    Get the masses from the POSCAR file.
+    """
+    natoms_dict, atom_seq = get_structure_info(filename)
+    all_mass_arrays = get_all_mass_arrays(atom_seq, natoms_dict)
+    return all_mass_arrays
+
+
+def create_dir_structure(root_path, compositions):
+    """
+    Create the directory structure for the given compositions list.
+    One folder for each composition is created in root_path.
+    """
+    for comp in compositions:
+        comp_path = os.path.join(root_path, comp)
+        if not os.path.exists(comp_path):
+            os.makedirs(comp_path)
+    print("Directory structure is created.")
+
+
 def read_properties(filename):
     """
     Read the properties from the json file.
@@ -1429,59 +1452,29 @@ def read_properties(filename):
     return properties
 
 
-def plot_interactive_intensity(filename, xlim=None):
+def plot_interactive_intensity(filename):
     """
     Plot the interactive intensity plot.
     """
-    import plotly.graph_objects as go
-    import numpy as np
-
     properties = read_properties(filename)
     I = properties["I"]
-    if xlim is None:
-        xlim = properties["omega_range"]
-    else:
-        xlim = xlim
     resolution = properties["resolution"]
-
-    # Assuming I, xlim, and resolution are already defined
     I_abs = I.__abs__()
     x_values = list(range(len(I_abs)))
-    labels = [float(x) / resolution for x in x_values]
-
+    x_values = np.array(x_values) / resolution
     fig = go.Figure()
 
     fig.add_trace(
         go.Scatter(x=x_values, y=I_abs, mode="lines", line=dict(color="black"))
     )
 
-    fig.update_layout(
-        yaxis_title=r"$I(\hbar\omega)$",
-        xaxis_title="Photon energy (eV)",
-        xaxis=dict(
-            tickmode="array",
-            tickvals=x_values,
-            ticktext=labels,
-            range=[xlim[0], xlim[1]],
-        ),
-    )
-
     fig.show()
 
 
-def comparepl(properties_files, xlim=None, legends=None):
+def comparepl(properties_files, xlim=None, legends=None, out_dir=None):
     """
     Compare the PL of different isotopic compositions.
     """
-    # out_path = Path(out_dir) / file_name
-    # plt.figure(figsize=(4, 4))
-    # plt.plot(I.__abs__(), "k")
-    # plt.ylabel(r"$I(\hbar\omega)$")
-    # plt.xlabel(r"Photon energy (eV)")
-    # plt.xlim(xlim[0], xlim[1])
-    # x_values, labels = plt.xticks()
-    # labels = [float(x) / resolution for x in x_values]
-    # plt.xticks(x_values, labels)
 
     properties = []
     for filename in properties_files:
@@ -1509,4 +1502,7 @@ def comparepl(properties_files, xlim=None, legends=None):
     ax.set_xticklabels(labels)
     ax.set_yticks([], [])
     ax.legend(loc=0)
-    plt.show()
+    if out_dir:
+        plt.savefig(Path(out_dir) / "compare_pl.pdf", dpi=300, bbox_inches="tight")
+    else:
+        plt.show()
