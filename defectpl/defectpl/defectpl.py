@@ -23,10 +23,15 @@ from tabulate import tabulate
 import plotly.graph_objects as go
 import json
 import os
+from defectpl.data import atom_data, symbol_map, isotope_data
 
 ## Use style file
 style_file = Path(__file__).parent / "defectpl.mplstyle"
 style.use(style_file)
+
+
+plt.rcParams["font.family"] = "Arial"
+plt.rcParams["text.usetex"] = False
 
 
 # Class for defectpl
@@ -44,7 +49,9 @@ class DefectPl:
         out_dir="./",
         plot_all=False,
         iplot_xlim=None,
+        iylim=None,
         dump_data=True,
+        max_freq=None,
     ):
         """
         Initialize the class with the required parameters
@@ -79,6 +86,8 @@ class DefectPl:
             ZPL-2000 to ZPL + 1000 meV. Give the range in meV.
         dump_data : bool
             If True, the data will be saved in the out_dir. If False, the data will not be saved.
+        max_freq : float
+            Maximum frequency in meV to plot the S(omega) vs omega plot.
         """
         self.band_yaml = band_yaml
         self.contcar_gs = contcar_gs
@@ -109,8 +118,15 @@ class DefectPl:
                 self.iplot_xlim = [(self.EZPL - 2) * EV2mEV, (self.EZPL + 1) * EV2mEV]
             else:
                 self.iplot_xlim = iplot_xlim
+            if max_freq:
+                max_freq = max_freq / 1000
             try:
-                self.plot_all(out_dir=self.out_dir, iplot_xlim=self.iplot_xlim)
+                self.plot_all(
+                    out_dir=self.out_dir,
+                    iplot_xlim=self.iplot_xlim,
+                    max_freq=max_freq,
+                    iylim=iylim,
+                )
             except Exception as e:
                 print(f"Error in plotting: {e}")
 
@@ -361,6 +377,7 @@ class DefectPl:
         qks = np.array(qks)
         frequencies = np.array(frequencies)
         Sks = frequencies * qks**2 / (2 * HBAR_Js * HBAR_eVs)
+
         return Sks
 
     def gaussian(self, omega, omega_k, sigma):
@@ -777,6 +794,7 @@ class DefectPl:
         plot=False,
         out_dir="./",
         file_name="S_omega_vs_penergy.pdf",
+        max_freq=None,
     ):
         """
         Plot the S(omega) vs phonon energy.
@@ -798,12 +816,14 @@ class DefectPl:
             not specified or not valid, it will be saved in pdf format.
         """
         out_path = Path(out_dir) / file_name
-        max_freq = max(frequencies)
+        if max_freq is None:
+            max_freq = max(frequencies)
         plt.figure(figsize=(4, 4))
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
         x = [i for i in omega_set if i <= max_freq]
-        plt.plot(omega_set[: len(x)] * 1000, S_omega[: len(x)], "k")
-        plt.ylabel(r"$S(\hbar\omega)$")
+        Somg = np.array(S_omega[: len(x)]) / 1000
+        plt.plot(omega_set[: len(x)] * 1000, Somg, "k")
+        plt.ylabel(r"$S(\hbar\omega)(1/meV)$")
         plt.xlabel(r"Phonon energy (meV)")
         plt.xlim(0, max_freq * 1000)
         if plot:
@@ -826,6 +846,7 @@ class DefectPl:
         plot=False,
         out_dir="./",
         file_name="S_omega_vs_penergy.pdf",
+        max_freq=None,
     ):
         """
         Plot the S(omega) vs phonon energy.
@@ -850,16 +871,18 @@ class DefectPl:
         """
         out_path = Path(out_dir) / file_name
         freq = frequencies * EV2mEV
-        max_freq = max(frequencies)
+        if max_freq is None:
+            max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
         fig, ax1 = plt.subplots(figsize=(6, 4))
         color = "tab:green"
         ax1.set_xlabel(r"Phonon energy (meV)")
-        ax1.set_ylabel(r"$S(\hbar\omega)$", color=color)
+        ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
         x = [i for i in omega_set if i <= max_freq]
-        ax1.plot(omega_set[: len(x)] * EV2mEV, S_omega[: len(x)], color=color)
+        Somg = np.array(S_omega[: len(x)]) / 1000
+        ax1.plot(omega_set[: len(x)] * EV2mEV, Somg, color=color)
         ax1.tick_params(axis="y", labelcolor=color)
         # ax1.set_ylim(-0.1, 28)
 
@@ -896,6 +919,7 @@ class DefectPl:
         plot=False,
         out_dir="./",
         file_name="S_omega_HRf_loc_rat_vs_penergy.pdf",
+        max_freq=None,
     ):
         """
         Plot the S(omega), partial HR factor and localization ratio vs phonon energy.
@@ -922,16 +946,18 @@ class DefectPl:
         """
         out_path = Path(out_dir) / file_name
         freq = frequencies * EV2mEV
-        max_freq = max(frequencies)
+        if max_freq is None:
+            max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
         fig, ax1 = plt.subplots(figsize=(6, 4))
         color = "tab:blue"
         ax1.set_xlabel(r"Phonon energy (meV)")
-        ax1.set_ylabel(r"$S(\hbar\omega)$", color=color)
+        ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
         x = [i for i in omega_set if i <= max_freq]
-        ax1.plot(omega_set[: len(x)] * 1000, S_omega[: len(x)], color=color)
+        Somg = np.array(S_omega[: len(x)]) / 1000
+        ax1.plot(omega_set[: len(x)] * 1000, Somg, color=color)
         ax1.tick_params(axis="y", labelcolor=color)
         # ax1.set_ylim(-0.1, 28)
 
@@ -977,6 +1003,7 @@ class DefectPl:
         plot=False,
         out_dir="./",
         file_name="S_omega_HRf_ipr_vs_penergy.pdf",
+        max_freq=None,
     ):
         """
         Plot the S(omega), partial HR factor and IPR vs phonon energy.
@@ -1003,16 +1030,18 @@ class DefectPl:
         """
         out_path = Path(out_dir) / file_name
         freq = frequencies * EV2mEV
-        max_freq = max(frequencies)
+        if max_freq is None:
+            max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
         fig, ax1 = plt.subplots(figsize=(6, 4))
         color = "tab:blue"
         ax1.set_xlabel(r"Phonon energy (meV)")
-        ax1.set_ylabel(r"$S(\hbar\omega)$", color=color)
+        ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
         x = [i for i in omega_set if i <= max_freq]
-        ax1.plot(omega_set[: len(x)] * 1000, S_omega[: len(x)], color=color)
+        Somg = np.array(S_omega[: len(x)]) / 1000
+        ax1.plot(omega_set[: len(x)] * 1000, Somg, color=color)
         ax1.tick_params(axis="y", labelcolor=color)
         # ax1.set_ylim(-0.1, 28)
 
@@ -1050,6 +1079,7 @@ class DefectPl:
         plot=False,
         out_dir="./",
         file_name="intensity_vs_penergy.pdf",
+        iylim=None,
     ):
         """Plot the intensity vs phonon energy.
 
@@ -1073,14 +1103,19 @@ class DefectPl:
         """
         out_path = Path(out_dir) / file_name
         plt.figure(figsize=(4, 4))
-        plt.plot(I.__abs__(), "k")
-        plt.ylabel(r"$I(\hbar\omega)$")
+        I_abs = I.__abs__()
+        I_abs = I_abs / np.max(I_abs)
+        plt.plot(I_abs, "k")
+        # plt.ylabel(r"$I(\hbar\omega)$")
+        plt.ylabel(r"PL intensity")
         plt.xlabel(r"Photon energy (eV)")
         plt.xlim(xlim[0], xlim[1])
         x_values, labels = plt.xticks()
         labels = [float(x) / resolution for x in x_values]
         plt.xticks(x_values, labels)
-        plt.ylim(0, 3000)
+        if iylim:
+            plt.ylim(iylim[0], iylim[1])
+        plt.yticks([])
         if plot:
             plt.show()
         else:
@@ -1092,7 +1127,7 @@ class DefectPl:
             plt.savefig(out_path, dpi=300, bbox_inches="tight", format=form)
             plt.close()
 
-    def plot_all(self, out_dir, iplot_xlim=None):
+    def plot_all(self, out_dir, iplot_xlim=None, max_freq=None, iylim=None):
         """Plot all the properties.
 
         Parameters:
@@ -1138,6 +1173,7 @@ class DefectPl:
             self.omega_range,
             plot=False,
             out_dir=out_dir,
+            max_freq=max_freq,
         )
         # Plot S(omega) and Sks vs phonon energy
         self.plot_S_omega_Sks_vs_penergy(
@@ -1147,6 +1183,7 @@ class DefectPl:
             self.Sks,
             plot=False,
             out_dir=out_dir,
+            max_freq=max_freq,
         )
         # Plot S(omega) and Sks vs phonon energy
         self.plot_S_omega_Sks_Loc_rat_vs_penergy(
@@ -1157,6 +1194,7 @@ class DefectPl:
             self.localization_ratio,
             plot=False,
             out_dir=out_dir,
+            max_freq=max_freq,
         )
         # Plot S(omega), Sks and IPR vs phonon energy
         self.plot_S_omega_Sks_ipr_vs_penergy(
@@ -1167,6 +1205,7 @@ class DefectPl:
             self.iprs,
             plot=False,
             out_dir=out_dir,
+            max_freq=max_freq,
         )
         # Plot intensity vs photon energy
         self.plot_intensity_vs_penergy(
@@ -1176,6 +1215,7 @@ class DefectPl:
             iplot_xlim,
             plot=False,
             out_dir=out_dir,
+            iylim=iylim,
         )
         print("All plots are saved in the output directory.")
 
@@ -1268,7 +1308,6 @@ def get_isotope_info(species):
     """
     Get the isotope information for different species.
     """
-    from data import atom_data, symbol_map, isotope_data
 
     data = {}
     for sp in species:
@@ -1293,7 +1332,6 @@ def get_atomic_mass_dict(species):
     """
     Get the atomic mass dictionary for the given species.
     """
-    from data import atom_data, symbol_map
 
     mass_dict = {}
     comp_dict = {}
@@ -1471,7 +1509,60 @@ def plot_interactive_intensity(filename):
     fig.show()
 
 
-def comparepl(properties_files, xlim=None, legends=None, out_dir=None):
+def plot_interactive_S_omega_Sks_Loc_rat_vs_penergy(filename):
+    """
+    Plot the interactive S(omega), partial HR factor and localization ratio vs phonon energy.
+    """
+    properties = read_properties(filename)
+    freq = np.array(properties["frequencies"]) * EV2mEV
+    S = properties["Sks"]
+    S_omega = properties["S_omega"]
+    loc_rat = properties["localization_ratio"]
+    max_freq = max(freq)
+    omega_set = np.linspace(
+        properties["omega_range"][0],
+        properties["omega_range"][1],
+        properties["omega_range"][2],
+    )
+    x = [i for i in omega_set if i <= max_freq]
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=omega_set[: len(x)] * 1000,
+            y=S_omega[: len(x)],
+            mode="lines",
+            line=dict(color="black"),
+            name="S(omega)",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=freq,
+            y=S,
+            mode="markers",
+            marker=dict(color="blue"),
+            name="Partial HR factor",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=freq,
+            y=loc_rat,
+            mode="markers",
+            marker=dict(color="green"),
+            name="Localization Ratio",
+        )
+    )
+
+    fig.show()
+
+
+def comparepl(
+    properties_files, xlim=None, ylim=None, legends=None, out_dir=None, colors=None
+):
     """
     Compare the PL of different isotopic compositions.
     """
@@ -1492,10 +1583,15 @@ def comparepl(properties_files, xlim=None, legends=None, out_dir=None):
     fig, ax = plt.subplots(figsize=(6, 4))
     for i, intensity in enumerate(I):
         I_abs = intensity.__abs__()
-        ax.plot(I_abs, label=legends[i])
+        I_abs = I_abs / np.max(I_abs)
+        if colors:
+            ax.plot(I_abs, label=legends[i], color=colors[i])
+        else:
+            ax.plot(I_abs, label=legends[i])
     ax.set_ylabel(r"$I(\hbar\omega)$")
     ax.set_xlabel("Photon energy (eV)")
     ax.set_xlim(xlim[0], xlim[1])
+    ax.set_ylim(ylim[0], ylim[1])
     x_values, labels = plt.xticks()
     labels = [float(x) / resolution for x in x_values]
     ax.set_xticks(x_values)
