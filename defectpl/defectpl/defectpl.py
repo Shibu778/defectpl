@@ -920,6 +920,7 @@ class DefectPl:
         out_dir="./",
         file_name="S_omega_HRf_loc_rat_vs_penergy.pdf",
         max_freq=None,
+        pylim=[None, None],
     ):
         """
         Plot the S(omega), partial HR factor and localization ratio vs phonon energy.
@@ -977,6 +978,7 @@ class DefectPl:
             alpha=0.7,
         )
         ax2.tick_params(axis="y", labelcolor=color)
+        ax2.set_ylim(pylim[0], pylim[1])
 
         plt.xlim(0, max_freq * 1000)
         # ax2.set_ylim(-0.002, 0.38)
