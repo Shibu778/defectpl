@@ -1,0 +1,1 @@
+This folder contains the `meta.yaml` file used for publishing `defectpl` in conda-forge.
