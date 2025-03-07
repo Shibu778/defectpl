@@ -14,6 +14,10 @@ A unified package to calculate and plot optical properties of point defects in i
 #### Purpose of the Package
 The purpose of this package is to calculate the intensity of photoluminescence from point defects in solids with method described in New J. Phys. 16 (2014) 073026. It also calculates and plot other relevant quantities like partial Huang Rhys factor, inverse participation ratio etc.
 
+If you use this code, consider citing the following article.
+
+[Carbon with Stone-Wales defect as quantum emitter in h-BN, Phys. Rev. B - Accepted 5 March, 2025](https://journals.aps.org/prb/accepted/af077O80Ldc11d40931d43e906c2f34c48ce8163e)
+
 ### Contribution
 Contributions are welcome.
 Notice a bug let us know. Thanks.

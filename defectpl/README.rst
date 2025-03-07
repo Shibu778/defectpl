@@ -16,6 +16,10 @@ New J. Phys. 16 (2014) 073026. It also calculates and plot other
 relevant quantities like partial Huang Rhys factor, inverse
 participation ratio etc.
 
+If you use this code, consider citing the following article.
+
+[Carbon with Stone-Wales defect as quantum emitter in h-BN, Phys. Rev. B - Accepted 5 March, 2025](https://journals.aps.org/prb/accepted/af077O80Ldc11d40931d43e906c2f34c48ce8163e)
+
 Documentation
 -------------
 
