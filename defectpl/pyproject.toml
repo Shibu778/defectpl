@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "defectpl"
-version = "0.1.2"
+version = "0.1.3"
 description = "A unified package for optical properties of point defects."
 authors = ["Shibu Meher <shibumeher@iisc.ac.in>"]
 readme = "README.md"
@@ -27,7 +27,6 @@ python = "^3.11"
 PyYAML = "^6.0.2"
 numpy = "^2.1.2"
 pymatgen = "2024.10.3"
-pathlib = "^1.0.1"
 pdoc3 = "^0.11.1"
 
 
