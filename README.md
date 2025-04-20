@@ -96,4 +96,4 @@ Contributions are welcome.
 Notice a bug let us know. Thanks.
 
 ### Author
-Main Maintainer: Shibu Meher
+Main Maintainer: Shibu Meher, Manoj Dey
