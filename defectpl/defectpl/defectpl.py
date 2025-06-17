@@ -53,6 +53,7 @@ class DefectPl:
         dump_data=True,
         max_freq=None,
         fig_format="pdf",
+        figsize=None,
     ):
         """
         Initialize the class with the required parameters
@@ -122,13 +123,23 @@ class DefectPl:
             if max_freq:
                 max_freq = max_freq / 1000
             try:
-                self.plot_all(
-                    out_dir=self.out_dir,
-                    iplot_xlim=self.iplot_xlim,
-                    max_freq=max_freq,
-                    iylim=iylim,
-                    fig_format=fig_format,
-                )
+                if figsize is None:
+                    self.plot_all(
+                        out_dir=self.out_dir,
+                        iplot_xlim=self.iplot_xlim,
+                        max_freq=max_freq,
+                        iylim=iylim,
+                        fig_format=fig_format,
+                    )
+                else:
+                    self.plot_all(
+                        out_dir=self.out_dir,
+                        iplot_xlim=self.iplot_xlim,
+                        max_freq=max_freq,
+                        iylim=iylim,
+                        fig_format=fig_format,
+                        figsize=figsize,
+                    )
             except Exception as e:
                 print(f"Error in plotting: {e}")
 
@@ -582,6 +593,7 @@ class DefectPl:
         out_dir="./",
         file_name="penergy_vs_pmode",
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the phonon energy vs phonon mode index.
 
@@ -601,7 +613,7 @@ class DefectPl:
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
         mode_i = np.linspace(0, len(freq), len(freq))
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         plt.plot(mode_i, freq)
         plt.xlabel(r"Phonon Mode Index")
         plt.ylabel(r"Phonon Energy (meV)")
@@ -622,6 +634,7 @@ class DefectPl:
         out_dir="./",
         file_name="ipr_vs_penergy",
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the IPR vs phonon energy.
 
@@ -643,7 +656,7 @@ class DefectPl:
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
         ipr_data = iprs
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         color = "tab:blue"
         plt.scatter(
             freq, ipr_data, color=color, s=5, linewidths=0.3, edgecolors="k", alpha=0.7
@@ -669,6 +682,7 @@ class DefectPl:
         out_dir="./",
         file_name="loc_rat_vs_penergy",
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the localization ratio vs phonon energy.
 
@@ -689,7 +703,7 @@ class DefectPl:
         file_name = f"{file_name}.{fig_format}"
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         color = "tab:green"
         plt.scatter(
             freq,
@@ -721,6 +735,7 @@ class DefectPl:
         out_dir="./",
         file_name="qk_vs_penergy",
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the vibrational displacement vs phonon energy.
 
@@ -742,7 +757,7 @@ class DefectPl:
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
         q_data = qks
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         color = "tab:blue"
         plt.scatter(
             freq, q_data, color=color, s=5, linewidths=0.3, edgecolors="k", alpha=0.7
@@ -768,6 +783,7 @@ class DefectPl:
         out_dir="./",
         file_name="HR_factor_vs_penergy",
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the partial HR factor vs phonon energy.
 
@@ -789,7 +805,7 @@ class DefectPl:
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
         phr_data = Sks
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         color = "tab:blue"
         plt.scatter(
             freq, phr_data, color=color, s=5, linewidths=0.3, edgecolors="k", alpha=0.7
@@ -817,6 +833,7 @@ class DefectPl:
         file_name="S_omega_vs_penergy",
         max_freq=None,
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """
         Plot the S(omega) vs phonon energy.
@@ -841,7 +858,7 @@ class DefectPl:
         out_path = Path(out_dir) / file_name
         if max_freq is None:
             max_freq = max(frequencies)
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
         x = [i for i in omega_set if i <= max_freq]
         Somg = np.array(S_omega[: len(x)]) / 1000
@@ -871,6 +888,7 @@ class DefectPl:
         file_name="S_omega_vs_penergy",
         max_freq=None,
         fig_format="pdf",
+        figsize=(6, 4),
     ):
         """
         Plot the S(omega) vs phonon energy.
@@ -900,7 +918,7 @@ class DefectPl:
             max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
-        fig, ax1 = plt.subplots(figsize=(6, 4))
+        fig, ax1 = plt.subplots(figsize=figsize)
         color = "tab:green"
         ax1.set_xlabel(r"Phonon energy (meV)")
         ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
@@ -947,6 +965,7 @@ class DefectPl:
         max_freq=None,
         pylim=[None, None],
         fig_format="pdf",
+        figsize=(6, 4),
     ):
         """
         Plot the S(omega), partial HR factor and localization ratio vs phonon energy.
@@ -978,7 +997,7 @@ class DefectPl:
             max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
-        fig, ax1 = plt.subplots(figsize=(6, 4))
+        fig, ax1 = plt.subplots(figsize=figsize)
         color = "tab:blue"
         ax1.set_xlabel(r"Phonon energy (meV)")
         ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
@@ -1034,6 +1053,7 @@ class DefectPl:
         file_name="S_omega_HRf_ipr_vs_penergy",
         max_freq=None,
         fig_format="pdf",
+        figsize=(6, 4),
     ):
         """
         Plot the S(omega), partial HR factor and IPR vs phonon energy.
@@ -1065,7 +1085,7 @@ class DefectPl:
             max_freq = max(frequencies)
         S = Sks
         # Plot S(omega) vs phonon energy
-        fig, ax1 = plt.subplots(figsize=(6, 4))
+        fig, ax1 = plt.subplots(figsize=figsize)
         color = "tab:blue"
         ax1.set_xlabel(r"Phonon energy (meV)")
         ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
@@ -1112,6 +1132,7 @@ class DefectPl:
         file_name="intensity_vs_penergy",
         iylim=None,
         fig_format="pdf",
+        figsize=(4, 4),
     ):
         """Plot the intensity vs phonon energy.
 
@@ -1135,7 +1156,7 @@ class DefectPl:
         """
         file_name = f"{file_name}.{fig_format}"
         out_path = Path(out_dir) / file_name
-        plt.figure(figsize=(4, 4))
+        plt.figure(figsize=figsize)
         I_abs = I.__abs__()
         I_abs = I_abs / np.max(I_abs)
         plt.plot(I_abs, "k")
@@ -1161,7 +1182,13 @@ class DefectPl:
             plt.close()
 
     def plot_all(
-        self, out_dir, iplot_xlim=None, max_freq=None, iylim=None, fig_format="pdf"
+        self,
+        out_dir,
+        iplot_xlim=None,
+        max_freq=None,
+        iylim=None,
+        fig_format="pdf",
+        **kwargs,
     ):
         """Plot all the properties.
 
@@ -1170,9 +1197,14 @@ class DefectPl:
         out_dir: str
             Path to the output directory to save the plots.
         """
+        figsize = kwargs.get("figsize", (4, 4))
         # Plot phonon energy vs phonon mode index
         self.plot_penergy_vs_pmode(
-            self.frequencies, plot=False, out_dir=out_dir, fig_format=fig_format
+            self.frequencies,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot IPR vs phonon energy
         self.plot_ipr_vs_penergy(
@@ -1181,6 +1213,7 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot localization ratio vs phonon energy
         self.plot_loc_rat_vs_penergy(
@@ -1189,6 +1222,7 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
+            figsize=figsize,
         )
 
         # Plot vibrational displacement vs phonon energy
@@ -1198,6 +1232,7 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot partial HR factor vs phonon energy
         self.plot_HR_factor_vs_penergy(
@@ -1206,6 +1241,7 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot S(omega) vs phonon energy
         self.plot_S_omega_vs_penergy(
@@ -1216,6 +1252,7 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot S(omega) and Sks vs phonon energy
         self.plot_S_omega_Sks_vs_penergy(
@@ -1227,6 +1264,7 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot S(omega) and Sks vs phonon energy
         self.plot_S_omega_Sks_Loc_rat_vs_penergy(
@@ -1239,6 +1277,7 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
+            figsize=figsize,
         )
         # Plot S(omega), Sks and IPR vs phonon energy
         self.plot_S_omega_Sks_ipr_vs_penergy(
@@ -1614,6 +1653,7 @@ def comparepl(
     out_dir=None,
     colors=None,
     fig_format="pdf",
+    figsize=(4, 4),
 ):
     """
     Compare the PL of different isotopic compositions.
@@ -1632,7 +1672,7 @@ def comparepl(
     if legends is None:
         legends = [f"Composition {i+1}" for i in range(len(properties_files))]
     # Create a matplotlib figure for each intensity
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=figsize)
     for i, intensity in enumerate(I):
         I_abs = intensity.__abs__()
         I_abs = I_abs / np.max(I_abs)

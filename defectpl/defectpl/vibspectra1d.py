@@ -171,10 +171,10 @@ class VibrationalSpectra1D:
         with open(lineshape_file, "w") as f:
             json.dump(self.spectral_data, f, indent=4)
 
-    def plot_lineshape(self, save_file=None):
+    def plot_lineshape(self, save_file=None, figsize=(6, 4)):
         if not hasattr(self, "spectral_data"):
             raise ValueError("Run compute_lineshape() before plotting.")
-        plt.figure(figsize=(6, 4))
+        plt.figure(figsize=figsize)
         #        plt.plot(self.spectral_data["energies"], self.spectral_data["dos"], label='DOS', linestyle='--', linewidth=2)
         #        plt.plot(self.spectral_data["energies"], self.spectral_data["dosw3"], label='DOS * E³', linestyle='--', linewidth=2)
         plt.plot(

@@ -5,12 +5,13 @@ from defectpl.defectpl import DefectPl
 band_yaml = "../tests/data/band.yaml"
 contcar_gs = "../tests/data/CONTCAR_gs"
 contcar_es = "../tests/data/CONTCAR_es"
-out_dir = "./plots"
+out_dir = "../../docs/plots"
 EZPL = 1.95
 gamma = 2
 plot_all = True
 iplot_xlim = [1000, 2000]
 fig_format = "svg"
+figsize = (4, 4)
 
 defctpl = DefectPl(
     band_yaml,
@@ -22,4 +23,5 @@ defctpl = DefectPl(
     plot_all=plot_all,
     out_dir=out_dir,
     fig_format=fig_format,
+    figsize=figsize,
 )
