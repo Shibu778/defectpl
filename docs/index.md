@@ -1,6 +1,5 @@
-# DefectPl
-A unified package to calculate and plot optical properties of point defects in insulators and semiconductors.
-
+# DefectPL
+A comprehensive toolkit for calculating and visualizing photoluminescence spectra of quantum defects. It also supports the analysis of other optical properties of point defects in insulators and semiconductors.
 
 [![image](https://img.shields.io/pypi/v/defectpl.svg)](https://pypi.python.org/pypi/defectpl)
 [![Downloads](https://static.pepy.tech/badge/defectpl)](https://pepy.tech/project/defectpl)
@@ -10,17 +9,42 @@ A unified package to calculate and plot optical properties of point defects in i
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/defectpl.svg)](https://anaconda.org/conda-forge/defectpl)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+> ⚠️ **This package is currently under active development.**
 
-#### Purpose of the Package
-The purpose of this package is to calculate the intensity of photoluminescence from point defects in solids with method described in New J. Phys. 16 (2014) 073026. It also calculates and plot other relevant quantities like partial Huang Rhys factor, inverse participation ratio etc.
+---
 
-If you use this code, consider citing the following article.
+## 📌 Purpose
 
-[Carbon with Stone-Wales defect as quantum emitter in h-BN, Phys. Rev. B - Accepted 5 March, 2025](https://journals.aps.org/prb/accepted/af077O80Ldc11d40931d43e906c2f34c48ce8163e)
+**DefectPL** is designed to compute the photoluminescence intensity of point defects in solids using the methodology described in *New J. Phys. 16 (2014) 073026*. It also provides tools to calculate and plot related quantities such as:
 
-### Contribution
-Contributions are welcome.
-Notice a bug let us know. Thanks.
+- Partial Huang-Rhys factors
+- Huang-Rhys factor
+- Debye-Waller factor
+- Inverse participation ratios (IPR)  
+- Localization ratios  
+- Vibrational displacements  
+- Effect of Isotope substitution
+- Photoluminescence Spectra in the High Huang-Rhys Factor Regime
 
-### Author
-Main Maintainer: Shibu Meher
+If you use this package in your research, please consider citing:
+
+> [**Carbon with Stone-Wales defect as quantum emitter in h-BN**, *Phys. Rev. B 111*, 104109 (2025)](https://doi.org/10.1103/PhysRevB.111.104109)
+
+> [Read the article](https://doi.org/10.1103/PhysRevB.111.104109)
+
+> [**High-throughput computational search for group-IV-related quantum defects as spin-photon interfaces in 4H-SiC**, ChemRxiv (2025)](https://doi.org/10.26434/chemrxiv-2025-7whnf9)
+
+> [Read the article](https://doi.org/10.26434/chemrxiv-2025-7whnf)
+
+---
+
+## 🤝 Contributing
+
+Contributions, suggestions, and bug reports are welcome!  
+If you encounter any issues, please open an issue or submit a pull request.
+
+---
+
+## 👤 Author
+
+**Main Maintainer:** Shibu Meher, Manoj Dey
