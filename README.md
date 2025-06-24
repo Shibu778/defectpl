@@ -32,7 +32,7 @@ If you use this package in your research, please consider citing:
 
 > [Read the article](https://doi.org/10.1103/PhysRevB.111.104109)
 
-> [**High-throughput computational search for group-IV-related quantum defects as spin-photon interfaces in 4H-SiC**, ChemRxiv (2025)](https://doi.org/10.26434/chemrxiv-2025-7whnf9)
+> [**High-throughput computational search for group-IV-related quantum defects as spin-photon interfaces in 4H-SiC**, ChemRxiv (2025)](https://doi.org/10.26434/chemrxiv-2025-7whnf)
 
 > [Read the article](https://doi.org/10.26434/chemrxiv-2025-7whnf)
 
