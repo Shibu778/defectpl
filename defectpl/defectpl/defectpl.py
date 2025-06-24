@@ -24,7 +24,7 @@ import plotly.graph_objects as go
 import json
 import os
 from defectpl.data import atom_data, symbol_map, isotope_data
-import defectpl.plot.Plotter as plotter
+from defectpl.plot import Plotter as plotter
 
 ## Use style file
 style_file = Path(__file__).parent / "defectpl.mplstyle"
