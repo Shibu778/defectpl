@@ -2,11 +2,13 @@
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 import numpy as np
+from pathlib import Path
+from defectpl.utils import *
 
 
 class Plotter:
-    def __init__(self, defectpl):
-        self.defectpl = defectpl
+    def __init__(self):
+        pass
 
         # Plotting Methods
 

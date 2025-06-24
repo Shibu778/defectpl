@@ -106,7 +106,8 @@ defctpl = DefectPl(
 | ![ipr] | ![loc_ratio] |
 | Partial HR factor (pHR) | Spectral Function, pHR |
 | ![pHR] | ![S_pHR] |
-|  |  |
+| Spectral Function, Partial HR factor and IPR | One Dimensional Vibrational Spectra |
+| ![S_ipr] | ![oned] |
 
 [intensity-photon-energy]: docs/plots/intensity_vs_penergy.svg
 [somega-pHR-locrat-penergy]: docs/plots/S_omega_HRf_loc_rat_vs_penergy.svg
@@ -116,6 +117,8 @@ defctpl = DefectPl(
 [loc_ratio]: docs/plots/loc_rat_vs_penergy.svg
 [pHR]: docs/plots/HR_factor_vs_penergy.svg
 [S_pHR]: docs/plots/S_omega_vs_penergy.svg
+[S_ipr]: docs/plots/S_omega_HRf_ipr_vs_penergy.svg
+[oned]: docs/plots/one_d_lineshape.svg
 
 ---
 

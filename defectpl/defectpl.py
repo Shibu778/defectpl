@@ -24,7 +24,7 @@ import plotly.graph_objects as go
 import json
 import os
 from defectpl.data import atom_data, symbol_map, isotope_data
-from defectpl.plot import Plotter as plotter
+from defectpl.plot import Plotter
 
 ## Use style file
 style_file = Path(__file__).parent / "defectpl.mplstyle"
@@ -54,7 +54,6 @@ class DefectPl:
         dump_data=True,
         max_freq=None,
         fig_format="pdf",
-        figsize=None,
     ):
         """
         Initialize the class with the required parameters
@@ -124,23 +123,13 @@ class DefectPl:
             if max_freq:
                 max_freq = max_freq / 1000
             try:
-                if figsize is None:
-                    self.plot_all(
-                        out_dir=self.out_dir,
-                        iplot_xlim=self.iplot_xlim,
-                        max_freq=max_freq,
-                        iylim=iylim,
-                        fig_format=fig_format,
-                    )
-                else:
-                    self.plot_all(
-                        out_dir=self.out_dir,
-                        iplot_xlim=self.iplot_xlim,
-                        max_freq=max_freq,
-                        iylim=iylim,
-                        fig_format=fig_format,
-                        figsize=figsize,
-                    )
+                self.plot_all(
+                    out_dir=self.out_dir,
+                    iplot_xlim=self.iplot_xlim,
+                    max_freq=max_freq,
+                    iylim=iylim,
+                    fig_format=fig_format,
+                )
             except Exception as e:
                 print(f"Error in plotting: {e}")
 
@@ -640,14 +629,13 @@ class DefectPl:
         out_dir: str
             Path to the output directory to save the plots.
         """
-        figsize = kwargs.get("figsize", (4, 4))
         # Plot phonon energy vs phonon mode index
+        plotter = Plotter()
         plotter.plot_penergy_vs_pmode(
-            self.frequencies,
+            frequencies=self.frequencies,
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot IPR vs phonon energy
         plotter.plot_ipr_vs_penergy(
@@ -656,7 +644,6 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot localization ratio vs phonon energy
         plotter.plot_loc_rat_vs_penergy(
@@ -665,7 +652,6 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
-            figsize=figsize,
         )
 
         # Plot vibrational displacement vs phonon energy
@@ -675,7 +661,6 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot partial HR factor vs phonon energy
         plotter.plot_HR_factor_vs_penergy(
@@ -684,7 +669,6 @@ class DefectPl:
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot S(omega) vs phonon energy
         plotter.plot_S_omega_vs_penergy(
@@ -695,7 +679,6 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot S(omega) and Sks vs phonon energy
         plotter.plot_S_omega_Sks_vs_penergy(
@@ -707,7 +690,6 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot S(omega) and Sks vs phonon energy
         plotter.plot_S_omega_Sks_Loc_rat_vs_penergy(
@@ -720,7 +702,6 @@ class DefectPl:
             out_dir=out_dir,
             max_freq=max_freq,
             fig_format=fig_format,
-            figsize=figsize,
         )
         # Plot S(omega), Sks and IPR vs phonon energy
         plotter.plot_S_omega_Sks_ipr_vs_penergy(
