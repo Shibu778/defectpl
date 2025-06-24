@@ -32,6 +32,10 @@ If you use this package in your research, please consider citing:
 
 > [Read the article](https://doi.org/10.1103/PhysRevB.111.104109)
 
+> [**High-throughput computational search for group-IV-related quantum defects as spin-photon interfaces in 4H-SiC**, ChemRxiv (2025)](https://doi.org/10.26434/chemrxiv-2025-7whnf9)
+
+> [Read the article](https://doi.org/10.26434/chemrxiv-2025-7whnf)
+
 ---
 
 ## 📚 Documentation
@@ -98,18 +102,20 @@ defctpl = DefectPl(
 | ![intensity-photon-energy] | ![somega-pHR-locrat-penergy]   |
 | Vibrational Displacement | Phonon Energy |
 | ![vibrational-displacement] | ![phonon-energy]   |
+| Inverse Participation Ratio | Localization Ratio |
+| ![ipr] | ![loc_ratio] |
+| Partial HR factor (pHR) | Spectral Function, pHR |
+| ![pHR] | ![S_pHR] |
+|  |  |
 
 [intensity-photon-energy]: docs/plots/intensity_vs_penergy.svg
 [somega-pHR-locrat-penergy]: docs/plots/S_omega_HRf_loc_rat_vs_penergy.svg
 [vibrational-displacement]: docs/plots/qk_vs_penergy.svg
 [phonon-energy]: docs/plots/penergy_vs_pmode.svg
-<!-- []: docs/plots/S_omega_pHR_ipr_vs_penergy.png
-[]: docs/plots/S_omega_pHR_vs_penergy.png
-[]: docs/plots/ipr_vs_phonon_energy.png
-[]: docs/plots/loc_rat_vs_phonon_energy.png
-[]: docs/plots/phonon_energy_vs_phonon_mode_index.png
-[]: docs/plots/pHR_vs_phonon_energy.png
-[]: docs/plots/vibrational_dis_vs_phonon_energy.png -->
+[ipr]: docs/plots/ipr_vs_penergy.svg
+[loc_ratio]: docs/plots/loc_rat_vs_penergy.svg
+[pHR]: docs/plots/HR_factor_vs_penergy.svg
+[S_pHR]: docs/plots/S_omega_vs_penergy.svg
 
 ---
 
