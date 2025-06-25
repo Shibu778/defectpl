@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 PyYAML = "^6.0.2"
 numpy = "^2.1.2"
 pymatgen = "2024.10.3"
