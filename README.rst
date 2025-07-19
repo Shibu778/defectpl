@@ -17,6 +17,8 @@ A comprehensive toolkit for calculating and visualizing photoluminescence spectr
    :target: https://anaconda.org/conda-forge/defectpl
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
+.. image:: https://deepwiki.com/badge.svg
+   :target: https://deepwiki.com/Shibu778/defectpl
 
 .. warning::
 

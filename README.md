@@ -8,6 +8,7 @@ A comprehensive toolkit for calculating and visualizing photoluminescence spectr
 [![image](https://img.shields.io/conda/vn/conda-forge/defectpl.svg)](https://anaconda.org/conda-forge/defectpl)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/defectpl.svg)](https://anaconda.org/conda-forge/defectpl)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Shibu778/defectpl)
 
 > ⚠️ **This package is currently under active development.**
 
