@@ -21,8 +21,8 @@ from matplotlib.ticker import MultipleLocator
 from utils import AMU2KG, ANG2M, EV2J, HBAR_eVs
 
 ## Use style file
-# style_file = Path(__file__).parent / "defectpl.mplstyle"
-style_file = Path("./") / "defectpl.mplstyle"
+style_file = Path(__file__).parent / "defectpl.mplstyle"
+#style_file = Path("./") / "defectpl.mplstyle"
 style.use(style_file)
 
 
