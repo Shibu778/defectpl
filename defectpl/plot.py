@@ -4,6 +4,7 @@ import matplotlib.style as style
 import numpy as np
 from pathlib import Path
 from defectpl.utils import *
+from defectpl.defectpl import read_properties
 
 
 class Plotter:
