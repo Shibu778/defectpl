@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 from pathlib import Path
 from defectpl.utils import *
+from defectpl.io import read_properties
 from phonopy.cui.load import load
 from tabulate import tabulate
-import plotly.graph_objects as go
 import json
 import os
 from defectpl.data import atom_data, symbol_map, isotope_data
@@ -926,36 +926,3 @@ def create_dir_structure(root_path, compositions):
         if not os.path.exists(comp_path):
             os.makedirs(comp_path)
     print("Directory structure is created.")
-
-
-def read_properties(filename):
-    """
-    Read the properties from the json file.
-    """
-    with open(filename, "r") as f:
-        data = json.load(f)
-
-    intensity = np.array(
-        [complex(real, imag) for real, imag in data["I"]], dtype=np.complex128
-    )
-    properties = {
-        "frequencies": data["frequencies"],
-        "iprs": data["iprs"],
-        "localization_ratio": data["localization_ratio"],
-        "qks": data["qks"],
-        "Sks": data["Sks"],
-        "S_omega": data["S_omega"],
-        "omega_range": data["omega_range"],
-        "I": intensity,
-        "resolution": data["resolution"],
-        "delta_R": np.array(data["delta_R"]),
-        "delta_Q": data["delta_Q"],
-        "HR_factor": data["HR_factor"],
-        "dR": np.array(data["dR"]),
-        "EZPL": data["EZPL"],
-        "gamma": data["gamma"],
-        "natoms": data["natoms"],
-        "masses": data["masses"],
-        "max_energy": data["max_energy"],
-    }
-    return properties

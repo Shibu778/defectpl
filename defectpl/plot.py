@@ -4,7 +4,8 @@ import matplotlib.style as style
 import numpy as np
 from pathlib import Path
 from defectpl.utils import *
-from defectpl.defectpl import read_properties
+from defectpl.io import read_properties
+import plotly.graph_objects as go
 
 
 class Plotter:
