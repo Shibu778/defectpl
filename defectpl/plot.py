@@ -394,6 +394,12 @@ class Plotter:
         pylim=[None, None],
         fig_format="pdf",
         figsize=(6, 4),
+        s_omega_color="tab:blue",
+        phr_color="black",
+        cmap="cool",
+        scatter_size=10,
+        scatter_alpha=0.7,
+        scatter_lw=0.3,
     ):
         """
         Plot the S(omega), partial HR factor and localization ratio vs phonon energy.
@@ -426,7 +432,7 @@ class Plotter:
         S = Sks
         # Plot S(omega) vs phonon energy
         fig, ax1 = plt.subplots(figsize=figsize)
-        color = "tab:blue"
+        color = s_omega_color
         ax1.set_xlabel(r"Phonon energy (meV)")
         ax1.set_ylabel(r"$S(\hbar\omega)(1/meV)$", color=color)
         omega_set = np.linspace(omega_range[0], omega_range[1], omega_range[2])
@@ -438,20 +444,19 @@ class Plotter:
 
         # Plot Sks vs phonon energy and localization as color of points
         ax2 = ax1.twinx()
-        color = "black"
-        cm = plt.get_cmap("cool")
-        ax2.set_ylabel(r"Partial HR factor", color=color)
+        cm = plt.get_cmap(cmap)
+        ax2.set_ylabel(r"Partial HR factor", color=phr_color)
         sc = ax2.scatter(
             freq,
             Sks,
             c=localization_ratio,
             cmap=cm,
-            s=10,
-            linewidths=0.3,
-            edgecolors="k",
-            alpha=0.7,
+            s=scatter_size,
+            linewidths=scatter_lw,
+            edgecolors=phr_color,
+            alpha=scatter_alpha,
         )
-        ax2.tick_params(axis="y", labelcolor=color)
+        ax2.tick_params(axis="y", labelcolor=phr_color)
         ax2.set_ylim(pylim[0], pylim[1])
 
         plt.xlim(0, max_freq * 1000)
