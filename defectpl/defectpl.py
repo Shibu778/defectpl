@@ -27,6 +27,7 @@ from defectpl.data import atom_data, symbol_map, isotope_data
 from defectpl.plot import Plotter
 
 ## Use style file
+# Note: defectpl.mplstyle file is adapted from sumo package
 style_file = Path(__file__).parent / "defectpl.mplstyle"
 style.use(style_file)
 
