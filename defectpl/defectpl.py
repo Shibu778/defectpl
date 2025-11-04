@@ -17,7 +17,7 @@ from pymatgen.util.coord import pbc_shortest_vectors
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 from pathlib import Path
-from defectpl.utils import *
+from defectpl.constants import *
 from defectpl.io import read_properties
 from phonopy.cui.load import load
 from tabulate import tabulate
