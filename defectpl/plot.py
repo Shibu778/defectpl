@@ -4,6 +4,7 @@ import matplotlib.style as style
 import numpy as np
 from pathlib import Path
 from defectpl.utils import *
+from defectpl.constants import *
 from defectpl.io import read_properties
 import plotly.graph_objects as go
 
@@ -111,6 +112,11 @@ class Plotter:
         file_name="loc_rat_vs_penergy",
         fig_format="pdf",
         figsize=(4, 4),
+        color="tab:green",
+        scatter_size=5,
+        linewidths=0.3,
+        edgecolors="k",
+        alpha=0.7,
     ):
         """Plot the localization ratio vs phonon energy.
 
@@ -132,15 +138,14 @@ class Plotter:
         out_path = Path(out_dir) / file_name
         freq = frequencies * 1000
         plt.figure(figsize=figsize)
-        color = "tab:green"
         plt.scatter(
             freq,
             localization_ratio,
-            color="tab:green",
-            s=5,
-            linewidths=0.3,
-            edgecolors="k",
-            alpha=0.7,
+            color=color,
+            s=scatter_size,
+            linewidths=linewidths,
+            edgecolors=edgecolors,
+            alpha=alpha,
         )
         plt.xlabel(r"Phonon Energy (meV)")
         plt.ylabel(r"Localization Ratio")
