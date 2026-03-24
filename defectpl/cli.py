@@ -1,7 +1,16 @@
+import json
+from pathlib import Path
+
 import click
 
 
-@click.command()
+@click.group()
+def main():
+    """defectpl command group."""
+    pass
+
+
+@main.command(name="run")
 @click.option(
     "--band_yaml",
     default="./band.yaml",
@@ -49,7 +58,7 @@ import click
     default="svg",
     help="Figure format for saving plots (e.g., svg, png, pdf)",
 )
-def main(
+def run(
     band_yaml,
     contcar_gs,
     contcar_es,
@@ -60,7 +69,7 @@ def main(
     iplot_xlim,
     fig_format,
 ):
-    """Main function to run the DefectPL analysis and plotting."""
+    """Main function to run the DefectPl analysis and plotting."""
     from defectpl.defectpl import DefectPl
     from defectpl.plot import Plotter
 
@@ -75,3 +84,68 @@ def main(
         out_dir=out_dir,
         fig_format=fig_format,
     )
+
+
+@main.command(name="dq")
+@click.argument("structure1", type=click.Path(exists=True))
+@click.argument("structure2", type=click.Path(exists=True))
+@click.option(
+    "--out",
+    "-o",
+    "out_path",
+    type=click.Path(),
+    default=None,
+    help="Optional output file to write JSON with result.",
+)
+@click.option(
+    "--format",
+    "-f",
+    "out_format",
+    type=click.Choice(["plain", "json"], case_sensitive=False),
+    default="plain",
+    help="Print format (plain = number, json = JSON object).",
+)
+def dq(structure1, structure2, out_path, out_format):
+    """Calculate deltaQ between two structure files.
+
+    Usage:
+      defectpl dq CONTCAR_gs CONTCAR_es [--out result.json] [--format json]
+    """
+    from defectpl.utils import calc_deltaQ
+
+    try:
+        delta_q = calc_deltaQ(structure1, structure2)
+    except Exception as exc:
+        raise click.ClickException(f"Failed to calculate deltaQ: {exc}")
+
+    if out_format.lower() == "plain":
+        click.echo(f"{delta_q:.8f}")
+    else:
+        click.echo(
+            json.dumps(
+                {
+                    "structure1": str(structure1),
+                    "structure2": str(structure2),
+                    "deltaQ": delta_q,
+                },
+                indent=2,
+            )
+        )
+
+    if out_path:
+        p = Path(out_path)
+        p.write_text(
+            json.dumps(
+                {
+                    "structure1": str(structure1),
+                    "structure2": str(structure2),
+                    "deltaQ": delta_q,
+                },
+                indent=2,
+            )
+        )
+        click.echo(f"Wrote result to {p}")
+
+
+if __name__ == "__main__":
+    main()
