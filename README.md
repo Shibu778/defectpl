@@ -16,7 +16,7 @@ A comprehensive toolkit for calculating and visualizing photoluminescence spectr
 
 ## 📌 Purpose
 
-**DefectPL** is designed to compute the photoluminescence intensity of point defects in solids using the methodology described in *New J. Phys. 16 (2014) 073026*. It also provides tools to calculate and plot related quantities such as:
+**DefectPL** is designed to compute the photoluminescence intensity of point defects in solids using the methodology described in *New J. Phys.* **16** 073026 (2014). It also provides tools to calculate and plot related quantities such as:
 
 - Partial Huang-Rhys factors
 - Huang-Rhys factor
@@ -29,13 +29,13 @@ A comprehensive toolkit for calculating and visualizing photoluminescence spectr
 
 If you use this package in your research, please consider citing:
 
-> [**Carbon with Stone-Wales defect as quantum emitter in h-BN**, *Phys. Rev. B 111*, 104109 (2025)](https://doi.org/10.1103/PhysRevB.111.104109)
+> [**Carbon with Stone-Wales Defect as Quantum Emitter in h-BN**, *Phys. Rev. B* **111**, 104109 (2025)](https://doi.org/10.1103/PhysRevB.111.104109)
 
 > [Read the article](https://doi.org/10.1103/PhysRevB.111.104109)
 
-> [**High-throughput computational search for group-IV-related quantum defects as spin-photon interfaces in 4H-SiC**, ChemRxiv (2025)](https://doi.org/10.26434/chemrxiv-2025-7whnf)
+> [**High-throughput Computational Search for Group-IV-related Quantum Defects as Spin-photon Interfaces in 4H-SiC**, *Phys. Rev. B* **112**, 184112 (2025)](https://doi.org/10.1103/lsxj-nvhw)
 
-> [Read the article](https://doi.org/10.26434/chemrxiv-2025-7whnf)
+> [Read the article](https://doi.org/10.1103/lsxj-nvhw)
 
 ---
 
