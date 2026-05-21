@@ -133,3 +133,7 @@ If you encounter any issues, please open an issue or submit a pull request.
 ## 👤 Author
 
 **Main Maintainer:** Shibu Meher, Manoj Dey
+
+## Acknowledgement
+
+We gratefully acknowledge the use of several excellent open-source tools that have contributed to the development of this package. This work is inspired by the `PyPhotonics` package, which motivated the development of a more flexible framework for calculating defect-related optical properties using multiple first-principles codes. The `defectpl.mplstyle` file is adapted from the `base.mplstyle` provided in the `sumo` package. We also appreciate the high-quality plotting aesthetics and design philosophy of `sumo`, which significantly influenced the visualization components of this project.
