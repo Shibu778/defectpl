@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 import matplotlib.style as style
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from monty.serialization import loadfn
 
-from defectpl.constants import EV2mEV
-from defectpl.io import read_properties
+from defectpl.constants import EV2MEV
 
 # Load custom style with graceful fallback
 style_file = Path(__file__).parent / "defectpl.mplstyle"
@@ -357,16 +357,25 @@ class Plotter:
 
 
 # =====================================================================
-# Standalone Interactive Plotly Utilities
+# Standalone Interactive Plotly & Comparison Utilities
 # =====================================================================
 
+
 def plot_interactive_intensity(filename: Union[str, Path]):
-    """Generates an interactive, scannable HTML Plotly line plot for PL Intensity data."""
-    properties = read_properties(filename)
-    I_abs = np.abs(np.array(properties["I"]))
+    """
+    Loads a Photoluminescence object from a Monty JSON file and generates 
+    an interactive, scannable HTML Plotly line plot for PL Intensity data.
+    """
+    # Load and deserialize the complete Photoluminescence object
+    pl = loadfn(str(filename))
+    if not isinstance(pl, Photoluminescence):
+        raise TypeError(f"The file {filename} does not contain a valid Photoluminescence MSON object.")
+
+    I_abs = np.abs(pl.intensity)
     I_norm = I_abs / np.max(I_abs) if np.max(I_abs) > 0 else I_abs
     
-    x_energy = np.arange(len(I_norm)) / float(properties["resolution"])
+    # Calculate real photon energy x-axis using class attributes
+    x_energy = np.arange(len(I_norm)) / float(pl.resolution)
     
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x_energy, y=I_norm, mode="lines", line=dict(color="black", width=2)))
@@ -383,27 +392,32 @@ def plot_interactive_intensity(filename: Union[str, Path]):
 
 
 def plot_interactive_S_omega_Sks_Loc_rat_vs_penergy(filename: Union[str, Path]):
-    """Generates an advanced multi-axis interactive visual framework detailing partial variables."""
-    properties = read_properties(filename)
-    freq_mev = np.array(properties["frequencies"]) * 1000.0
-    Sks = properties["Sks"]
-    S_omega = properties["S_omega"]
-    loc_rat = properties["localization_ratio"]
+    """
+    Loads a Photoluminescence object from a Monty JSON file and generates 
+    an advanced multi-axis interactive visual framework detailing partial variables.
+    """
+    # Load and deserialize the complete Photoluminescence object
+    pl = loadfn(str(filename))
+    if not isinstance(pl, Photoluminescence):
+        raise TypeError(f"The file {filename} does not contain a valid Photoluminescence MSON object.")
+
+    freq_mev = np.array(pl.frequencies) * 1000.0
     
-    omega_range = properties["omega_range"]
+    # Generate continuous omega array from class properties
+    omega_range = pl.omega_range
     omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
     
-    max_f = max(properties["frequencies"])
+    max_f = max(pl.frequencies)
     mask = omega_set <= max_f
     
     # Create subplots with a secondary y-axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
-    # Line trace for continuous S_omega
+    # Line trace for continuous S_omega (scaled to 1/meV)
     fig.add_trace(
         go.Scatter(
             x=omega_set[mask] * 1000.0,
-            y=np.array(S_omega)[mask] / 1000.0,
+            y=np.array(pl.S_omega)[mask] / 1000.0,
             mode="lines",
             line=dict(color="black", width=2),
             name="S(ω) Spectral Density",
@@ -411,15 +425,15 @@ def plot_interactive_S_omega_Sks_Loc_rat_vs_penergy(filename: Union[str, Path]):
         secondary_y=False
     )
     
-    # Marker trace for individual S_k modes
+    # Marker trace for individual S_k modes color-coded by localization ratio
     fig.add_trace(
         go.Scatter(
             x=freq_mev,
-            y=Sks,
+            y=pl.Sks,
             mode="markers",
             marker=dict(
                 size=7,
-                color=loc_rat,
+                color=pl.localization_ratio,
                 colorscale="Viridis",
                 showscale=True,
                 colorbar=dict(title="Localization Ratio", x=1.15)
@@ -452,18 +466,25 @@ def comparepl(
     fig_format: str = "pdf",
     figsize: Tuple[float, float] = (4, 4),
 ):
-    """Plots comparative normalization trends mapping multiple saved isotope calculation runs."""
-    properties = [read_properties(f) for f in properties_files]
+    """
+    Loads multiple Photoluminescence objects from Monty JSON files to plot 
+    comparative normalization trends across different isotope calculation runs.
+    """
+    # Unpack file paths directly into Photoluminescence instances
+    pl_runs = [loadfn(str(f)) for f in properties_files]
     
     if legends is None:
         legends = [f"Composition {i+1}" for i in range(len(properties_files))]
         
     fig, ax = plt.subplots(figsize=figsize)
     
-    for i, prop in enumerate(properties):
-        resolution = float(prop["resolution"])
-        x_energy = np.arange(len(prop["I"])) / resolution
-        I_abs = np.abs(np.array(prop["I"]))
+    for i, pl in enumerate(pl_runs):
+        if not isinstance(pl, Photoluminescence):
+            raise TypeError(f"File index {i} does not contain a valid Photoluminescence object.")
+            
+        resolution = float(pl.resolution)
+        x_energy = np.arange(len(pl.intensity)) / resolution
+        I_abs = np.abs(pl.intensity)
         I_norm = I_abs / np.max(I_abs) if np.max(I_abs) > 0 else I_abs
         
         line_color = colors[i] if colors else None

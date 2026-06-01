@@ -5,12 +5,62 @@ Author: Shibu Meher, Manoj Dey
 """
 
 import math
+from pathlib import Path
 from typing import List, Tuple, Union
 import numpy as np
 from pymatgen.core import Structure
+from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.util.coord import pbc_shortest_vectors
 
 from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS
+
+def _to_structure(obj: Union[Structure, str, Path]) -> Structure:
+    """Helper to convert a Structure, str, or Path into a pymatgen Structure."""
+    if isinstance(obj, (str, Path)):
+        # Support both regular POSCAR/CONTCAR syntax files
+        return Poscar.from_file(str(obj)).structure
+    elif isinstance(obj, Structure):
+        return obj
+    else:
+        raise TypeError(
+            f"Unsupported type: {type(obj)}. Expected pymatgen Structure, str, or Path."
+        )
+
+
+def calc_dR(
+    constcar_gs: Union[Structure, str, Path],
+    contcar_es: Union[Structure, str, Path]
+) -> np.ndarray:
+    """
+    Calculates the shortest periodic boundary condition (PBC) safe displacement 
+    vectors between the ground state and excited state structures.
+
+    Parameters:
+    ===========
+    constcar_gs : Structure, str, or Path
+        Ground state equilibrium configuration (Structure object or file path).
+    contcar_es : Structure, str, or Path
+        Excited state equilibrium configuration (Structure object or file path).
+
+    Returns:
+    =================
+    dR : np.ndarray
+        2D array of shape (n_atoms, 3) detailing Cartesian displacements 
+        (Excited - Ground) in Å.
+    """
+    # Normalize both inputs to pymatgen Structure objects
+    struct_gs = _to_structure(constcar_gs)
+    struct_es = _to_structure(contcar_es)
+
+    if len(struct_gs) != len(struct_es):
+        raise ValueError("Lattice structure mismatch: Input configurations have differing site counts.")
+
+    # Vectorized calculation over periodic boundaries matching calc_delta_Q
+    dR_matrix = pbc_shortest_vectors(struct_gs.lattice, struct_gs.frac_coords, struct_es.frac_coords)
+    
+    # Isolate the exact 1-to-1 site mappings along the diagonal axes
+    dR = np.diagonal(dR_matrix, axis1=0, axis2=1).T
+    return dR
 
 
 def calc_delR(dR: np.ndarray) -> float:
@@ -68,10 +118,9 @@ def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np
         The projected configuration displacements array for each mode k.
     """
     qks = []
+    sqrt_m = np.sqrt(masses)
     for k in range(len(eigenvectors)):
-        qk = 0.0
-        for i in range(len(masses)):
-            qk += np.sqrt(masses[i]) * np.dot(dR[i], eigenvectors[k][i])
+        qk = np.sum([sqrt_m[i] * np.dot(dR[i], eigenvectors[k][i]) for i in range(len(masses))])
         qk = qk * ANG2M * np.sqrt(AMU2KG)
         qks.append(qk)
     return np.array(qks)
@@ -265,12 +314,8 @@ def calc_delta_Q(struct1: Structure, struct2: Structure) -> float:
 
     masses = np.array([site.specie.atomic_mass for site in struct1.sites])
 
-    frac_coords1 = struct1.frac_coords
-    frac_coords2 = struct2.frac_coords
-    length = len(frac_coords1)
-
-    dR = pbc_shortest_vectors(struct1.lattice, frac_coords1, frac_coords2)
-    dR = np.diagonal(dR, axis1=0, axis2=1).T
+    dR = pbc_shortest_vectors(struct1.lattice, struct1.frac_coords, struct2.frac_coords)
+    dR = np.reshape(dR, (len(struct1), 3))
     squared_displacements = np.sum(dR**2, axis=1)
 
     return float(np.sqrt(np.sum(masses * squared_displacements)))
@@ -355,3 +400,68 @@ def calculate_overlap_element(
             ix += pr1 * pr2 * pr3 * f
 
     return ix
+
+
+def get_q_from_structure(
+    ground: Structure,
+    excited: Structure,
+    struct: Union[Structure, str, Path],
+    tol: float = 1e-4,
+    nround: int = 4,
+) -> float:
+    """
+    Calculates the mass-weighted configuration coordinate (Q) value for a given 
+    displaced configuration relative to the equilibrium ground-state structure.
+
+    Parameters:
+    ===========
+    ground : Structure
+        Equilibrium geometry structure for the electronic ground state.
+    excited : Structure
+        Equilibrium geometry structure for the electronic excited state.
+    struct : Structure, str, or Path
+        The intermediate or displaced structure (or path to its file) to evaluate.
+    tol : float, default 1e-4
+        Distance threshold filter cutoff (Å) to strip stationary lattice atoms 
+        out of the interpolation projection tracking step.
+    nround : int, default 4
+        Decimal rounding precision used when clustering atomic displacement ratios.
+
+    Returns:
+    ========
+    Q : float
+        Calculated configuration coordinate position step in units of amu^(1/2) * Å.
+    """
+    if isinstance(struct, (str, Path)):
+        tstruct = Structure.from_file(str(struct))
+    else:
+        tstruct = struct
+
+    if len(ground) != len(excited) or len(ground) != len(tstruct):
+        raise ValueError("Lattice structure mismatch: Input geometries have differing site counts.")
+
+    masses = np.array([site.specie.atomic_mass for site in ground], dtype=float)
+    lattice = ground.lattice
+    
+    # Vectorized PBC shortest vector layout matching calc_delta_Q
+    dr_excited_raw = pbc_shortest_vectors(lattice, ground.frac_coords, excited.frac_coords)
+    dr_excited_raw = np.reshape(dr_excited_raw, (len(ground), 3))
+    
+    total_dQ = float(np.sqrt(np.sum(masses * np.sum(dr_excited_raw**2, axis=1))))
+
+    dx_excited = dr_excited_raw
+    dx_struct = pbc_shortest_vectors(lattice, ground.frac_coords, tstruct.frac_coords)
+    dx_struct = np.reshape(dx_struct, (len(ground), 3))
+
+    active_mask = np.abs(dx_excited) > tol
+    
+    if not np.any(active_mask):
+        return 0.0
+
+    ratios = dx_struct[active_mask] / dx_excited[active_mask]
+    rounded_ratios = np.round(ratios, decimals=nround)
+    
+    values, counts = np.unique(rounded_ratios, return_counts=True)
+    scaling_factor = float(values[np.argmax(counts)])
+
+    return scaling_factor * total_dQ

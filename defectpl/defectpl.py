@@ -18,7 +18,7 @@ import numpy as np
 from monty.json import MSONable
 from pymatgen.core import Structure
 
-from defectpl.constants import AMU2KG, ANG2M, EV2J, EV2mEV, HBAR_eVs
+from defectpl.constants import AMU2KG, ANG2M, EV2J, HBAR_EVS
 from defectpl.plot import Plotter
 import defectpl.utils as utils
 
@@ -68,6 +68,7 @@ class Photoluminescence(MSONable):
         self.qks = utils.calc_qks(self.masses, self.dR, self.eigenvectors)
         self.Sks = utils.calc_Sks(self.qks, self.frequencies)
         self.HR_factor = float(np.sum(self.Sks))
+        self.DW_factor = np.exp(-self.HR_factor)
         
         self.iprs = utils.calc_IPR(self.eigenvectors)
         self.localization_ratio = self.natoms / self.iprs
@@ -90,7 +91,9 @@ class Photoluminescence(MSONable):
             "gamma": self.gamma,
             "resolution": self.resolution,
             "max_energy": self.max_energy,
-            "sigma": self.sigma
+            "sigma": self.sigma,
+            "HR_factor": self.HR_factor,
+            "DW_factor": self.DW_factor,
         }
 
     @classmethod
@@ -262,7 +265,7 @@ class VibrationalSpectra1D(MSONable):
 
     def save_results(self, overlap_file: str = "overlap.json", lineshape_file: str = "lineshape.json") -> None:
         """Serialize parameters and calculated datasets directly into target JSON files."""
-        Path(overlap_file).write_text(self.to_json(indent=4), encoding="utf-8")
+        Path(overlap_file).write_text(self.to_json(), encoding="utf-8")
         with open(lineshape_file, "w", encoding="utf-8") as f:
             json.dump(self.spectral_data, f, indent=4)
 
