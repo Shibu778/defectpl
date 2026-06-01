@@ -1,0 +1,32 @@
+#algorithm
+ALGO  =  Normal
+
+# accuracy
+PREC   =  Normal
+LREAL  =  Auto
+EDIFF  =  1e-05
+ENCUT  =  520.0
+LASPH  =  True
+NELM   =  100
+
+# ionic relaxation
+ISIF    =  2
+IBRION  =  2
+EDIFFG  =  -0.01
+NSW     =  500
+ISYM = -1
+
+# occupation
+ISMEAR  =  0
+SIGMA   =  0.1
+NELECT =  862
+
+# spin
+ISPIN  =  2
+
+# IO control
+LWAVE   =  True
+LCHARG  =  True
+
+# analyzer
+LORBIT  =  11
