@@ -15,14 +15,10 @@ from defectpl.defectpl import Photoluminescence
 # Configuration Paths, Tolerances, and Variables Setup
 # =====================================================================
 # Legacy path references kept for development tracking history:
-# band_yaml_path = Path("../ground_dfpt/band.yaml")
-# contcar_gs_path = Path("../pbe/gs/CONTCAR")
-# contcar_es_path = Path("../pbe/zpl/CONTCAR")
-
-band_yaml_path = Path("../old_data/band.yaml")
-contcar_gs_path = Path("../old_data/CONTCAR_GS")
-contcar_es_path = Path("../old_data/CONTCAR_ES")
-outdir = Path("./old_data")
+band_yaml_path = Path("../../ground_dfpt/band.yaml")
+contcar_gs_path = Path("../../pbe/gs/CONTCAR")
+contcar_es_path = Path("../../pbe/zpl/CONTCAR")
+outdir = Path(".")
 
 ezpl = 1.95        # Zero-phonon line energy threshold in eV
 gamma = 2.0        # Homogeneous ZPL broadening scale factor

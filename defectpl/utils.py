@@ -12,7 +12,7 @@ from pymatgen.core import Structure
 from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.util.coord import pbc_shortest_vectors
 
-from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS
+from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J, HBAR_JS
 
 def _to_structure(obj: Union[Structure, str, Path]) -> Structure:
     """Helper to convert a Structure, str, or Path into a pymatgen Structure."""
@@ -103,19 +103,30 @@ def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np
     """
     Project atomic displacements onto phonon normal modes to find mode coordinates q_k.
 
+    This function uses a loop-based approach to calculate the dimensioned 
+    configuration coordinates from real-space displacement vectors.
+
     Parameters
     ----------
     masses : np.ndarray
-        Array of atomic masses.
+        1D array of atomic masses for each atom in the system. 
+        Shape: (N_atoms,). Unit: AMU.
     dR : np.ndarray
-        Array containing atomic displacement vectors.
+        2D array of atomic displacement vectors between two configurations.
+        Shape: (N_atoms, 3). Unit: Angstrom (Å).
     eigenvectors : np.ndarray
-        Phonon normal mode eigenvectors matrix.
+        3D array representing the normal mode eigenvectors matrix.
+        Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
 
     Returns
     -------
     np.ndarray
-        The projected configuration displacements array for each mode k.
+        1D array of projected configuration coordinates for each mode k.
+        Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
+        
+    See Also
+    --------
+    calc_qks_vectorized : Faster, loopless alternative for this calculation.
     """
     qks = []
     sqrt_m = np.sqrt(masses)
@@ -124,6 +135,179 @@ def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np
         qk = qk * ANG2M * np.sqrt(AMU2KG)
         qks.append(qk)
     return np.array(qks)
+
+
+def calc_qks_force_mode(
+    masses: np.ndarray, 
+    forces: np.ndarray, 
+    eigenvectors: np.ndarray, 
+    frequencies_eV: np.ndarray
+) -> np.ndarray:
+    """
+    Project atomic force differences onto phonon normal modes using energies in eV.
+
+    This function calculates the dimensioned configuration coordinates using a 
+    loop-based approach, derived from the excited state forces acting on the 
+    ground state geometry. Acoustic or zero-frequency modes are protected to 
+    prevent division-by-zero errors.
+
+    Parameters
+    ----------
+    masses : np.ndarray
+        1D array of atomic masses for each atom in the system. 
+        Shape: (N_atoms,). Unit: AMU.
+    forces : np.ndarray
+        2D array containing the difference in force vectors between the excited 
+        and ground states. Shape: (N_atoms, 3). Unit: eV/Angstrom (eV/Å).
+    eigenvectors : np.ndarray
+        3D array representing the normal mode eigenvectors matrix.
+        Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
+    frequencies_eV : np.ndarray
+        1D array of Gamma-point phonon mode energies. 
+        Shape: (N_modes,). Unit: Electron-volts (eV).
+
+    Returns
+    -------
+    np.ndarray
+        1D array of projected configuration coordinates for each mode k.
+        Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
+        
+    See Also
+    --------
+    calc_qks_force_vectorized : Faster, loopless alternative for this calculation.
+    """
+    qks = []
+    sqrt_m = np.sqrt(masses)
+    
+    for k in range(len(eigenvectors)):
+        freq_ev = frequencies_eV[k]
+        
+        # Handle the acoustic/zero-frequency modes safely
+        if np.isclose(freq_ev, 0.0, atol=1e-5):
+            qks.append(0.0)
+            continue
+            
+        # 1. Raw projection: sum_i (1 / sqrt(M_i)) * dot(F_i, e_{k;i}) -> (eV / Angstrom) / sqrt(AMU)
+        proj_sum = np.sum([
+            (1.0 / sqrt_m[i]) * np.dot(forces[i], eigenvectors[k][i]) 
+            for i in range(len(masses))
+        ])
+        
+        # 2. Convert raw projection numerator to SI units -> (Joules / meter) / sqrt(kg)
+        proj_sum_SI = proj_sum * (EV2J / ANG2M) / np.sqrt(AMU2KG)
+        
+        # 3. Convert energy in eV to angular frequency omega_k (rad/s)
+        omega_k = (freq_ev * EV2J) / HBAR_JS
+        
+        # 4. Divide by omega_k^2 to find configuration coordinate
+        qk_SI = (1.0 / (omega_k ** 2)) * proj_sum_SI
+        
+        qks.append(qk_SI)
+        
+    return np.array(qks)
+
+
+def calc_qks_vectorized(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np.ndarray:
+    """
+    Vectorized configuration coordinate calculation from displacements via Einstein summation.
+
+    Eliminates explicit Python loops by using `np.einsum` to project real-space 
+    atomic displacements onto the full normal mode space simultaneously.
+
+    Parameters
+    ----------
+    masses : np.ndarray
+        1D array of atomic masses for each atom in the system. 
+        Shape: (N_atoms,). Unit: AMU.
+    dR : np.ndarray
+        2D array of atomic displacement vectors between two configurations.
+        Shape: (N_atoms, 3). Unit: Angstrom (Å).
+    eigenvectors : np.ndarray
+        3D array representing the normal mode eigenvectors matrix.
+        Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
+
+    Returns
+    -------
+    np.ndarray
+        1D array of projected configuration coordinates for each mode k.
+        Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
+        
+    See Also
+    --------
+    calc_qks : The loop-based alternative for this displacement-based approach.
+    """
+    # Scale displacements by sqrt(masses)
+    sqrt_m = np.sqrt(masses)[:, np.newaxis]
+    scaled_dR = dR * sqrt_m
+    
+    # Project scaled dR onto eigenvectors: sum over atoms (i) and directions (j)
+    proj_sum = np.einsum('kij,ij->k', eigenvectors, scaled_dR)
+    
+    # Convert unit system from (Angstrom * sqrt(AMU)) to SI (meter * sqrt(kg))
+    return proj_sum * ANG2M * np.sqrt(AMU2KG)
+
+
+def calc_qks_force_vectorized(
+    masses: np.ndarray, 
+    forces: np.ndarray, 
+    eigenvectors: np.ndarray, 
+    frequencies_eV: np.ndarray
+) -> np.ndarray:
+    """
+    Vectorized configuration coordinate calculation from forces using eV energies.
+
+    Utilizes `np.einsum` to bypass explicit loops and projects forces across all 
+    modes simultaneously. Implements high-throughput masking to safely neutralize 
+    acoustic and near-zero modes without inducing divide-by-zero exceptions.
+
+    Parameters
+    ----------
+    masses : np.ndarray
+        1D array of atomic masses for each atom in the system. 
+        Shape: (N_atoms,). Unit: AMU.
+    forces : np.ndarray
+        2D array containing the difference in force vectors between the excited 
+        and ground states. Shape: (N_atoms, 3). Unit: eV/Angstrom (eV/Å).
+    eigenvectors : np.ndarray
+        3D array representing the normal mode eigenvectors matrix.
+        Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
+    frequencies_eV : np.ndarray
+        1D array of Gamma-point phonon mode energies. 
+        Shape: (N_modes,). Unit: Electron-volts (eV).
+
+    Returns
+    -------
+    np.ndarray
+        1D array of projected configuration coordinates for each mode k.
+        Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
+        
+    See Also
+    --------
+    calc_qks_force_mode : The loop-based alternative for this force-based approach.
+    """
+    # 1. Scale forces by 1/sqrt(masses)
+    inv_sqrt_m = (1.0 / np.sqrt(masses))[:, np.newaxis]
+    scaled_forces = forces * inv_sqrt_m
+    
+    # 2. Project onto eigenvectors across all modes simultaneously
+    proj_sum = np.einsum('kij,ij->k', eigenvectors, scaled_forces)
+    
+    # 3. Convert eV energy values to SI omega squared (rad/s)^2
+    omega = (frequencies_eV * EV2J) / HBAR_JS
+    omega_sq = omega ** 2
+    
+    # Safely mask zero frequency/acoustic modes
+    acoustic_mask = np.isclose(frequencies_eV, 0.0, atol=1e-5)
+    omega_sq[acoustic_mask] = np.inf 
+    
+    # 4. Conversion scalar: converts numerator from [eV / (A * sqrt(AMU))] to SI [J / (m * sqrt(kg))]
+    to_SI_numerator = (EV2J / ANG2M) / np.sqrt(AMU2KG)
+    
+    # 5. Calculate configuration coordinates
+    qks = (proj_sum / omega_sq) * to_SI_numerator
+    qks[acoustic_mask] = 0.0
+    
+    return qks
 
 
 def calc_Sks(qks: np.ndarray, frequencies: np.ndarray) -> np.ndarray:
@@ -314,11 +498,10 @@ def calc_delta_Q(struct1: Structure, struct2: Structure) -> float:
 
     masses = np.array([site.specie.atomic_mass for site in struct1.sites])
 
-    dR = pbc_shortest_vectors(struct1.lattice, struct1.frac_coords, struct2.frac_coords)
-    dR = np.reshape(dR, (len(struct1), 3))
-    squared_displacements = np.sum(dR**2, axis=1)
+    dR = calc_dR(struct1, struct2)
+    delta_Q = calc_delQ(masses, dR)
 
-    return float(np.sqrt(np.sum(masses * squared_displacements)))
+    return delta_Q
 
 
 def calculate_hermite(n: int, x: float) -> float:
