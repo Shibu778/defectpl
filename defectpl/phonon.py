@@ -114,10 +114,29 @@ def calculate_phonon_symmetries(
     degeneracy_tolerance: Optional[float] = None,
     nac_q_direction: Optional[List[float]] = None,
     is_little_cogroup: bool = False,
-) -> Dict[str, Any]:
+) -> None:
     """
     Calculate irreducible representations (irreps) of phonon modes at the Gamma point
     and export the computed symmetry details to a Phonopy YAML format.
+
+    Parameters
+    ----------
+    unitcell_path : str or pathlib.Path
+        Path to a structural VASP input unitcell geometry file (POSCAR).
+    force_constants_path : str or pathlib.Path, optional
+        Path pointing to an active FORCE_CONSTANTS file layout.
+    force_sets_path : str or pathlib.Path, optional
+        Path pointing to an active FORCE_SETS file layout.
+    dimension : str, list of int, or numpy.ndarray, default "1 1 1"
+        The expansion dimensions matrix configuring supercell construction loops.
+    symprec : float, default 1e-5
+        Distance tolerance metric required to map equivalent atomic positions.
+    degeneracy_tolerance : float, optional
+        Energy cutoff width identifying degenerate frequency bands.
+    nac_q_direction : list of float, optional
+        The q-vector direction for non-analytical term corrections (NAC).
+    is_little_cogroup : bool, default False
+        Determines group representation parsing parameters.
     """
     if isinstance(dimension, str):
         dim = np.array([int(x) for x in dimension.split()])
@@ -154,6 +173,19 @@ def calculate_gamma_phonon_to_band_yaml(
 ) -> None:
     """
     Evaluate phonon modes at the Gamma point using force constants and write to a band.yaml file.
+
+    Parameters
+    ----------
+    unitcell_filename : str or pathlib.Path, default "POSCAR"
+        Path to the primary reference cell geometry description file.
+    force_constants_filename : str or pathlib.Path, default "FORCE_CONSTANTS"
+        Path addressing source file storing parsed 2nd-order derivatives.
+    dimension : str, list of int, or numpy.ndarray, default "1 1 1"
+        The structural supercell replication shape vector configuration array.
+    symprec : float, default 1e-5
+        Structural crystal space group symmetry parsing threshold tolerance.
+    output_filename : str or pathlib.Path, default "band.yaml"
+        Destination filename target for generating the Phonopy track output data file.
     """
     if isinstance(dimension, str):
         dim = np.array([int(x) for x in dimension.split()])
@@ -172,15 +204,30 @@ def calculate_gamma_phonon_to_band_yaml(
 def read_band_yaml(
     band_yaml_path: Union[str, Path],
     q_idx: int = 0,
-) -> Tuple[np.ndarray, np.ndarray, list]:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Parses a Phonopy band.yaml summary output file to extract Gamma-point 
     phonon frequencies, displacement eigenvectors, and atomic masses.
+
+    Parameters
+    ----------
+    band_yaml_path : str or pathlib.Path
+        The filename tracking location of the processed Phonopy yaml payload.
+    q_idx : int, default 0
+        The absolute entry loop lookup selection index focusing on a specific q-point.
+
+    Returns
+    -------
+    frequencies : numpy.ndarray
+        A flat array of all parsed vibrational mode frequencies, rescaled to eV.
+    eigenvectors : numpy.ndarray
+        Flattened real displacement vector matrix of shape (nmodes, natoms * 3).
+    masses : numpy.ndarray
+        Array containing mass metrics for each ion matching index layout configurations.
     """
     with open(str(band_yaml_path), "r") as f:
         band = yaml.safe_load(f)
 
-    q_idx = 0  # Isolate first entry corresponding to Gamma point tracking
     n_atoms = band["natom"]
     nmodes = len(band["phonon"][q_idx]["band"])
 
@@ -197,28 +244,40 @@ def read_band_yaml(
         [band["phonon"][q_idx]["band"][i]["eigenvector"] for i in range(nmodes)],
         dtype=complex
     )
-    # Strip complex phase: (n_modes, n_atoms, 3, 2) -> (n_modes, n_atoms, 3)
-    eigenvectors = np.array(geigenvecs[..., 0].real, dtype=float)
+    # Strip complex phase: (nmodes, natoms, 3, 2) -> (nmodes, natoms, 3)
+    eigenvectors_3d = np.array(geigenvecs[..., 0].real, dtype=float)
+    
+    # Flatten displacement matrix vectors to meet MSONable shape schema constraints: (nmodes, natoms * 3)
+    eigenvectors = eigenvectors_3d.reshape(nmodes, -1)
 
-    # 3. Gather masses (Fixed unbound variable 'natoms' -> 'n_atoms')
-    masses = np.asarray([band["points"][i]["mass"] for i in range(n_atoms)])
-    frequencies = gfrequencies
+    # 3. Gather masses
+    masses = np.asarray([band["points"][i]["mass"] for i in range(n_atoms)], dtype=float)
 
-    return frequencies, eigenvectors, masses
+    return gfrequencies, eigenvectors, masses
 
 
 def extract_gamma_phonon_data(band_yaml_path: Union[str, Path]) -> GammaPhononData:
     """
     High-level factory function to extract and instantiate a GammaPhononData container from a band.yaml file.
+
+    Parameters
+    ----------
+    band_yaml_path : str or pathlib.Path
+        The destination track file path addressing parsed band structure information.
+
+    Returns
+    -------
+    GammaPhononData
+        An operational, JSON-serializable structured database holding phononic properties.
     """
-    freqs, evecs, masses = read_band_yaml(band_yaml_path)
+    freqs, evecs, masses = read_band_yaml(band_yaml_path, q_idx=0)
     natoms = len(masses)
     nmodes = len(freqs)
     
     return GammaPhononData(
         frequencies=freqs.tolist(),
         eigenvectors=evecs.tolist(),
-        masses=masses,
+        masses=masses.tolist(),
         natoms=natoms,
         nmodes=nmodes,
         meta_info={"source_file": str(band_yaml_path)}

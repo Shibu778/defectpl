@@ -1,22 +1,23 @@
 ### FIGURE & RESOLUTION
+# Single-column journal width specification (APS / ACS / Nature style)
 figure.figsize     : 3.3, 2.5
 figure.dpi         : 600
 figure.autolayout  : True
 
-### COLORS (Publication-friendly, colorblind-safe subset)
-# Optimized using a high-contrast palette (Okabe-Ito / Tol inspired)
-axes.prop_cycle: cycler('color', ['0075dc', 'ffaa00', '00998f', 'c20088', '4c005c', '9dcc00', 'ff0010', '993f00'])
+### COLORS (Publication-friendly, high-contrast, colorblind-safe)
+# CRITICAL FIX: Explicit '#' prefixes added to prevent parsing exceptions
+axes.prop_cycle: cycler('color', ['#0075DC', '#FFAA00', '#00998F', '#C20088', '#4C005C', '#9DCC00', '#FF0010', '#993F00'])
 
 ### TYPOGRAPHY & LATEX
 font.family        : sans-serif
-font.sans-serif    : Helvetica, Arial, Liberation Sans, Dejavu Sans
+font.sans-serif    : Helvetica, Arial, Liberation Sans, DejaVu Sans
 font.size          : 10
 pdf.fonttype       : 42
 ps.fonttype        : 42
 
-# CRITICAL FIX: If using text.usetex, matplotlib defers to LaTeX's engine
+# CRITICAL FIX: Forces math blocks ($...$) to natively render using Helvetica/Sans
 text.usetex        : True
-text.latex.preamble: \usepackage{amsmath} \usepackage{helvet} \usepackage{sansmath} \sansmath
+text.latex.preamble: \usepackage{amsmath} \usepackage{helvet} \usepackage[eulergreek]{sansmath} \sansmath \renewcommand{\familydefault}{\sfdefault}
 
 ### AXES & BORDERS
 axes.titlesize     : 10
@@ -24,7 +25,7 @@ axes.labelsize     : 10
 axes.linewidth     : 0.8
 axes.axisbelow     : True
 
-### TICKS (Inward, crisp, with minors enabled)
+### TICKS (Inward, clean framing, with mirrors)
 xtick.direction    : in
 xtick.major.size   : 4.0
 xtick.minor.size   : 2.0
@@ -48,14 +49,27 @@ ytick.minor.visible: True
 ### LINES & PLOTS
 lines.linewidth    : 1.2
 lines.markersize   : 4.5
+lines.markeredgewidth : 0.8
+
+# Structural scaling for typical error plots
+errorbar.capsize   : 2.0
 
 ### LEGEND
 legend.frameon     : False
-legend.handlelength: 1.2
 legend.fontsize    : 8.5
 legend.loc         : best
+# Tighten layout spacing to optimize single-column real estate
+legend.handlelength: 1.2
+legend.handletextpad: 0.4
+legend.columnspacing: 1.0
 
-### GRID (Optional, disabled by default for clean physics/chem layout)
+### GRID (Disabled by default; highly discrete when activated)
 grid.linewidth     : 0.5
-grid.color         : e0e0e0
+grid.color         : #E0E0E0
 grid.linestyle     : --
+
+### SAVING CONFIGURATION
+# Ensures bounding margins are clipped tightly to the edge coordinates
+savefig.bbox       : tight
+savefig.pad_inches : 0.02
+savefig.format     : pdf

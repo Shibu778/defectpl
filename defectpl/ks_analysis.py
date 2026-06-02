@@ -14,8 +14,9 @@ from typing import Dict, Any, List, Tuple, Union, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from monty.json import MSONable
-from pymatgen.io.vasp.outputs import Eigenval
-from pymatgen.electronic_structure.core import Spin
+
+# Cross-module package imports supporting decoupled VASP I/O pipelines
+from defectpl.vasp import get_spin_multiplicity, read_eigenval_file
 
 
 class KohnShamPlotData(MSONable):
@@ -257,78 +258,6 @@ def get_homo_lumo_idx(eigenval: List[List[float]], thr: float = 0.6) -> Tuple[in
     return homo_idx, lumo_idx
 
 
-def get_spin_multiplicity(homo_up_idx: int, homo_down_idx: int) -> float:
-    """
-    Calculate the spin multiplicity of the electronic configuration.
-
-    Parameters
-    ----------
-    homo_up_idx : int
-        The HOMO level position index extracted for the spin-up channel.
-    homo_down_idx : int
-        The HOMO level position index extracted for the spin-down channel.
-
-    Returns
-    -------
-    float
-        The calculated spin multiplicity ($2S + 1$).
-    """
-    S = abs(homo_up_idx - homo_down_idx) / 2.0
-    return 2 * S + 1
-
-
-def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, Any]:
-    """
-    Parse a VASP EIGENVAL file to extract spin-polarized eigenvalues at a k-point.
-
-    Parameters
-    ----------
-    filename : str or pathlib.Path
-        The destination track file path addressing the target EIGENVAL parameter.
-    k_idx : int, default 0
-        The absolute sequential list entry index picking the desired k-point grid item.
-
-    Returns
-    -------
-    dict
-        A data block payload containing keys mapping spin channels, index boundaries, 
-        gaps, and calculation metrics.
-
-    Raises
-    ------
-    ValueError
-        If the input calculation structure data shows it is not spin-polarized.
-    """
-    data = {}
-    eig = Eigenval(filename, separate_spins=True)
-    if eig.ispin != 2:
-        raise ValueError("The calculation is not spin polarized.")
-        
-    print(f"Selecting the {k_idx}-th k-point from {eig.nkpt} k-points.")
-    print(f"Selected k-point: {eig.kpoints[k_idx]}")
-    
-    data["up"] = list(eig.eigenvalues[Spin.up][k_idx])
-    data["down"] = list(eig.eigenvalues[Spin.down][k_idx])
-    
-    data["homo_up_idx"], data["lumo_up_idx"] = get_homo_lumo_idx(data["up"])
-    data["homo_down_idx"], data["lumo_down_idx"] = get_homo_lumo_idx(data["down"])
-    
-    data["homo_up"] = eig.eigenvalue_band_properties[2][0]
-    data["homo_down"] = eig.eigenvalue_band_properties[2][1]
-    data["lumo_up"] = eig.eigenvalue_band_properties[1][0]
-    data["lumo_down"] = eig.eigenvalue_band_properties[1][1]
-    data["hl_gap_up"] = eig.eigenvalue_band_properties[0][0]
-    data["hl_gap_down"] = eig.eigenvalue_band_properties[0][1]
-    
-    data["nelect"] = eig.nelect
-    data["nbands"] = eig.nbands
-    data["nkpt"] = eig.nkpt
-    data["selected_kpoint"] = [k_idx, list(eig.kpoints[k_idx])]
-    data["spin_multiplicity"] = get_spin_multiplicity(data["homo_up_idx"], data["homo_down_idx"])
-    
-    return data
-
-
 def truncate_eigenval(eigenval: List[List[float]], emin: float, emax: float) -> Tuple[List[List[float]], List[int]]:
     """
     Truncate an eigenvalues array to a specified energy range.
@@ -433,12 +362,12 @@ def xpos_evaluation(npoint: int, max_div: int, sep: float = 0.1, lim: float = 10
 
     if npoint == 1:
         return [midpos]
-    elif npoint % 2 == 1:  # Odd number of points
+    elif npoint % 2 == 1:
         xpos = [midpos]
         xpos += [midpos + i * w / 2.0 + i * sep / 2.0 for i in range(2, npoint, 2)]
         xpos += [midpos - i * w / 2.0 - i * sep / 2.0 for i in range(2, npoint, 2)]
         return xpos
-    else:  # Even number of points
+    else:
         xpos = [midpos + i * w / 2.0 + i * sep / 2.0 for i in range(1, npoint, 2)]
         xpos += [midpos - i * w / 2.0 - i * sep / 2.0 for i in range(1, npoint, 2)]
         return xpos
@@ -583,54 +512,73 @@ def extract_ksplot_data(
 def plot_spin_resolved_levels(
     data: KohnShamPlotData, 
     output_filename: Union[str, Path] = "ks_plot.png", 
-    style_file: Optional[str] = None
-) -> None:
+    style_file: Optional[str] = None,
+    ax: Optional[plt.Axes] = None
+) -> Optional[plt.Axes]:
     """
     Plot Kohn-Sham energy levels with separate spin-up and spin-down panels.
 
     Renders energy levels alongside shaded regions for the valence and conduction 
-    bands, and marks state occupancy.
+    bands, and marks state occupancy. Supports native Matplotlib Axes injection.
 
     Parameters
     ----------
     data : KohnShamPlotData
         The processed data container containing the state properties and layout coordinates.
     output_filename : str or pathlib.Path, default "ks_plot.png"
-        The path and file name where the final plot image will be saved.
+        The path and file name where the final plot image will be saved if ax is None.
     style_file : str, optional
         An optional path to a matplotlib `.mplstyle` configuration file.
+    ax : matplotlib.axes.Axes, optional
+        An existing Matplotlib Axes object to paint the plot on. If None, a new 
+        standalone figure is instantiated and written to output_filename.
+
+    Returns
+    -------
+    matplotlib.axes.Axes or None
+        Returns the active axes object if an ax argument was injected; otherwise 
+        saves the figure to disk and returns None.
     """
     if style_file and os.path.exists(style_file):
         plt.style.use(style_file)
         
     figsize = (6, 6)
     vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.5}
-    fig, ax = plt.subplots(figsize=figsize)
+    
+    standalone = ax is None
+    if standalone:
+        fig, target_ax = plt.subplots(figsize=figsize)
+    else:
+        target_ax = ax
 
-    ax.set_xlim(-data.lim, data.lim)
-    ax.set_ylim(data.emin, data.emax)
-    ax.axvline(0, color="black", linestyle="--", alpha=0.5)
+    target_ax.set_xlim(-data.lim, data.lim)
+    target_ax.set_ylim(data.emin, data.emax)
+    target_ax.axvline(0, color="black", linestyle="--", alpha=0.5)
     
     # Shade bulk band edges regions
-    ax.axhspan(data.emin, data.vbm, color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
-    ax.axhspan(data.cbm, data.emax, color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
+    target_ax.axhspan(data.emin, data.vbm, color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
+    target_ax.axhspan(data.cbm, data.emax, color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
 
     # Adjust marker line layout scaling dynamically
     s = data.w * 200 * (figsize[0] / 6.0)
-    ax.scatter(data.xvalues_up, data.up_energies, color="black", marker="_", s=s)
-    ax.scatter(data.xvalues_down, data.down_energies, color="black", marker="_", s=s)
+    target_ax.scatter(data.xvalues_up, data.up_energies, color="black", marker="_", s=s)
+    target_ax.scatter(data.xvalues_down, data.down_energies, color="black", marker="_", s=s)
     
     electron_markers = {"occupied": "o", "unoccupied": "x", "s": s / 25.0}
     
     # Draw electron occupation dots and holes representations
-    ax.scatter(data.occupied_up["xvalues"], data.occupied_up["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    ax.scatter(data.unoccupied_up["xvalues"], data.unoccupied_up["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
-    ax.scatter(data.occupied_down["xvalues"], data.occupied_down["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    ax.scatter(data.unoccupied_down["xvalues"], data.unoccupied_down["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
+    target_ax.scatter(data.occupied_up["xvalues"], data.occupied_up["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
+    target_ax.scatter(data.unoccupied_up["xvalues"], data.unoccupied_up["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
+    target_ax.scatter(data.occupied_down["xvalues"], data.occupied_down["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
+    target_ax.scatter(data.unoccupied_down["xvalues"], data.unoccupied_down["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
 
-    ax.set_ylabel("Energy (eV)")
-    ax.set_xticks([])
-    ax.set_xticklabels([])
+    target_ax.set_ylabel("Energy (eV)")
+    target_ax.set_xticks([])
+    target_ax.set_xticklabels([])
     
-    plt.savefig(Path(output_filename), dpi=300, bbox_inches="tight")
-    plt.close()
+    if standalone:
+        plt.savefig(Path(output_filename), dpi=300, bbox_inches="tight")
+        plt.close()
+        return None
+        
+    return target_ax

@@ -28,13 +28,16 @@ class Photoluminescence(MSONable):
     """
     Standard core engine computing defect PL state dynamics.
     
-    Inherits from MSONable for out-of-the-box dictionary and JSON serialization.
+    Inherits from MSONable for JSON serialization.
+
+    When dR is provided, qks is computed using calc_qks function.
+    However, when dF is provided, qks is computed using calc_qks_force_mode.
     """
     frequencies: np.ndarray        # (nmodes,) Mode phonon energies in eV
     eigenvectors: np.ndarray       # (nmodes, natoms, 3) Displacement matrix vectors
     masses: np.ndarray             # (natoms,) Atomic mass structural log in AMU
     dR: np.ndarray                 # (natoms, 3) Atomic structural shift (Excited - Ground) in Å
-    
+    dF: np.ndarray                 # (natoms, 3) Atomic force shift (Excited - Ground) in eV/Å
     EZPL: float                    # Zero phonon line energy in eV
     gamma: float                   # Homogeneous/inhomogeneous ZPL broadening factor
     resolution: int = 1000         # Density step intervals per 1 eV boundary limit
@@ -65,7 +68,12 @@ class Photoluminescence(MSONable):
         """Executes the calculation pipeline using detached utility modules."""
         self.delR = utils.calc_delR(self.dR)
         self.delQ = utils.calc_delQ(self.masses, self.dR)
-        self.qks = utils.calc_qks(self.masses, self.dR, self.eigenvectors)
+        if self.dF is not None and np.any(self.dF):
+            self.qks = utils.calc_qks_force_mode(self.masses, self.dF, self.eigenvectors, self.frequencies)
+        elif self.dR is not None and np.any(self.dR):
+            self.qks = utils.calc_qks(self.masses, self.dR, self.eigenvectors)
+        else:
+            raise ValueError("Either dR or dF must be provided and non-zero to compute qks.")
         self.Sks = utils.calc_Sks(self.qks, self.frequencies)
         self.HR_factor = float(np.sum(self.Sks))
         self.DW_factor = np.exp(-self.HR_factor)
@@ -86,7 +94,8 @@ class Photoluminescence(MSONable):
             "frequencies": self.frequencies.tolist(),
             "eigenvectors": self.eigenvectors.tolist(),
             "masses": self.masses.tolist(),
-            "dR": self.dR.tolist(),
+            "dR": self.dR.tolist() if self.dR is not None else None,
+            "dF": self.dF.tolist() if self.dF is not None else None,
             "EZPL": self.EZPL,
             "gamma": self.gamma,
             "resolution": self.resolution,
@@ -103,7 +112,8 @@ class Photoluminescence(MSONable):
             frequencies=np.array(d["frequencies"]),
             eigenvectors=np.array(d["eigenvectors"]),
             masses=np.array(d["masses"]),
-            dR=np.array(d["dR"]),
+            dR=np.array(d["dR"]) if d["dR"] is not None else None,
+            dF=np.array(d["dF"]) if d["dF"] is not None else None,
             EZPL=d["EZPL"],
             gamma=d["gamma"],
             resolution=d["resolution"],

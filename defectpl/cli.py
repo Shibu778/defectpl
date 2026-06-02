@@ -20,7 +20,7 @@ def main():
 # PHOTOLUMINESCENCE ENGINE COMMANDS
 # =====================================================================
 
-@main.command(name="run")
+@main.command(name="pl")
 @click.option(
     "--band_yaml",
     default="./band.yaml",
@@ -63,7 +63,7 @@ def main():
     default="pdf",
     help="Export graphic file extension target layout standard (e.g., pdf, png, svg).",
 )
-def run(
+def pl(
     band_yaml,
     contcar_gs,
     contcar_es,
