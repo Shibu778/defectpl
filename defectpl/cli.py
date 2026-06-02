@@ -17,23 +17,32 @@ def main():
 
 
 # =====================================================================
-# PHOTOLUMINESCENCE ENGINE COMMANDS
+# PHOTOLUMINESCENCE ENGINE COMMANDS (DISPLACEMENT & FORCE MODES)
 # =====================================================================
 
-@main.command(name="pl")
+@click.group(name="pl")
+def pl_group():
+    """Execute high-level defect photoluminescence multi-mode spectral profile engines."""
+    pass
+
+
+@pl_group.command(name="displacement")
 @click.option(
     "--band_yaml",
     default="./band.yaml",
-    help="Phonopy band.yaml configuration file track destination path.",
+    type=click.Path(exists=True),
+    help="Phonopy band.yaml configuration file tracking destination path.",
 )
 @click.option(
     "--contcar_gs",
     default="./CONTCAR_gs",
+    type=click.Path(exists=True),
     help="Pymatgen readable Ground State equilibrium configuration structure file path.",
 )
 @click.option(
     "--contcar_es",
     default="./CONTCAR_es",
+    type=click.Path(exists=True),
     help="Pymatgen readable Excited State equilibrium configuration structure file path.",
 )
 @click.option(
@@ -44,6 +53,7 @@ def main():
 @click.option(
     "--ezpl",
     default=1.95,
+    type=float,
     help="Energy value designating Zero-Phonon Line baseline transitions boundary in eV.",
 )
 @click.option(
@@ -51,6 +61,11 @@ def main():
     default=2.0,
     type=float,
     help="Broadening damping parameter managing electronic state correlation lifespans.",
+)
+@click.option(
+    "--json_out",
+    default=None,
+    help="Optional output path to serialize the complete Photoluminescence data model as a JSON file.",
 )
 @click.option(
     "--plot_all",
@@ -63,23 +78,40 @@ def main():
     default="pdf",
     help="Export graphic file extension target layout standard (e.g., pdf, png, svg).",
 )
-def pl(
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated limits for the intensity plot y-axis (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+)
+def pl_displacement(
     band_yaml,
     contcar_gs,
     contcar_es,
     out_dir,
     ezpl,
     gamma,
+    json_out,
     plot_all,
     fig_format,
+    iylim,
+    max_freq,
 ):
-    """Execute high-level defect photoluminescence multi-mode spectral profile engines."""
-    from pymatgen.core import Structure
+    """Run PL calculations using atomic structural shifts (Displacement Mode)."""
     from defectpl.phonon import read_band_yaml
-    from defectpl.utils import calc_dR
+    from pymatgen.core import Structure
+    from defectpl.vasp_wrapper import calc_dR
     from defectpl.defectpl import Photoluminescence
+    from monty.serialization import dumpfn
+    
 
     try:
+        click.echo("Initializing multi-mode PL calculation via Displacement Mode...")
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         struct_gs = Structure.from_file(contcar_gs)
         struct_es = Structure.from_file(contcar_es)
@@ -90,19 +122,225 @@ def pl(
             eigenvectors=eigenvectors,
             masses=masses,
             dR=dR,
+            dF=None,
             EZPL=ezpl,
             gamma=gamma,
             max_energy=5.0,
             sigma=6e-3
         )
         click.echo("Photoluminescence engine data properties calculated successfully.")
+
+        if json_out:
+            dumpfn(pl_engine, json_out, indent=2)
+            click.echo(f"Serialized Photoluminescence class properties safely to {json_out}")
         
         if plot_all:
-            pl_engine.generate_plots(out_dir=out_dir, fig_format=fig_format)
+            parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            pl_engine.generate_plots(
+                out_dir=out_dir, 
+                fig_format=fig_format,
+                iylim=parsed_iylim,
+                max_freq=max_freq
+            )
             
     except Exception as exc:
         raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
 
+
+@pl_group.command(name="force")
+@click.option(
+    "--band_yaml",
+    default="./band.yaml",
+    type=click.Path(exists=True),
+    help="Phonopy band.yaml configuration file tracking destination path.",
+)
+@click.option(
+    "--outcar_gs",
+    default="./OUTCAR_gs",
+    type=click.Path(exists=True),
+    help="VASP OUTCAR calculation log file tracking ground state atomic forces.",
+)
+@click.option(
+    "--outcar_es",
+    default="./OUTCAR_es",
+    type=click.Path(exists=True),
+    help="VASP OUTCAR calculation log file tracking excited state vertical forces.",
+)
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Output directory path endpoint to drop calculated results database records.",
+)
+@click.option(
+    "--ezpl",
+    default=1.95,
+    type=float,
+    help="Energy value designating Zero-Phonon Line baseline transitions boundary in eV.",
+)
+@click.option(
+    "--gamma",
+    default=2.0,
+    type=float,
+    help="Broadening damping parameter managing electronic state correlation lifespans.",
+)
+@click.option(
+    "--json_out",
+    default=None,
+    help="Optional output path to serialize the complete Photoluminescence data model as a JSON file.",
+)
+@click.option(
+    "--plot_all",
+    is_flag=True,
+    default=False,
+    help="If flagged, automatically spawns all downstream visualization graphics profiles.",
+)
+@click.option(
+    "--fig_format",
+    default="pdf",
+    help="Export graphic file extension target layout standard (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated limits for the intensity plot y-axis (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+)
+def pl_force(
+    band_yaml,
+    outcar_gs,
+    outcar_es,
+    out_dir,
+    ezpl,
+    gamma,
+    json_out,
+    plot_all,
+    fig_format,
+    iylim,
+    max_freq,
+):
+    """Run PL calculations using force-difference vectors at vertical excitation (Force Mode)."""
+    from defectpl.phonon import read_band_yaml
+    from defectpl.vasp_wrapper import prepare_dF_files
+    from defectpl.defectpl import Photoluminescence
+    from monty.serialization import dumpfn
+
+    try:
+        click.echo("Initializing multi-mode PL calculation via Force Mode...")
+        frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
+        dF = prepare_dF_files(outcar_gs, outcar_es)
+
+        pl_engine = Photoluminescence(
+            frequencies=frequencies,
+            eigenvectors=eigenvectors,
+            masses=masses,
+            dR=None,
+            dF=dF,
+            EZPL=ezpl,
+            gamma=gamma,
+            max_energy=5.0,
+            sigma=6e-3
+        )
+        click.echo("Photoluminescence engine data properties calculated successfully.")
+
+        if json_out:
+            dumpfn(pl_engine, json_out, indent=2)
+            click.echo(f"Serialized Photoluminescence class properties safely to {json_out}")
+        
+        if plot_all:
+            parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            pl_engine.generate_plots(
+                out_dir=out_dir, 
+                fig_format=fig_format,
+                iylim=parsed_iylim,
+                max_freq=max_freq
+            )
+            
+    except Exception as exc:
+        raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
+
+
+# =====================================================================
+# INDIVIDUAL PLOT CONTROLLER COMMAND
+# =====================================================================
+
+@main.command(name="plot")
+@click.argument("json_file", type=click.Path(exists=True))
+@click.option(
+    "--type",
+    "-t",
+    "plot_type",
+    type=click.Choice(["intensity", "mode", "partial_energy", "all"], case_sensitive=False),
+    required=True,
+    help="The specific individual graphic component layout to plot from the data file.",
+)
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Output destination path mapping location to dump the generated graphic.",
+)
+@click.option(
+    "--fmt",
+    default="pdf",
+    help="Export graphic file standard extension layout (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated limits for the intensity plot y-axis (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+)
+def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
+    """Deserialize a saved property JSON file and render standalone visualization metrics plots."""
+    from defectpl.defectpl import Photoluminescence
+    from defectpl.plot import Plotter
+    from monty.serialization import loadfn
+
+    try:
+        click.echo(f"Loading data profile records from: {json_file}")
+        # Deserializes complex data patterns seamlessly via MSONable schema hooks
+        pl_engine = loadfn(json_file)
+        if not isinstance(pl_engine, Photoluminescence):
+            raise ValueError("The deserialized records did not resolve into a standard Photoluminescence engine.")
+
+        plotter = Plotter(pl_engine)
+        parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+        
+        out_path = Path(out_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+
+        if plot_type.lower() in ["intensity", "all"]:
+            plotter.plot_intensity_vs_penergy(out_dir=out_dir, fig_format=fmt, iylim=parsed_iylim)
+            click.echo(f"Rendered Intensity vs Photon Energy plot in {out_dir}")
+            
+        if plot_type.lower() in ["mode", "all"]:
+            plotter.plot_penergy_vs_pmode(out_dir=out_dir, fig_format=fmt, max_freq=max_freq)
+            click.echo(f"Rendered Partial Energy / S_k distribution vs Mode plot in {out_dir}")
+
+        if plot_type.lower() in ["partial_energy", "all"]:
+            # Check if specialized plot engine components exist in local module
+            if hasattr(plotter, "plot_partial_energy_vs_penergy"):
+                plotter.plot_partial_energy_vs_penergy(out_dir=out_dir, fig_format=fmt)
+                click.echo(f"Rendered Partial Energy vs Energy plot in {out_dir}")
+            elif plot_type.lower() == "partial_energy":
+                click.echo("Warning: 'plot_partial_energy_vs_penergy' method not found in Plotter engine.", err=True)
+
+    except Exception as exc:
+        raise click.ClickException(f"Failed to generate custom standalone graphic: {exc}")
+
+
+# =====================================================================
+# CONFIGURATION COORDINATE DISPLACEMENT (DQ) COMMANDS
+# =====================================================================
 
 @main.command(name="dq")
 @click.argument("structure1", type=click.Path(exists=True))
@@ -126,7 +364,7 @@ def pl(
 def dq(structure1, structure2, out_path, out_format):
     """Calculate mass-weighted generalized configuration coordinate displacement delta Q."""
     from pymatgen.core import Structure
-    from defectpl.utils import calc_delta_Q
+    from defectpl.vasp_wrapper import calc_delta_Q
 
     try:
         s1 = Structure.from_file(structure1)
@@ -202,20 +440,19 @@ def spectra1d(ezpl, w1, w2, dq_val, temp, e0, de, points, nn1, nn2, plot, save_p
 def setup_ccd(gs, es, out_dir, tmpl_gs, tmpl_es, steps):
     """Generate linear interpolation structure configuration spaces for automated VASP execution parameters."""
     from pymatgen.core import Structure
-    from defectpl.vasp_wrapper import generate_ccd_calculations
+    from defectpl.defectpl import ConfigurationCoordinateDiagram
 
     try:
         s_gs = Structure.from_file(gs)
         s_es = Structure.from_file(es)
         displacements = [float(x.strip()) for x in steps.split(",")]
 
-        generate_ccd_calculations(
-            gs_structure=s_gs,
-            es_structure=s_es,
+        ccd = ConfigurationCoordinateDiagram(ground_struct=s_gs, excited_struct=s_es)
+        ccd.setup_calculations(
             displacements=displacements,
             output_dir=out_dir,
-            ground_template_dir=tmpl_gs,
-            excited_template_dir=tmpl_es,
+            ground_input_dir=tmpl_gs,
+            excited_input_dir=tmpl_es,
         )
         click.echo(f"Interpolated task configuration structures tree setup complete at: {out_dir}")
     except Exception as exc:
@@ -232,7 +469,7 @@ def setup_ccd(gs, es, out_dir, tmpl_gs, tmpl_es, steps):
 def analyze_ccd(gs, es, gs_runs, es_runs, de, save_plot):
     """Fit calculated Potential Energy Surfaces data arrays, extract well parameters, and report metrics."""
     from pymatgen.core import Structure
-    from defectpl.vasp_wrapper import analyze_ccd_framework
+    from defectpl.defectpl import ConfigurationCoordinateDiagram
 
     try:
         s_gs = Structure.from_file(gs)
@@ -241,9 +478,8 @@ def analyze_ccd(gs, es, gs_runs, es_runs, de, save_plot):
         paths_gs = [p.strip() for p in gs_runs.split(" ") if p.strip()]
         paths_es = [p.strip() for p in es_runs.split(" ") if p.strip()]
 
-        w_g, w_e = analyze_ccd_framework(
-            gs_structure=s_gs,
-            es_structure=s_es,
+        ccd = ConfigurationCoordinateDiagram(ground_struct=s_gs, excited_struct=s_es)
+        w_g, w_e = ccd.analyze_ccd(
             ground_vaspruns=paths_gs,
             excited_vaspruns=paths_es,
             dE=de,
@@ -370,6 +606,7 @@ def phonon_symm(poscar, fc, fs, dim, symprec):
     except Exception as exc:
         raise click.ClickException(f"Symmetry parser pipeline execution failed: {exc}")
 
+
 @main.command(name="phonon-band")
 @click.option("--poscar", default="./POSCAR", help="Target VASP structural base unit cell geometry filepath.")
 @click.option("--fc", default="./FORCE_CONSTANTS", help="Source force constants tracking parameter file matrix.")
@@ -449,6 +686,10 @@ def ksplot(eigenval, vbm, cbm, espan, kidx, out_img, out_json):
             
     except Exception as exc:
         raise click.ClickException(f"Kohn-Sham calculation plotting tracking layer crashed: {exc}")
+
+
+# Link the nested PL group structure into our root application workspace
+main.add_command(pl_group)
 
 
 if __name__ == "__main__":

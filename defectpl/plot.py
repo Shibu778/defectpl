@@ -237,7 +237,8 @@ class Plotter:
         cmap: str = "viridis",
     ):
         """Plots S(omega) curve and scattered partial S_k points color-mapped by Localization Ratio."""
-        fig, ax1 = plt.subplots(figsize=figsize)
+        # FIX: Explicitly set layout="constrained" to cleanly handle twinx + colorbar spacing
+        fig, ax1 = plt.subplots(figsize=figsize, layout="constrained")
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
         
         cutoff = max_freq if max_freq is not None else float(max(frequencies))
@@ -265,6 +266,7 @@ class Plotter:
             
         ax1.set_xlim(0, cutoff * 1000.0)
         
+        # When using layout="constrained", we can target ax2 directly with an explicit pad
         cbar = fig.colorbar(sc, ax=ax2, pad=0.12)
         cbar.set_label("Localization Ratio")
         
@@ -286,7 +288,8 @@ class Plotter:
         cmap: str = "viridis",
     ):
         """Plots S(omega) curve and scattered partial S_k points color-mapped by IPR values."""
-        fig, ax1 = plt.subplots(figsize=figsize)
+        # FIX: Explicitly set layout="constrained" to cleanly handle twinx + colorbar spacing
+        fig, ax1 = plt.subplots(figsize=figsize, layout="constrained")
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
         
         cutoff = max_freq if max_freq is not None else float(max(frequencies))
@@ -311,6 +314,7 @@ class Plotter:
         ax2.tick_params(axis="y", labelcolor="black")
         ax1.set_xlim(0, cutoff * 1000.0)
         
+        # When using layout="constrained", we can target ax2 directly with an explicit pad
         cbar = fig.colorbar(sc, ax=ax2, pad=0.12)
         cbar.set_label("Inverse Participation Ratio")
         
@@ -354,7 +358,7 @@ class Plotter:
 
 def plot_interactive_intensity(filename: Union[str, Path]):
     """Loads a Photoluminescence file and generates an interactive HTML Plotly line plot."""
-    from defectpl.photoluminescence import Photoluminescence  # Runtime lazy-import safeguards execution
+    from defectpl.defectpl import Photoluminescence  # Runtime lazy-import safeguards execution
     
     pl = loadfn(str(filename))
     if not isinstance(pl, Photoluminescence):
@@ -380,7 +384,7 @@ def plot_interactive_intensity(filename: Union[str, Path]):
 
 def plot_interactive_S_omega_Sks_Loc_rat_vs_penergy(filename: Union[str, Path]):
     """Loads a Photoluminescence file and generates a multi-axis interactive visual framework."""
-    from defectpl.photoluminescence import Photoluminescence
+    from defectpl.defectpl import Photoluminescence
     
     pl = loadfn(str(filename))
     if not isinstance(pl, Photoluminescence):
@@ -447,7 +451,7 @@ def comparepl(
     figsize: Tuple[float, float] = (3.3, 2.5),
 ):
     """Loads multiple Photoluminescence data frames to plot comparative isotope pathways."""
-    from defectpl.photoluminescence import Photoluminescence
+    from defectpl.defectpl import Photoluminescence
     
     pl_runs = [loadfn(str(f)) for f in properties_files]
     if legends is None:

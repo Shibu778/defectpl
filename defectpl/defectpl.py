@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 Defect Optical Properties Engine (DefectPL) core module.
-Author: Shibu Meher, Manoj Dey
+Authors: Shibu Meher, Manoj Dey
 """
 
 from dataclasses import dataclass, field
 import json
-import os
 from pathlib import Path
 from shutil import copyfile
 from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
 import numpy as np
 from monty.json import MSONable
@@ -21,6 +19,7 @@ from pymatgen.core import Structure
 from defectpl.constants import AMU2KG, ANG2M, EV2J, HBAR_EVS
 from defectpl.plot import Plotter
 import defectpl.utils as utils
+from defectpl.vasp_wrapper import calc_delta_Q, get_q_from_structure
 
 
 @dataclass
@@ -33,23 +32,28 @@ class Photoluminescence(MSONable):
     When dR is provided, qks is computed using calc_qks function.
     However, when dF is provided, qks is computed using calc_qks_force_mode.
     """
+    # 1. Mandatory Core Inputs (No Default Values Allowed First)
     frequencies: np.ndarray        # (nmodes,) Mode phonon energies in eV
     eigenvectors: np.ndarray       # (nmodes, natoms, 3) Displacement matrix vectors
     masses: np.ndarray             # (natoms,) Atomic mass structural log in AMU
-    dR: np.ndarray                 # (natoms, 3) Atomic structural shift (Excited - Ground) in Å
-    dF: np.ndarray                 # (natoms, 3) Atomic force shift (Excited - Ground) in eV/Å
     EZPL: float                    # Zero phonon line energy in eV
-    gamma: float                   # Homogeneous/inhomogeneous ZPL broadening factor
+
+    # 2. Runtime Optional Parameters & Settings (Defaults Grouped Last)
+    dR: Optional[np.ndarray] = None       # (natoms, 3) Atomic structural shift (Excited - Ground) in Å
+    dF: Optional[np.ndarray] = None       # (natoms, 3) Atomic force shift (Excited - Ground) in eV/Å
     resolution: int = 1000         # Density step intervals per 1 eV boundary limit
     max_energy: float = 5.0        # Range tracking upper caps conditions in eV
     sigma: float = 6e-3            # Continuous broadening profile used in Gaussian calculations
+    gamma: float = 2.0             # Homogeneous/inhomogeneous ZPL broadening factor
     
     # Dependent calculated properties stored dynamically downstream
+    natoms: int = field(init=False)
     delR: float = field(init=False, default=None)
     delQ: float = field(init=False, default=None)
     qks: np.ndarray = field(init=False, default=None)
     Sks: np.ndarray = field(init=False, default=None)
     HR_factor: float = field(init=False, default=None)
+    DW_factor: float = field(init=False, default=None)
     iprs: np.ndarray = field(init=False, default=None)
     localization_ratio: np.ndarray = field(init=False, default=None)
     omega_range: List[Union[float, int]] = field(init=False, default=None)
@@ -60,23 +64,33 @@ class Photoluminescence(MSONable):
     intensity: np.ndarray = field(init=False, default=None)
 
     def __post_init__(self):
+        self.frequencies = np.asarray(self.frequencies)
+        self.eigenvectors = np.asarray(self.eigenvectors)
+        self.masses = np.asarray(self.masses)
+        if self.dR is not None:
+            self.dR = np.asarray(self.dR)
+        if self.dF is not None:
+            self.dF = np.asarray(self.dF)
+
         self.natoms = len(self.masses)
         self.omega_range = [0.0, self.max_energy, int(self.max_energy * self.resolution)]
         self.compute_properties()
 
     def compute_properties(self):
         """Executes the calculation pipeline using detached utility modules."""
-        self.delR = utils.calc_delR(self.dR)
-        self.delQ = utils.calc_delQ(self.masses, self.dR)
+        self.delR = utils.calc_delR(self.dR) if self.dR is not None else 0.0
+        self.delQ = utils.calc_delQ(self.masses, self.dR) if self.dR is not None else 0.0
+        
         if self.dF is not None and np.any(self.dF):
             self.qks = utils.calc_qks_force_mode(self.masses, self.dF, self.eigenvectors, self.frequencies)
         elif self.dR is not None and np.any(self.dR):
             self.qks = utils.calc_qks(self.masses, self.dR, self.eigenvectors)
         else:
             raise ValueError("Either dR or dF must be provided and non-zero to compute qks.")
+            
         self.Sks = utils.calc_Sks(self.qks, self.frequencies)
         self.HR_factor = float(np.sum(self.Sks))
-        self.DW_factor = np.exp(-self.HR_factor)
+        self.DW_factor = float(np.exp(-self.HR_factor))
         
         self.iprs = utils.calc_IPR(self.eigenvectors)
         self.localization_ratio = self.natoms / self.iprs
@@ -87,10 +101,14 @@ class Photoluminescence(MSONable):
         self.A_line, self.intensity = utils.calc_Spectrum_Intensity(self.Gts, self.EZPL, self.resolution)
 
     def as_dict(self) -> dict:
-        """Required for Monty serialization support across deep nested structures."""
+        """
+        Exports core parameters and safe real-valued arrays, leaving 
+        complex-valued or massive spectral tracking lines out of the payload.
+        """
         return {
             "@module": self.__class__.__module__,
             "@class": self.__class__.__name__,
+            # Core Inputs
             "frequencies": self.frequencies.tolist(),
             "eigenvectors": self.eigenvectors.tolist(),
             "masses": self.masses.tolist(),
@@ -101,24 +119,93 @@ class Photoluminescence(MSONable):
             "resolution": self.resolution,
             "max_energy": self.max_energy,
             "sigma": self.sigma,
-            "HR_factor": self.HR_factor,
-            "DW_factor": self.DW_factor,
+            
+            # Safe Real-Valued Computed Properties 
+            "natoms": self.natoms,
+            "delR": float(self.delR) if hasattr(self.delR, "__float__") else self.delR,
+            "delQ": float(self.delQ) if hasattr(self.delQ, "__float__") else self.delQ,
+            "qks": self.qks.tolist() if self.qks is not None else None,
+            "Sks": self.Sks.tolist() if self.Sks is not None else None,
+            "HR_factor": float(self.HR_factor) if hasattr(self.HR_factor, "__float__") else self.HR_factor,
+            "DW_factor": float(self.DW_factor) if hasattr(self.DW_factor, "__float__") else self.DW_factor,
+            "iprs": self.iprs.tolist() if self.iprs is not None else None,
+            "localization_ratio": self.localization_ratio.tolist() if self.localization_ratio is not None else None,
+            "omega_range": self.omega_range,
+            "S_omega": self.S_omega.tolist() if self.S_omega is not None else None,
+            
+            # Explicitly drop complex/spectral properties to avoid serialization bugs
+            "Sts": None,
+            "Gts": None,
+            "A_line": None,
+            "intensity": None,
         }
 
     @classmethod
     def from_dict(cls, d: dict):
-        """Reconstructs the structural data engine instance perfectly out of JSON dictionary outputs."""
+        """
+        Reconstructs the object by reading core inputs and real values, 
+        then automatically recomputes missing complex and spectrum properties.
+        """
+        # Create an uninitialized instance to handle assignment without tripping standard __post_init__ loops
+        obj = cls.__new__(cls)
+        
+        # Load Core Inputs
+        obj.frequencies = np.array(d["frequencies"])
+        obj.eigenvectors = np.array(d["eigenvectors"])
+        obj.masses = np.array(d["masses"])
+        obj.dR = np.array(d["dR"]) if d.get("dR") is not None else None
+        obj.dF = np.array(d["dF"]) if d.get("dF") is not None else None
+        obj.EZPL = d["EZPL"]
+        obj.gamma = d["gamma"]
+        obj.resolution = d.get("resolution", 1000)
+        obj.max_energy = d.get("max_energy", 5.0)
+        obj.sigma = d.get("sigma", 6e-3)
+        
+        # Load Stored Real-Valued Properties
+        obj.natoms = d.get("natoms", len(obj.masses))
+        obj.delR = d.get("delR")
+        obj.delQ = d.get("delQ")
+        obj.qks = np.array(d["qks"]) if d.get("qks") is not None else None
+        obj.Sks = np.array(d["Sks"]) if d.get("Sks") is not None else None
+        obj.HR_factor = d.get("HR_factor")
+        obj.DW_factor = d.get("DW_factor")
+        obj.iprs = np.array(d["iprs"]) if d.get("iprs") is not None else None
+        obj.localization_ratio = np.array(d["localization_ratio"]) if d.get("localization_ratio") is not None else None
+        obj.omega_range = d.get("omega_range", [0.0, obj.max_energy, int(obj.max_energy * obj.resolution)])
+        obj.S_omega = np.array(d["S_omega"]) if d.get("S_omega") is not None else None
+        
+        # Set up placeholders for the missing complex/spectral parameters
+        obj.Sts = None
+        obj.Gts = None
+        obj.A_line = None
+        obj.intensity = None
+        
+        # Fallback Trigger: Recompute the complex-dependent parts of the pipeline on-the-fly
+        if obj.intensity is None:
+            # Recompute the remaining downstream properties (Sts, Gts, A_line, intensity)
+            obj.Sts = utils.calc_St(obj.S_omega)
+            obj.Gts = utils.calc_Gts(obj.Sts, obj.HR_factor, obj.gamma, obj.resolution)
+            obj.A_line, obj.intensity = utils.calc_Spectrum_Intensity(obj.Gts, obj.EZPL, obj.resolution)
+            
+        return obj
+
+    @classmethod
+    def from_dict_expensive(cls, d: dict):
+        """
+        Reconstructs the object cleanly by extracting ONLY the required primary 
+        inputs. Dependent arrays are automatically recalculated via __post_init__.
+        """
         return cls(
             frequencies=np.array(d["frequencies"]),
             eigenvectors=np.array(d["eigenvectors"]),
             masses=np.array(d["masses"]),
-            dR=np.array(d["dR"]) if d["dR"] is not None else None,
-            dF=np.array(d["dF"]) if d["dF"] is not None else None,
+            dR=np.array(d["dR"]) if d.get("dR") is not None else None,
+            dF=np.array(d["dF"]) if d.get("dF") is not None else None,
             EZPL=d["EZPL"],
             gamma=d["gamma"],
-            resolution=d["resolution"],
-            max_energy=d["max_energy"],
-            sigma=d["sigma"]
+            resolution=d.get("resolution", 1000),
+            max_energy=d.get("max_energy", 5.0),
+            sigma=d.get("sigma", 6e-3)
         )
 
     def generate_plots(self, out_dir: Union[str, Path], max_freq: Optional[float] = None, iylim=None, fig_format="pdf"):
@@ -155,29 +242,6 @@ class Photoluminescence(MSONable):
 class VibrationalSpectra1D(MSONable):
     """
     1D Harmonic Oscillator model for computing the vibrational lineshape of luminescence bands.
-
-    Parameters
-    ----------
-    EZPL : float
-        Zero-phonon line energy in electronvolts (eV).
-    w1_meV : float
-        Vibrational frequency in the excited state in millielectronvolts (meV).
-    w2_meV : float
-        Vibrational frequency in the ground state in millielectronvolts (meV).
-    DQ : float
-        Mass-weighted atomic displacement in units of amu^(1/2) * Å.
-    T : float
-        Temperature of the system in Kelvin (K).
-    E0 : float
-        Starting energy boundary grid for the output spectrum in eV.
-    dE : float
-        Energy step width interval in eV.
-    M : int
-        Total number of energy grid sampling points.
-    NN1 : int, optional
-        Maximum number of vibrational states included for the excited state. Default is 22.
-    NN2 : int, optional
-        Maximum number of vibrational states included for the ground state. Default is 52.
     """
     EZPL: float
     w1_meV: float
@@ -195,23 +259,29 @@ class VibrationalSpectra1D(MSONable):
     overlap_data: Dict[str, List[float]] = field(default_factory=dict, init=False, repr=False)
     spectral_data: Dict[str, List[float]] = field(default_factory=dict, init=False, repr=False)
 
-    K2EV: float = 8.617e-5       
-    FACTOR: float = 15.46484755   
+    # Coherent SI Conversion Factors derived directly from package constants
+    K2EV: float = 8.617333262e-5       
+    FACTOR: float = field(init=False)
     
     def __post_init__(self):
         self.M = int(self.M)
         self.w1 = self.w1_meV / 1000.0  
         self.w2 = self.w2_meV / 1000.0
         
+        # Unified mass-weighted conversion factor substitution: sqrt(AMU2KG)*ANG2M / HBAR_J_S
+        hbar_j_s = HBAR_EVS * EV2J
+        self.FACTOR = np.sqrt(AMU2KG) * ANG2M / hbar_j_s  # Yields ~15.46485
+        
         self.sigma = 0.70 * self.w2
         self.TE = self.T * self.K2EV
-        self.w = self.w1 * self.w2 / (self.w1 + self.w2)
+        self.w = self.w1 * self.w2 / (self.w1 + self.w2) if (self.w1 + self.w2) > 0 else 0.0
+        self.FACTOR = 15.46484755
         self.rho = self.FACTOR * np.sqrt(self.w / 2.0) * self.DQ
-        
-        self.Erel1 = 0.5 * self.FACTOR**2 * self.w1**2 * self.DQ**2
-        self.Erel2 = 0.5 * self.FACTOR**2 * self.w2**2 * self.DQ**2
-        self.sinfi = np.sqrt(self.w2 / (self.w1 + self.w2))
-        self.cosfi = np.sqrt(self.w1 / (self.w1 + self.w2))
+
+        self.Erel1 = 0.5 * (self.FACTOR**2) * (self.w1**2) * (self.DQ**2)
+        self.Erel2 = 0.5 * (self.FACTOR**2) * (self.w2**2) * (self.DQ**2)
+        self.sinfi = np.sqrt(self.w2 / (self.w1 + self.w2)) if (self.w1 + self.w2) > 0 else 0.0
+        self.cosfi = np.sqrt(self.w1 / (self.w1 + self.w2)) if (self.w1 + self.w2) > 0 else 0.0
         
         print(f"Relaxation energy in ground state: {self.Erel1:.6f} eV")
         print(f"Relaxation energy in excited state: {self.Erel2:.6f} eV")
@@ -229,20 +299,26 @@ class VibrationalSpectra1D(MSONable):
     def compute_spectrum(self) -> None:
         """Compute individual transition intensities and check closure."""
         self.compute_overlap_matrix()
-        Z = 1.0 / (1.0 - np.exp(-self.w1 / self.TE))
-        Rpart = 0.0
-        contr, en = [], []
+        
+        # Guard against zero temperature limits
+        if self.TE <= 0:
+            Z = 1.0
+            weights = np.zeros(self.NN1 + 1)
+            weights[0] = 1.0
+        else:
+            Z = 1.0 / (1.0 - np.exp(-self.w1 / self.TE))
+            weights = np.exp(-np.arange(self.NN1 + 1) * self.w1 / self.TE) / Z
 
+        contr, en = [], []
         for i in range(self.NN1 + 1):
-            weight = np.exp(-i * self.w1 / self.TE) / Z
+            weight = weights[i]
             for j in range(self.NN2 + 1):
                 val = self.overlap_matrix[i, j]
                 contrib = weight * (val**2)
-                Rpart += contrib
                 contr.append(contrib)
                 en.append(self.EZPL - j * self.w2 + i * self.w1)
 
-        print(f"Closure relation sum (should be ~1.0): {Rpart:.6f}")
+        print(f"Closure relation sum (should be ~1.0): {sum(contr):.6f}")
         self.overlap_data = {"contributions": contr, "energies": en}
 
     def compute_lineshape(self) -> None:
@@ -250,19 +326,16 @@ class VibrationalSpectra1D(MSONable):
         if not self.overlap_data:
             self.compute_spectrum()
             
-        energies_grid = np.array([self.E0 + l * self.dE for l in range(self.M)])
-        dos = np.zeros(self.M)
-        
+        energies_grid = self.E0 + np.arange(self.M) * self.dE
         contr = np.array(self.overlap_data["contributions"])
         en = np.array(self.overlap_data["energies"])
         
-        for l, E in enumerate(energies_grid):
-            deltaE = en - E
-            gaussian = np.exp(-(deltaE**2) / (2 * self.sigma**2)) / (self.sigma * np.sqrt(2 * np.pi))
-            dos[l] = np.sum(contr * gaussian)
+        # Vectorized calculation pipeline across grid positions to maximize performance
+        delta_E = en[:, np.newaxis] - energies_grid[np.newaxis, :]
+        gaussian = np.exp(-(delta_E**2) / (2 * self.sigma**2)) / (self.sigma * np.sqrt(2 * np.pi))
+        dos = np.dot(contr, gaussian)
 
         dosw3 = dos * (energies_grid**3)
-        
         norm_factor = np.sum(dosw3) * self.dE
         if norm_factor > 0:
             dosw3 /= norm_factor
@@ -279,23 +352,25 @@ class VibrationalSpectra1D(MSONable):
         with open(lineshape_file, "w", encoding="utf-8") as f:
             json.dump(self.spectral_data, f, indent=4)
 
-    def plot_lineshape(self, save_file: Optional[str] = None, figsize: Tuple[int, int] = (6, 4)) -> None:
-        """Generate visual breakdown plots detailing the normalized intensity spectrum."""
+    def plot_lineshape(self, save_file: Optional[str] = None, figsize: Tuple[float, float] = (4.4, 4.4)) -> None:
+        """Generate visual breakdown plots detailing the normalized intensity spectrum.
+        """
         if not self.spectral_data:
             raise ValueError("Run compute_lineshape() before plotting.")
             
-        plt.figure(figsize=figsize)
-        plt.plot(self.spectral_data["energies"], self.spectral_data["dosw3"], linewidth=2)
-        plt.xlabel("Energy (eV)")
-        plt.ylabel("Intensity (arb. units)")
-        plt.title("Vibrational Lineshape")
-        plt.tight_layout()
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.plot(self.spectral_data["energies"], self.spectral_data["dosw3"])
+        ax.set_xlabel("Energy (eV)")
+        ax.set_ylabel("Intensity (arb. u.)")
+        ax.set_yticks([])
         
         if save_file:
-            plt.savefig(save_file, dpi=300)
+            plt.savefig(save_file, dpi=600, bbox_inches="tight")
+            plt.close(fig)
             print(f"Lineshape plot saved to {save_file}")
         else:
             plt.show()
+            plt.close(fig)
 
     def get_peak_position(self) -> Tuple[float, float]:
         """Fetch the energy location corresponding to the peak maximum intensity."""
@@ -329,18 +404,6 @@ class VibrationalSpectra1D(MSONable):
 class ConfigurationCoordinateDiagram(MSONable):
     """
     Class managing Potential Energy Surface calculations and diagrams.
-
-    Parameters
-    ----------
-    ground_struct : Structure
-        Equilibrium geometry structure for the electronic ground state.
-    excited_struct : Structure
-        Equilibrium geometry structure for the electronic excited state.
-
-    Attributes
-    ----------
-    dQ : float
-        Total mass-weighted displacement step length between equilibrium configurations.
     """
     ground_struct: Structure
     excited_struct: Structure
@@ -348,29 +411,13 @@ class ConfigurationCoordinateDiagram(MSONable):
 
     def __post_init__(self):
         """Calculate secondary equilibrium distance vectors automatically."""
-        self.dQ = utils.calc_delta_Q(self.ground_struct, self.excited_struct)
+        self.dQ = calc_delta_Q(self.ground_struct, self.excited_struct)
 
     def generate_structures(
         self, displacements: Union[List[float], np.ndarray], remove_zero: bool = True
     ) -> Tuple[List[Structure], List[Structure]]:
-        """
-        Linearly interpolate atomic displacement paths across configurations.
-
-        Parameters
-        ----------
-        disacements : list or np.ndarray
-            Displacement ratios relative to the baseline path (e.g., -0.2 to 1.2).
-        remove_zero : bool, default True
-            If True, filters out exact 0.0 ground index configurations.
-
-        Returns
-        -------
-        ground_structures : list of Structure
-            Displaced structures tracking the ground state potential well.
-        excited_structures : list of Structure
-            Displaced structures tracking the excited state potential well.
-        """
-        disp_arr = np.array(displacements)
+        """Linearly interpolate atomic displacement paths across configurations."""
+        disp_arr = np.atleast_1d(displacements)
         if remove_zero:
             disp_arr = disp_arr[disp_arr != 0.0]
 
@@ -386,22 +433,7 @@ class ConfigurationCoordinateDiagram(MSONable):
         excited_input_dir: Union[str, Path],
         input_files: Optional[List[str]] = None,
     ) -> None:
-        """
-        Generate file trees containing interpolated VASP calculation parameters.
-
-        Parameters
-        ----------
-        displacements : list or np.ndarray
-            Array listing position fractional paths to generate.
-        output_dir : str or Path
-            Root directory path string destination.
-        ground_input_dir : str or Path
-            Reference location containing template ground state run parameters.
-        excited_input_dir : str or Path
-            Reference location containing template excited state run parameters.
-        input_files : list of str, optional
-            Filenames to copy alongside POSCAR profiles. Defaults to INCAR, KPOINTS, POTCAR.
-        """
+        """Generate file trees containing interpolated VASP calculation parameters."""
         if input_files is None:
             input_files = ["KPOINTS", "POTCAR", "INCAR"]
 
@@ -428,23 +460,7 @@ class ConfigurationCoordinateDiagram(MSONable):
     def extract_pes_profile(
         self, vasprun_paths: List[Union[str, Path]], tol: float = 0.001
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Parse raw output collection files to construct the local energy surface.
-
-        Parameters
-        ----------
-        vasprun_paths : list of str or Path
-            Collection of completed run xml path trajectories.
-        tol : float, default 0.001
-            Coordinate distance mapping detection threshold.
-
-        Returns
-        -------
-        q_values : np.ndarray
-            Projected coordinate array points.
-        energies : np.ndarray
-            Relative baseline-shifted energy levels array (eV).
-        """
+        """Parse raw output collection files to construct the local energy surface."""
         from pymatgen.io.vasp.outputs import Vasprun
 
         total_runs = len(vasprun_paths)
@@ -453,7 +469,7 @@ class ConfigurationCoordinateDiagram(MSONable):
 
         for idx, path in enumerate(vasprun_paths):
             vr = Vasprun(str(path), parse_dos=False, parse_eigen=False)
-            q_values[idx] = utils.get_q_from_structure(
+            q_values[idx] = get_q_from_structure(
                 self.ground_struct, self.excited_struct, vr.structures[-1], tol=tol
             )
             energies[idx] = vr.final_energy
@@ -466,65 +482,39 @@ class ConfigurationCoordinateDiagram(MSONable):
         excited_vaspruns: List[Union[str, Path]],
         dE: float = 0.0,
         plot: bool = True,
-        figsize: Tuple[int, int] = (5, 5),
+        figsize: Tuple[float, float] = (3.3, 3.3),
         xlim: Tuple[float, float] = (-3.0, 10.0),
         ylim: Tuple[float, float] = (-0.5, 4.0),
         save_plot: Optional[str] = None,
     ) -> Tuple[float, float]:
-        """
-        Process the completed calculations data arrays and fit harmonic wells.
-
-        Parameters
-        ----------
-        ground_vaspruns : list of str or Path
-            File tracks indicating calculated values for the electronic ground states.
-        excited_vaspruns : list of str or Path
-            File tracks indicating calculated values for the electronic excited states.
-        dE : float, default 0.0
-            Energy gap separation offset fixed between the baseline minima (eV).
-        plot : bool, default True
-            Controls if graphical plots are rendered.
-        figsize : tuple of int, default (5, 5)
-            Render window dimensions specification.
-        xlim : tuple of float, default (-3.0, 10.0)
-            X-axis configuration limits.
-        ylim : tuple of float, default (-0.5, 4.0)
-            Y-axis energy grid visualization limits.
-        save_plot : str, optional
-            Path indicating filename target destination to export figure files.
-
-        Returns
-        -------
-        ground_omega : float
-            Fitted configuration energy value for the ground state well (eV).
-        excited_omega : float
-            Fitted configuration energy value for the excited state well (eV).
-        """
+        """Process completed calculation data arrays and fit harmonic wells."""
         q_ground, e_ground = self.extract_pes_profile(ground_vaspruns)
         q_excited, e_excited = self.extract_pes_profile(excited_vaspruns)
         e_excited += dE
 
         if plot:
             fig, ax = plt.subplots(figsize=figsize)
-            ax.scatter(q_ground, e_ground, s=10, label="Ground State")
-            ax.scatter(q_excited, e_excited, s=10, label="Excited State")
+            ax.scatter(q_ground, e_ground, label="Ground State")
+            ax.scatter(q_excited, e_excited, label="Excited State")
 
             grid_line = np.linspace(xlim[0], xlim[1], 100)
             ground_omega = utils.get_omega_from_pes(q_ground, e_ground, ax=ax, eval_grid=grid_line)
             excited_omega = utils.get_omega_from_pes(q_excited, e_excited, ax=ax, eval_grid=grid_line)
 
-            ax.set_xlabel(r"$Q$ [amu$^{1/2}$ $\AA$]", fontsize=16)
-            ax.set_ylabel("Energy [eV]", fontsize=16)
+            ax.set_xlabel(r"$Q$ ($\mathrm{amu}^{1/2}\cdot\mathrm{\AA}$)")
+            ax.set_ylabel("Energy (eV)")
             ax.set_xlim(xlim)
             ax.set_ylim(ylim)
-            ax.set_xticks(np.arange(xlim[0], xlim[1] + 1, 2))
             ax.xaxis.set_minor_locator(MultipleLocator(1))
             ax.yaxis.set_minor_locator(MultipleLocator(1))
             ax.legend()
 
             if save_plot:
-                plt.savefig(save_plot, bbox_inches="tight", dpi=400)
-            plt.show()
+                plt.savefig(save_plot, bbox_inches="tight", dpi=600)
+                plt.close(fig)
+            else:
+                plt.show()
+                plt.close(fig)
         else:
             ground_omega = utils.get_omega_from_pes(q_ground, e_ground)
             excited_omega = utils.get_omega_from_pes(q_excited, e_excited)
@@ -534,35 +524,11 @@ class ConfigurationCoordinateDiagram(MSONable):
     def estimate_vertical_transitions(
         self, ground_omega: float, excited_omega: float, dE: float, eps: float = 1e-6
     ) -> Tuple[float, float, float, float]:
-        """
-        Calculate vertical absorption and emission energy transitions.
-
-        Parameters
-        ----------
-        ground_omega : float
-            Harmonic phonon frequency of the ground state well (eV).
-        excited_omega : float
-            Harmonic phonon frequency of the excited state well (eV).
-        dE : float
-            Energy difference between minima of the two parabolas (eV).
-        eps : float, default 1e-6
-            Small regularization constant to avoid division-by-zero errors.
-
-        Returns
-        -------
-        e_abs : float
-            Vertical absorption transition energy step value (eV).
-        e_em : float
-            Vertical emission relaxation transition energy step value (eV).
-        fc_e : float
-            Franck-Condon relaxation offset shift inside the excited state manifold (eV).
-        fc_g : float
-            Franck-Condon relaxation offset shift inside the ground state manifold (eV).
-        """
+        """Calculate vertical absorption and emission energy transitions."""
         if ground_omega < eps or excited_omega < eps:
             raise ValueError("Phonon frequencies must be strictly positive.")
 
-        conversion_factor = (self.dQ**2) * AMU2KG * (ANG2M**2) / (HBAR_eVs**2) / EV2J
+        conversion_factor = (self.dQ**2) * AMU2KG * (ANG2M**2) / (HBAR_EVS**2) / EV2J
         
         fc_e = 0.5 * (excited_omega**2) * conversion_factor
         fc_g = 0.5 * (ground_omega**2) * conversion_factor

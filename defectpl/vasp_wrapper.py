@@ -16,9 +16,7 @@ from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.util.coord import pbc_shortest_vectors
 
 from defectpl.phonon import read_band_yaml
-from defectpl.utils import calc_dR
-from defectpl.defectpl import Photoluminescence
-from defectpl.vasp import get_last_structure_and_forces_from_outcar, get_first_structure_and_forces_from_outcar
+from defectpl.vasp import get_final_structure_and_forces_from_outcar, get_first_structure_and_forces_from_outcar
 from defectpl.utils import calc_delQ
 
 def generate_ccd_calculations(
@@ -200,6 +198,7 @@ def run_pl_calc_vasp_displacement_mode(
     fig_format,
 ):
     try:
+        from defectpl.defectpl import Photoluminescence
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         struct_gs = Structure.from_file(contcar_gs)
         struct_es = Structure.from_file(contcar_es)
@@ -278,7 +277,7 @@ def prepare_dF_files(ground_outcar, excited_outcar, ground_poscar=None, excited_
         The calculated force difference vector dF.
     """
     # Extract structures and forces from OUTCAR files
-    ground_structure, ground_forces = get_last_structure_and_forces_from_outcar(ground_outcar, poscar_path=ground_poscar)
+    ground_structure, ground_forces = get_final_structure_and_forces_from_outcar(ground_outcar, poscar_path=ground_poscar)
     excited_structure, excited_forces = get_first_structure_and_forces_from_outcar(excited_outcar, poscar_path=excited_poscar)
     
     # Prepare data dictionaries for dF calculation
@@ -301,6 +300,7 @@ def run_pl_calc_vasp_force_mode(
     fig_format,
 ):
     try:
+        from defectpl.defectpl import Photoluminescence
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         dF = prepare_dF_files(outcar_gs, outcar_es)
 
@@ -362,11 +362,16 @@ def calc_dR(
     if len(struct_gs) != len(struct_es):
         raise ValueError("Lattice structure mismatch: Input configurations have differing site counts.")
 
-    # Vectorized calculation over periodic boundaries matching calc_delta_Q
-    dR_matrix = pbc_shortest_vectors(struct_gs.lattice, struct_gs.frac_coords, struct_es.frac_coords)
-    
-    # Isolate the exact 1-to-1 site mappings along the diagonal axes
-    dR = np.diagonal(dR_matrix, axis1=0, axis2=1).T
+    length = len(struct_gs)
+    lattice = struct_gs.lattice
+    dR = np.vstack(
+            [
+                pbc_shortest_vectors(
+                    lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i]
+                )
+                for i in range(length)
+            ]
+        ).reshape(length, 3)
     return dR
 
 def calc_delta_Q(struct1: Structure, struct2: Structure) -> float:

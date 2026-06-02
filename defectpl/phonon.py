@@ -245,10 +245,8 @@ def read_band_yaml(
         dtype=complex
     )
     # Strip complex phase: (nmodes, natoms, 3, 2) -> (nmodes, natoms, 3)
-    eigenvectors_3d = np.array(geigenvecs[..., 0].real, dtype=float)
+    eigenvectors = np.array(geigenvecs[..., 0].real, dtype=float)
     
-    # Flatten displacement matrix vectors to meet MSONable shape schema constraints: (nmodes, natoms * 3)
-    eigenvectors = eigenvectors_3d.reshape(nmodes, -1)
 
     # 3. Gather masses
     masses = np.asarray([band["points"][i]["mass"] for i in range(n_atoms)], dtype=float)

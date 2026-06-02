@@ -405,7 +405,7 @@ def calc_Spectrum_Intensity(Gts: np.ndarray, EZPL: float, resolution: float) -> 
 
     Returns
     -------
-    luminescence_dos : np.ndarray
+    luminescence_spectral_function : np.ndarray
         Raw line shape density of states function array matrix (A).
     luminescence_intensity : np.ndarray
         Luminescence intensity array spectrum scaled by omega^3 energy modulation.
@@ -499,3 +499,51 @@ def calculate_overlap_element(
             ix += pr1 * pr2 * pr3 * f
 
     return ix
+
+
+def extract_important_properties(pl_engine, filename: str = "important_properties.txt") -> None:
+    """Extracts single-value physical properties from a Photoluminescence engine 
+    instance and formats them into a structured text file.
+    
+    Dynamically tracks the operational calculation mode (Force vs. Displacement)
+    and drops coordinate-based displacement scalars if evaluating a force mode run.
+    """
+    import numpy as np
+
+    # 1. Determine the calculation mode based on input state flags
+    is_force_mode = hasattr(pl_engine, 'dF') and pl_engine.dF is not None and np.any(pl_engine.dF)
+    calc_mode = "Force Mode" if is_force_mode else "Displacement Mode"
+
+    # 2. Build the structural layout header
+    lines = [
+        "===================================================",
+        "                PROPERTIES SUMMARY                 ",
+        "===================================================",
+        f"Calculation Run Mode         : {calc_mode:>12}",
+        f"Zero-Phonon Line (ZPL) Energy : {getattr(pl_engine, 'EZPL', 'N/A'):>12} eV",
+        f"Total Huang-Rhys (HR) Factor : {getattr(pl_engine, 'HR_factor', 'N/A'):>12.6f}",
+        f"Debye-Waller (DW) Factor     : {getattr(pl_engine, 'DW_factor', 'N/A'):>12.6f}",
+    ]
+
+    # 3. Conditional Step: Only inject spatial metrics if we are NOT in Force Mode
+    if not is_force_mode:
+        lines.extend([
+            f"Mass-Weighted Delta Q (delQ)  : {getattr(pl_engine, 'delQ', 'N/A'):>12.6f} amu^(1/2)*Å",
+            f"Structural Delta R (delR)     : {getattr(pl_engine, 'delR', 'N/A'):>12.6f} Å",
+        ])
+
+    # 4. Append operational configuration tracking metadata
+    lines.extend([
+        "---------------------------------------------------",
+        f"Total Number of Atoms (natoms): {getattr(pl_engine, 'natoms', 'N/A'):>12}",
+        f"ZPL Broadening Factor (gamma) : {getattr(pl_engine, 'gamma', 'N/A'):>12.2f} meV",
+        f"Gaussian Broadening (sigma)   : {getattr(pl_engine, 'sigma', 'N/A'):>12.6f} eV",
+        f"Energy Mesh Resolution        : {getattr(pl_engine, 'resolution', 'N/A'):>12} points/eV",
+        "==================================================="
+    ])
+    
+    # Write cleanly to file out
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+        
+    print(f"Important parameters successfully exported to text summary: {filename}")

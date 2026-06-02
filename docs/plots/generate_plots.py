@@ -1,137 +1,191 @@
-# Generate Plots for the documentation
-# Example Usage of the DefectPL library
+# -*- coding: utf-8 -*-
+"""
+Documentation generation script: Rehydrates a precalculated DefectPL dataset 
+from properties.json using Monty, summarizes scalar physical properties, 
+and exports publication-ready diagnostic plots.
+"""
 
-from defectpl.defectpl import DefectPl
+from pathlib import Path
+from monty.serialization import loadfn
+from monty.json import MontyDecoder
+
+# Import core model engines and standalone plotting pipeline utilities
+from defectpl.defectpl import Photoluminescence, VibrationalSpectra1D
 from defectpl.plot import Plotter
-from defectpl.vibspectra1d import VibrationalSpectra1D
+from defectpl.utils import extract_important_properties
 
-band_yaml = "../../tests/data/band.yaml"
-contcar_gs = "../../tests/data/CONTCAR_gs"
-contcar_es = "../../tests/data/CONTCAR_es"
-out_dir = "."
-EZPL = 1.95
-gamma = 2
-plot_all = False
-iplot_xlim = [1000, 2000]
+# =====================================================================
+# Configuration Paths, Tolerances, and Variables Setup
+# =====================================================================
+json_input_path = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/tests/data/test_outputs/pl_from_abs_force/properties.json")
+out_dir = Path(".")
 fig_format = "svg"
 
-dpl = DefectPl(
-    band_yaml,
-    contcar_gs,
-    contcar_es,
-    EZPL,
-    gamma,
-    iplot_xlim=iplot_xlim,
-    plot_all=plot_all,
-    out_dir=out_dir,
-    fig_format=fig_format,
-)
+# Verify precalculated data matrix state exists before initializing load sequences
+if not json_input_path.exists():
+    raise FileNotFoundError(
+        f"Could not locate '{json_input_path}'. Run your calculation pipeline "
+        f"script first to export the state metadata records via dumpfn."
+    )
 
+# =====================================================================
+# 1. Rehydrate Core Engine Instance & Save Scalar Physical Properties
+# =====================================================================
+print(f"Loading cached state properties from {json_input_path}...")
+# Rehydrate the true Photoluminescence object instance instead of a raw python dict
+pl_engine = loadfn(str(json_input_path), cls=MontyDecoder)
+
+# Run property extraction summary file out via imported utility function
+prop_output_file = out_dir / "important_properties.txt"
+extract_important_properties(pl_engine, filename=str(prop_output_file))
+print(f"Extracted important scalar properties to {prop_output_file} for quick reference.")
+
+# =====================================================================
+# 2. Sequential Granular Generation of All Gallery Plots
+# =====================================================================
+print(f"Generating full sequential suite of diagnostic plots as .{fig_format} files...")
+
+# Initialize standalone plotting instance 
 plotter = Plotter()
-max_freq = None  # Max frequence to plot S(omega)
-iylim = None  # Intensity y-limit for the intensity vs photon energy plot
-iplot_xlim = iplot_xlim  # x-limit for the intensity vs photon
+
+# Fix configuration scope limits by fetching directly from the rehydrated engine parameters
+iplot_xlim = (max(0.0, pl_engine.EZPL - 2.0), pl_engine.EZPL + 1.0)
+max_freq = None  # Capping limits tracker for frequency ranges
+freq_limit = (max_freq / 1000.0) if max_freq else None
+iylim = None     # Intensity vertical y-limit limits override
+
+# --- Track A: Lattice Dynamics & Structural Confinements ---
+
+# 1. penergy_vs_pmode.svg
 plotter.plot_penergy_vs_pmode(
-    frequencies=dpl.frequencies,
-    plot=False,
-    out_dir=out_dir,
-    fig_format=fig_format,
-)
-# Plot IPR vs phonon energy
-plotter.plot_ipr_vs_penergy(
-    dpl.frequencies,
-    dpl.iprs,
-    plot=False,
-    out_dir=out_dir,
-    fig_format=fig_format,
-)
-# Plot localization ratio vs phonon energy
-plotter.plot_loc_rat_vs_penergy(
-    dpl.frequencies,
-    dpl.localization_ratio,
-    plot=False,
-    out_dir=out_dir,
-    fig_format=fig_format,
+    frequencies=pl_engine.frequencies, 
+    plot=False, 
+    out_dir=out_dir, 
+    fig_format=fig_format
 )
 
-# Plot vibrational displacement vs phonon energy
+# 2. ipr_vs_penergy.svg
+plotter.plot_ipr_vs_penergy(
+    frequencies=pl_engine.frequencies, 
+    iprs=pl_engine.iprs, 
+    plot=False, 
+    out_dir=out_dir, 
+    fig_format=fig_format
+)
+
+# 3. loc_rat_vs_penergy.svg
+plotter.plot_loc_rat_vs_penergy(
+    frequencies=pl_engine.frequencies, 
+    localization_ratio=pl_engine.localization_ratio, 
+    plot=False, 
+    out_dir=out_dir, 
+    fig_format=fig_format
+)
+
+# 4. qk_vs_penergy.svg
 plotter.plot_qk_vs_penergy(
-    dpl.frequencies,
-    dpl.qks,
-    plot=False,
-    out_dir=out_dir,
-    fig_format=fig_format,
+    frequencies=pl_engine.frequencies, 
+    qks=pl_engine.qks, 
+    plot=False, 
+    out_dir=out_dir, 
+    fig_format=fig_format
 )
-# Plot partial HR factor vs phonon energy
+
+# 5. HR_factor_vs_penergy.svg
 plotter.plot_HR_factor_vs_penergy(
-    dpl.frequencies,
-    dpl.Sks,
-    plot=False,
-    out_dir=out_dir,
-    fig_format=fig_format,
+    frequencies=pl_engine.frequencies, 
+    Sks=pl_engine.Sks, 
+    plot=False, 
+    out_dir=out_dir, 
+    fig_format=fig_format
 )
-# Plot S(omega) vs phonon energy
+
+# --- Track B: Electronic-Vibrational Coupling Spectra Functionals ---
+
+# 6. S_omega_vs_penergy.svg
 plotter.plot_S_omega_vs_penergy(
-    dpl.frequencies,
-    dpl.S_omega,
-    dpl.omega_range,
+    frequencies=pl_engine.frequencies,
+    S_omega=pl_engine.S_omega,
+    omega_range=pl_engine.omega_range,
     plot=False,
     out_dir=out_dir,
-    max_freq=max_freq,
+    max_freq=freq_limit,
     fig_format=fig_format,
-    figsize=(4, 4),
+    figsize=(4, 4)
 )
-# Plot S(omega) and Sks vs phonon energy
+
+# 7. S_omega_Sks_vs_penergy.svg
 plotter.plot_S_omega_Sks_vs_penergy(
-    dpl.frequencies,
-    dpl.S_omega,
-    dpl.omega_range,
-    dpl.Sks,
+    frequencies=pl_engine.frequencies,
+    S_omega=pl_engine.S_omega,
+    omega_range=pl_engine.omega_range,
+    Sks=pl_engine.Sks,
     plot=False,
     out_dir=out_dir,
-    max_freq=max_freq,
+    max_freq=freq_limit,
     fig_format=fig_format,
-    figsize=(4, 4),
+    figsize=(4, 4)
 )
-# Plot S(omega) and Sks vs phonon energy
+
+# 8. S_omega_HRf_loc_rat_vs_penergy.svg
 plotter.plot_S_omega_Sks_Loc_rat_vs_penergy(
-    dpl.frequencies,
-    dpl.S_omega,
-    dpl.omega_range,
-    dpl.Sks,
-    dpl.localization_ratio,
+    frequencies=pl_engine.frequencies,
+    S_omega=pl_engine.S_omega,
+    omega_range=pl_engine.omega_range,
+    Sks=pl_engine.Sks,
+    localization_ratio=pl_engine.localization_ratio,
     plot=False,
     out_dir=out_dir,
-    max_freq=max_freq,
+    max_freq=freq_limit,
     fig_format=fig_format,
-    figsize=(4, 4),
+    figsize=(4, 4)
 )
-# Plot S(omega), Sks and IPR vs phonon energy
+
+# 9. S_omega_HRf_ipr_vs_penergy.svg
 plotter.plot_S_omega_Sks_ipr_vs_penergy(
-    dpl.frequencies,
-    dpl.S_omega,
-    dpl.omega_range,
-    dpl.Sks,
-    dpl.iprs,
+    frequencies=pl_engine.frequencies,
+    S_omega=pl_engine.S_omega,
+    omega_range=pl_engine.omega_range,
+    Sks=pl_engine.Sks,
+    iprs=pl_engine.iprs,
     plot=False,
     out_dir=out_dir,
-    max_freq=max_freq,
+    max_freq=freq_limit,
     fig_format=fig_format,
-    figsize=(4, 4),
+    figsize=(4, 4)
 )
-# Plot intensity vs photon energy
+
+# --- Track C: Final Convoluted Multi-Phonon Luminescence Profiles ---
+
+# 10. intensity_vs_penergy.svg
 plotter.plot_intensity_vs_penergy(
-    dpl.frequencies,
-    dpl.I,
-    dpl.resolution,
-    iplot_xlim,
+    frequencies=pl_engine.frequencies,
+    I=pl_engine.intensity,
+    resolution=pl_engine.resolution,
+    xlim=iplot_xlim,
     plot=False,
     out_dir=out_dir,
     iylim=iylim,
-    fig_format=fig_format,
+    fig_format=fig_format
 )
 
-# Plotting one-dimensional vibrational spectra
-ligo = VibrationalSpectra1D(2.6, 35.75, 41.56, 1.5476, 300, 1.2, 0.001, 1800)
+# =====================================================================
+# 3. 1D Harmonic Approximation Lineshape Analysis
+# =====================================================================
+print("Generating 1D effective coordinate verification lineshapes...")
+
+# 11. one_d_lineshape.svg
+ligo = VibrationalSpectra1D(
+    EZPL=2.6, 
+    w1_meV=35.75, 
+    w2_meV=41.56, 
+    DQ=1.5476, 
+    T=300, 
+    E0=1.2, 
+    dE=0.001, 
+    M=1800
+)
 ligo.compute_lineshape()
-ligo.plot_lineshape(save_file="./one_d_lineshape.svg", figsize=(4, 4))
+ligo.plot_lineshape(save_file=str(out_dir / "one_d_lineshape.svg"), figsize=(4, 4))
+
+print("All documentation visualization graphics successfully updated.")
