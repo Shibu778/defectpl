@@ -1,14 +1,17 @@
 site_name: defectpl
 site_url: https://github.com/Shibu778/defectpl
+
 nav:
   - "Home": index.md
   - "Getting Started": getting_started.md
   - "Installation": installation.md
   - "Usage": usage.md
+  - "Command Line Interface": command_line_interface.md
   - "Plots Gallery": plots_gallery.md
   - "Tutorials": tutorials.md
   - "Theory": theory.md
-  - "API": api_reference.md
+  - "Benchmark": benchmark.md
+  - "API Reference": api_reference.md
 
 theme: readthedocs
 
