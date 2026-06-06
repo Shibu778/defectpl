@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Documentation generation script: Rehydrates a precalculated DefectPL dataset 
-from properties.json using Monty, summarizes scalar physical properties, 
+"""Documentation generation script: Rehydrates a precalculated DefectPL dataset
+
+from properties.json.gz using Monty, summarizes scalar physical properties,
 and exports publication-ready diagnostic plots.
 """
 
@@ -17,8 +17,9 @@ from defectpl.utils import extract_important_properties
 # =====================================================================
 # Configuration Paths, Tolerances, and Variables Setup
 # =====================================================================
-path = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/tests/data/test_outputs/pl_force_pbe_ncdft_gs_abs")
-json_input_path = path / "properties.json"
+# Pointing to the target evaluation directory containing compressed state records
+path = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/hse06_out/zpl_ems_force_mode")
+json_input_path = path / "properties.json.gz"
 out_dir = Path(".")
 fig_format = "svg"
 
@@ -33,7 +34,7 @@ if not json_input_path.exists():
 # 1. Rehydrate Core Engine Instance & Save Scalar Physical Properties
 # =====================================================================
 print(f"Loading cached state properties from {json_input_path}...")
-# Rehydrate the true Photoluminescence object instance instead of a raw python dict
+# Rehydrate the true Photoluminescence object instance directly from the .json.gz file
 pl_engine = loadfn(str(json_input_path), cls=MontyDecoder)
 
 # Run property extraction summary file out via imported utility function
@@ -57,7 +58,7 @@ iylim = None     # Intensity vertical y-limit limits override
 
 # --- Track A: Lattice Dynamics & Structural Confinements ---
 
-# 1. penergy_vs_pmode.svg
+# 1. penergy_vs_pmode.[fig_format]
 plotter.plot_penergy_vs_pmode(
     frequencies=pl_engine.frequencies, 
     plot=False, 
@@ -65,7 +66,7 @@ plotter.plot_penergy_vs_pmode(
     fig_format=fig_format
 )
 
-# 2. ipr_vs_penergy.svg
+# 2. ipr_vs_penergy.[fig_format]
 plotter.plot_ipr_vs_penergy(
     frequencies=pl_engine.frequencies, 
     iprs=pl_engine.iprs, 
@@ -74,7 +75,7 @@ plotter.plot_ipr_vs_penergy(
     fig_format=fig_format
 )
 
-# 3. loc_rat_vs_penergy.svg
+# 3. loc_rat_vs_penergy.[fig_format]
 plotter.plot_loc_rat_vs_penergy(
     frequencies=pl_engine.frequencies, 
     localization_ratio=pl_engine.localization_ratio, 
@@ -83,7 +84,7 @@ plotter.plot_loc_rat_vs_penergy(
     fig_format=fig_format
 )
 
-# 4. qk_vs_penergy.svg
+# 4. qk_vs_penergy.[fig_format]
 plotter.plot_qk_vs_penergy(
     frequencies=pl_engine.frequencies, 
     qks=pl_engine.qks, 
@@ -92,7 +93,7 @@ plotter.plot_qk_vs_penergy(
     fig_format=fig_format
 )
 
-# 5. HR_factor_vs_penergy.svg
+# 5. HR_factor_vs_penergy.[fig_format]
 plotter.plot_HR_factor_vs_penergy(
     frequencies=pl_engine.frequencies, 
     Sks=pl_engine.Sks, 
@@ -103,7 +104,7 @@ plotter.plot_HR_factor_vs_penergy(
 
 # --- Track B: Electronic-Vibrational Coupling Spectra Functionals ---
 
-# 6. S_omega_vs_penergy.svg
+# 6. S_omega_vs_penergy.[fig_format]
 plotter.plot_S_omega_vs_penergy(
     frequencies=pl_engine.frequencies,
     S_omega=pl_engine.S_omega,
@@ -111,11 +112,10 @@ plotter.plot_S_omega_vs_penergy(
     plot=False,
     out_dir=out_dir,
     max_freq=freq_limit,
-    fig_format=fig_format,
-    figsize=(4, 4)
+    fig_format=fig_format
 )
 
-# 7. S_omega_Sks_vs_penergy.svg
+# 7. S_omega_Sks_vs_penergy.[fig_format]
 plotter.plot_S_omega_Sks_vs_penergy(
     frequencies=pl_engine.frequencies,
     S_omega=pl_engine.S_omega,
@@ -124,11 +124,10 @@ plotter.plot_S_omega_Sks_vs_penergy(
     plot=False,
     out_dir=out_dir,
     max_freq=freq_limit,
-    fig_format=fig_format,
-    figsize=(4, 4)
+    fig_format=fig_format
 )
 
-# 8. S_omega_HRf_loc_rat_vs_penergy.svg
+# 8. S_omega_HRf_loc_rat_vs_penergy.[fig_format]
 plotter.plot_S_omega_Sks_Loc_rat_vs_penergy(
     frequencies=pl_engine.frequencies,
     S_omega=pl_engine.S_omega,
@@ -138,11 +137,10 @@ plotter.plot_S_omega_Sks_Loc_rat_vs_penergy(
     plot=False,
     out_dir=out_dir,
     max_freq=freq_limit,
-    fig_format=fig_format,
-    figsize=(4, 4)
+    fig_format=fig_format
 )
 
-# 9. S_omega_HRf_ipr_vs_penergy.svg
+# 9. S_omega_HRf_ipr_vs_penergy.[fig_format]
 plotter.plot_S_omega_Sks_ipr_vs_penergy(
     frequencies=pl_engine.frequencies,
     S_omega=pl_engine.S_omega,
@@ -152,13 +150,12 @@ plotter.plot_S_omega_Sks_ipr_vs_penergy(
     plot=False,
     out_dir=out_dir,
     max_freq=freq_limit,
-    fig_format=fig_format,
-    figsize=(4, 4)
+    fig_format=fig_format
 )
 
 # --- Track C: Final Convoluted Multi-Phonon Luminescence Profiles ---
 
-# 10. intensity_vs_penergy.svg
+# 10. intensity_vs_penergy.[fig_format]
 plotter.plot_intensity_vs_penergy(
     frequencies=pl_engine.frequencies,
     I=pl_engine.intensity,
@@ -175,7 +172,7 @@ plotter.plot_intensity_vs_penergy(
 # =====================================================================
 print("Generating 1D effective coordinate verification lineshapes...")
 
-# 11. one_d_lineshape.svg
+# 11. one_d_lineshape.[fig_format]
 ligo = VibrationalSpectra1D(
     EZPL=2.6, 
     w1_meV=35.75, 
@@ -187,6 +184,9 @@ ligo = VibrationalSpectra1D(
     M=1800
 )
 ligo.compute_lineshape()
-ligo.plot_lineshape(save_file=str(out_dir / "one_d_lineshape.svg"), figsize=(4, 4))
+
+# Dynamically follow configuration variable layout parameters with default size
+lineshape_out_path = out_dir / f"one_d_lineshape.{fig_format}"
+ligo.plot_lineshape(save_file=str(lineshape_out_path))
 
 print("All documentation visualization graphics successfully updated.")
