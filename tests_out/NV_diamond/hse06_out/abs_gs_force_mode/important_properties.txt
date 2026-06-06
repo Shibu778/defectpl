@@ -1,0 +1,13 @@
+===================================================
+                PROPERTIES SUMMARY                 
+===================================================
+Calculation Run Mode         :   Force Mode
+Zero-Phonon Line (ZPL) Energy :        1.991 eV
+Total Huang-Rhys (HR) Factor :     5.029075
+Debye-Waller (DW) Factor     :     0.006545
+---------------------------------------------------
+Total Number of Atoms (natoms):          215
+ZPL Broadening Factor (gamma) :         2.00 meV
+Gaussian Broadening (sigma)   :     0.006000 eV
+Energy Mesh Resolution        :         1000 points/eV
+===================================================

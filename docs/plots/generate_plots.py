@@ -17,7 +17,8 @@ from defectpl.utils import extract_important_properties
 # =====================================================================
 # Configuration Paths, Tolerances, and Variables Setup
 # =====================================================================
-json_input_path = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/tests/data/test_outputs/pl_from_abs_force/properties.json")
+path = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/tests/data/test_outputs/pl_force_pbe_ncdft_gs_abs")
+json_input_path = path / "properties.json"
 out_dir = Path(".")
 fig_format = "svg"
 

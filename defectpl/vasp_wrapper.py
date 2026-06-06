@@ -278,7 +278,7 @@ def prepare_dF_files(ground_outcar, excited_outcar, ground_poscar=None, excited_
     """
     # Extract structures and forces from OUTCAR files
     ground_structure, ground_forces = get_final_structure_and_forces_from_outcar(ground_outcar, poscar_path=ground_poscar)
-    excited_structure, excited_forces = get_first_structure_and_forces_from_outcar(excited_outcar, poscar_path=excited_poscar)
+    excited_structure, excited_forces = get_final_structure_and_forces_from_outcar(excited_outcar, poscar_path=excited_poscar)
     
     # Prepare data dictionaries for dF calculation
     ground_data = {'structure': ground_structure, 'forces': ground_forces}

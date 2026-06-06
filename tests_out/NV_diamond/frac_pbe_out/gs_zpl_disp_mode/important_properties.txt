@@ -1,0 +1,15 @@
+===================================================
+                PROPERTIES SUMMARY                 
+===================================================
+Calculation Run Mode         : Displacement Mode
+Zero-Phonon Line (ZPL) Energy :        1.729 eV
+Total Huang-Rhys (HR) Factor :     2.574647
+Debye-Waller (DW) Factor     :     0.076181
+Mass-Weighted Delta Q (delQ)  :     0.603373 amu^(1/2)*Å
+Structural Delta R (delR)     :     0.172432 Å
+---------------------------------------------------
+Total Number of Atoms (natoms):          215
+ZPL Broadening Factor (gamma) :         2.00 meV
+Gaussian Broadening (sigma)   :     0.006000 eV
+Energy Mesh Resolution        :         1000 points/eV
+===================================================
