@@ -1,55 +1,75 @@
-figure.figsize : 3.2, 5.18
-figure.dpi: 400
+### FIGURE & RESOLUTION
+# Single-column journal width specification (APS / ACS / Nature style)
+figure.figsize: 3.3, 2.5
+figure.dpi: 600
+figure.autolayout: True
 
-axes.prop_cycle: cycler('color', ['f0a3ff', '0075dc', '993f00', '4c005c', '426600', 'ff0010', '9dcc00', 'c20088', '003380', 'ffa405', 'ffff00', 'ff5005', '5ef1f2', '740aff', '990000', '00998f', '005c31', '2bce48', 'ffcc99', '94ffb5', '8f7c00', '6fa8bb', '808080'])
+### COLORS (Publication-friendly, high-contrast, colorblind-safe)
+# FIXED: Wrapped cycler expression in explicit double quotes to prevent parsing errors
+axes.prop_cycle: "cycler('color', ['#0075DC', '#FFAA00', '#00998F', '#C20088', '#4C005C', '#9DCC00', '#FF0010', '#993F00'])"
 
-font.family : sans-serif
-font.sans-serif : Arial, Whitney Pro, Whitney Book Extended, Catamaran, Helvetica, Liberation Sans, Andale Sans
+### TYPOGRAPHY & LATEX
+font.family: sans-serif
+font.sans-serif: Helvetica, Arial, Liberation Sans, DejaVu Sans
+font.size: 10
+pdf.fonttype: 42
+ps.fonttype: 42
 
-text.usetex : True
-font.size : 11.5
-pdf.fonttype : 3
+# Forces math blocks to natively render using Helvetica/Sans
+text.usetex: True
+text.latex.preamble: \usepackage{amsmath} \usepackage{helvet} \usepackage[eulergreek]{sansmath} \sansmath \renewcommand{\familydefault}{\sfdefault}
 
-legend.handlelength  : 1.5
-legend.fontsize     : 11.5
-legend.loc  : lower right
+### AXES & BORDERS
+axes.titlesize: 10
+axes.labelsize: 10
+axes.linewidth: 0.8
+axes.axisbelow: True
 
-axes.titlesize : 11.5
-axes.labelsize : 11.5
-axes.linewidth       : 0.8
-axes.axisbelow: False
+### TICKS (Inward, clean framing, with mirrors)
+xtick.direction: in
+xtick.major.size: 4.0
+xtick.minor.size: 2.0
+xtick.major.width: 0.8
+xtick.minor.width: 0.6
+xtick.major.pad: 4
+xtick.top: True
+xtick.bottom: True
+xtick.minor.visible: True
 
-grid.linewidth       : 0.8
-grid.color           : black
-grid.linestyle       : -
+ytick.direction: in
+ytick.major.size: 4.0
+ytick.minor.size: 2.0
+ytick.major.width: 0.8
+ytick.minor.width: 0.6
+ytick.major.pad: 4
+ytick.right: True
+ytick.left: True
+ytick.minor.visible: True
 
-lines.linewidth : 1.1
-lines.markersize: 4
+### LINES & PLOTS
+lines.linewidth: 1.2
+lines.markersize: 4.5
+lines.markeredgewidth: 0.8
 
-xtick.major.size     : 3.5
-xtick.minor.size     : 0
-xtick.major.width    : 0.8
-xtick.minor.width    : 0.8
-xtick.major.pad      : 4
-xtick.direction      : in
-xtick.top            : False
-xtick.bottom         : True
+# Structural scaling for typical error plots
+errorbar.capsize: 2.0
 
-ytick.major.size     : 3.5
-ytick.minor.size     : 0
-ytick.major.width    : 0.8
-ytick.minor.width    : 0.8
-ytick.major.pad      : 2
-ytick.direction      : in
-ytick.right          : False
-ytick.left           : True
+### LEGEND
+legend.frameon: False
+legend.fontsize: 8.5
+legend.loc: best
+# Tighten layout spacing to optimize single-column real estate
+legend.handlelength: 1.2
+legend.handletextpad: 0.4
+legend.columnspacing: 1.0
 
-mathtext.fontset : custom
-mathtext.bf: sans:semibold
-mathtext.cal: cursive
-mathtext.it: sans:italic
-mathtext.rm: sans
-mathtext.sf: sans
-mathtext.tt: sans
-mathtext.fallback: stixsans
-mathtext.default: it
+# grid
+grid.linewidth: 0.5
+grid.color:     "#e0e0e0"
+grid.linestyle: --
+
+### SAVING CONFIGURATION
+# Ensures bounding margins are clipped tightly to the edge coordinates
+savefig.bbox: tight
+savefig.pad_inches: 0.02
+savefig.format: pdf
