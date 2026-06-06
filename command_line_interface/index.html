@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://github.com/Shibu778/defectpl/command_line_interface/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Command Line Interface - defectpl</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Command Line Interface";
+        var mkdocs_page_input_path = "command_line_interface.md";
+        var mkdocs_page_url = "/Shibu778/defectpl/command_line_interface/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> defectpl
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting Started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../usage/">Usage</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Command Line Interface</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-global-application-entry-point">1. Global Application entry Point</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-multi-mode-photoluminescence-defectpl-pl">2. Multi-Mode Photoluminescence (defectpl pl)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#a-displacement-mode-defectpl-pl-displacement">A. Displacement Mode (defectpl pl displacement)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#b-force-mode-defectpl-pl-force">B. Force Mode (defectpl pl force)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-standalone-plotting-defectpl-plot">3. Standalone Plotting (defectpl plot)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-generalized-displacements-defectpl-dq">4. Generalized Displacements (defectpl dq)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-analytical-1d-lineshapes-defectpl-spectra1d">5. Analytical 1D Lineshapes (defectpl spectra1d)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd">6. Configuration Coordinate Diagrams (defectpl setup-ccd / analyze-ccd)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#a-initialization-script-setup-ccd">A. Initialization Script (setup-ccd)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#b-curvature-analysis-script-analyze-ccd">B. Curvature Analysis Script (analyze-ccd)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-comparative-benchmark-suites-defectpl-compare-json-compare-yaml">7. Comparative Benchmark Suites (defectpl compare-json / compare-yaml)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#a-json-spectra-comparisons-compare-json">A. JSON Spectra Comparisons (compare-json)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#b-raw-phonopy-input-comparisons-compare-yaml">B. Raw Phonopy Input Comparisons (compare-yaml)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-phonon-and-lattice-utilities">8. Phonon and Lattice Utilities</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#a-extract-force-constants-phonon-fc">A. Extract Force Constants (phonon-fc)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#b-extract-phonon-irreducible-representations-phonon-symm">B. Extract Phonon Irreducible Representations (phonon-symm)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#c-compile-band-target-structural-outputs-phonon-band">C. Compile Band Target Structural Outputs (phonon-band)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#d-re-serialize-band-properties-phonon-parse">D. Re-serialize Band Properties (phonon-parse)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-kohn-sham-level-visualization-defectpl-ksplot">9. Kohn-Sham Level Visualization (defectpl ksplot)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../plots_gallery/">Plots Gallery</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../tutorials/">Tutorials</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../theory/">Theory</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../benchmark/">Benchmark</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">defectpl</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Command Line Interface</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="command-line-interface-cli-manual-defectpl">Command Line Interface (CLI) Manual: <code>defectpl</code></h1>
+<p>The <code>defectpl</code> suite features a unified command-line application layer managed via <code>click</code>. This utility handles tasks ranging from raw VASP force parsing and phonon symmetry reduction to full multi-mode photoluminescence lineshape synthesis and Configuration Coordinate Diagram (CCD) mapping.</p>
+<hr />
+<h2 id="1-global-application-entry-point">1. Global Application entry Point</h2>
+<p>Once installed, the root command hook can be executed directly from your terminal:</p>
+<pre><code class="language-bash">defectpl --help
+
+</code></pre>
+<hr />
+<h2 id="2-multi-mode-photoluminescence-defectpl-pl">2. Multi-Mode Photoluminescence (<code>defectpl pl</code>)</h2>
+<p>The <code>pl</code> group executes high-level multi-phonon spectral sideband convolutions. It exposes two sub-commands corresponding to the available physical data-collection frameworks.</p>
+<h3 id="a-displacement-mode-defectpl-pl-displacement">A. Displacement Mode (<code>defectpl pl displacement</code>)</h3>
+<p>Evaluates vibronic profiles from converged ground-state and excited-state geometry coordinates (<code>CONTCAR</code> structures).</p>
+<p><strong>Usage and Parameters:</strong></p>
+<pre><code class="language-bash">defectpl pl displacement \
+  --band_yaml ./band.yaml \
+  --contcar_gs ./CONTCAR_gs \
+  --contcar_es ./CONTCAR_es \
+  --ezpl 1.95 \
+  --gamma 2.0 \
+  --out_dir ./output_data/ \
+  --json_out properties.json \
+  --plot_all \
+  --fig_format svg
+
+</code></pre>
+<ul>
+<li><code>--band_yaml</code>: Path to the Phonopy structural <code>band.yaml</code> file <em>(Default: <code>./band.yaml</code>)</em>.</li>
+<li><code>--contcar_gs</code>: Ground-state equilibrium geometry structure file <em>(Default: <code>./CONTCAR_gs</code>)</em>.</li>
+<li><code>--contcar_es</code>: Excited-state equilibrium geometry structure file <em>(Default: <code>./CONTCAR_es</code>)</em>.</li>
+<li><code>--ezpl</code>: Zero-Phonon Line transition energy threshold in eV <em>(Default: <code>1.95</code>)</em>.</li>
+<li><code>--gamma</code>: Homogeneous Lorentzian broadening damping metric in meV <em>(Default: <code>2.0</code>)</em>.</li>
+<li><code>--json_out</code>: Optional path to dump the serialized <code>Photoluminescence</code> object state using Monty JSON hooks.</li>
+<li><code>--plot_all</code>: Boolean flag. When invoked, it automatically generates all 10 standard diagnostic plots.</li>
+<li><code>--fig_format</code>: Graphics layout vector standard extension (e.g., <code>pdf</code>, <code>png</code>, <code>svg</code>) <em>(Default: <code>pdf</code>)</em>.</li>
+<li><code>--max_freq</code>: Frequency range limit override for spectral density charts (in meV).</li>
+<li><code>--iylim</code>: Y-axis limits override passed as a comma-separated string (e.g., <code>--iylim 0,1.5</code>).</li>
+</ul>
+<h3 id="b-force-mode-defectpl-pl-force">B. Force Mode (<code>defectpl pl force</code>)</h3>
+<p>Evaluates vibronic coupling paths via vertical forces acting on atoms from unrelaxed, fixed-geometry electronic manifolds (<code>OUTCAR</code> inputs).</p>
+<p><strong>Usage and Parameters:</strong></p>
+<pre><code class="language-bash">defectpl pl force \
+  --band_yaml ./band.yaml \
+  --outcar_gs ./OUTCAR_gs \
+  --outcar_es ./OUTCAR_es \
+  --ezpl 1.95 \
+  --gamma 2.0 \
+  --json_out force_properties.json \
+  --plot_all \
+  --fig_format png
+
+</code></pre>
+<ul>
+<li>Parameters match the displacement mode command, substituting <code>--contcar_*</code> path options for VASP <code>--outcar_gs</code> and <code>--outcar_es</code> force vectors. Spatial metrics like <span class="arithmatex">\(\Delta Q\)</span> and <span class="arithmatex">\(\Delta R\)</span> are omitted automatically in the backend during generation sweeps to enforce force-mode consistency.</li>
+</ul>
+<hr />
+<h2 id="3-standalone-plotting-defectpl-plot">3. Standalone Plotting (<code>defectpl plot</code>)</h2>
+<p>Deserializes previously cached <code>properties.json</code> data files to regenerate or customize visual layouts without re-executing the underlying Fourier transforms.</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-bash">defectpl plot ./properties.json --type intensity --out_dir ./plots/ --fmt png
+
+</code></pre>
+<ul>
+<li><strong>Argument:</strong> Path to a serialized JSON file containing a valid MSONable <code>Photoluminescence</code> configuration.</li>
+<li><code>--type</code> (<code>-t</code>): Specific graphic layout configuration target. Must be one of: <code>intensity</code>, <code>mode</code>, <code>partial_energy</code>, or <code>all</code>.</li>
+<li><code>--fmt</code>: Graphic layout format selection (<code>pdf</code>, <code>png</code>, <code>svg</code>).</li>
+</ul>
+<hr />
+<h2 id="4-generalized-displacements-defectpl-dq">4. Generalized Displacements (<code>defectpl dq</code>)</h2>
+<p>Calculates the raw, mass-weighted configuration coordinate vector offset (<span class="arithmatex">\(\Delta Q\)</span>) across any two matching structural geometry supercells.</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-bash">defectpl dq ./CONTCAR_GS ./CONTCAR_ES --format json --out delta_q.json
+
+</code></pre>
+<ul>
+<li><strong>Arguments:</strong> Paths to the initial (<code>structure1</code>) and final (<code>structure2</code>) VASP structure files.</li>
+<li><code>--format</code> (<code>-f</code>): Output representation format. Select <code>plain</code> (prints raw float string to standard output stream) or <code>json</code>.</li>
+<li><code>--out</code> (<code>-o</code>): Optional file path to dump the compiled structural displacement metadata records.</li>
+</ul>
+<hr />
+<h2 id="5-analytical-1d-lineshapes-defectpl-spectra1d">5. Analytical 1D Lineshapes (<code>defectpl spectra1d</code>)</h2>
+<p>Simulates a decoupled 1D displaced-distorted harmonic oscillator spectrum without assuming identical Hessians (<span class="arithmatex">\(\omega_1 \neq \omega_2\)</span>).</p>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-bash">defectpl spectra1d \
+  --ezpl 2.60 \
+  --w1 35.75 \
+  --w2 41.56 \
+  --dq_val 1.5476 \
+  --temp 300.0 \
+  --points 5000 \
+  --plot \
+  --save_prefix tracking_1d
+
+</code></pre>
+<ul>
+<li><code>--ezpl</code>: ZPL transition energy center in eV <em>(Required)</em>.</li>
+<li><code>--w1</code>: Ground-state effective vibrational frequency in meV <em>(Required)</em>.</li>
+<li><code>--w2</code>: Excited-state effective vibrational frequency in meV <em>(Required)</em>.</li>
+<li><code>--dq_val</code>: Configuration coordinate shift <span class="arithmatex">\(\Delta Q\)</span> in <span class="arithmatex">\(\text{amu}^{1/2}\cdot\text{Å}\)</span> <em>(Required)</em>.</li>
+<li><code>--temp</code>: Physical target evaluation temperature in Kelvin <em>(Default: <code>300.0</code>)</em>.</li>
+<li><code>--points</code>: Linear sampling integration rows count dimension for the grid array <em>(Default: <code>5000</code>)</em>.</li>
+<li><code>--plot</code>: Flag enabling immediate rendering of the output PDF visual spectrum sideband chart.</li>
+<li><code>--save_prefix</code>: Prefix appended to generated data output records (<code>*_overlap.json</code>, <code>*_lineshape.json</code>).</li>
+</ul>
+<hr />
+<h2 id="6-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd">6. Configuration Coordinate Diagrams (<code>defectpl setup-ccd</code> / <code>analyze-ccd</code>)</h2>
+<p>Automates linear structure interpolation tasks across structural potential surfaces to map the classical harmonic potential energy curves.</p>
+<h3 id="a-initialization-script-setup-ccd">A. Initialization Script (<code>setup-ccd</code>)</h3>
+<p>Generates structural interpolation arrays scaling across specific configuration displacement grid targets.</p>
+<pre><code class="language-bash">defectpl setup-ccd \
+  --gs ./CONTCAR_GS \
+  --es ./CONTCAR_ES \
+  --tmpl_gs ./template_GS_dir/ \
+  --tmpl_es ./template_ES_dir/ \
+  --out_dir ./ccd_workspace/ \
+  --steps &quot;-0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2&quot;
+
+</code></pre>
+<h3 id="b-curvature-analysis-script-analyze-ccd">B. Curvature Analysis Script (<code>analyze-ccd</code>)</h3>
+<p>Parses completed calculations across the interpolated task trees to fit potential curvatures and resolve corresponding frequencies.</p>
+<pre><code class="language-bash">defectpl analyze-ccd \
+  --gs ./CONTCAR_GS \
+  --es ./CONTCAR_ES \
+  --gs_runs &quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot; \
+  --es_runs &quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot; \
+  --de 1.95 \
+  --save_plot ccd_fit.pdf
+
+</code></pre>
+<hr />
+<h2 id="7-comparative-benchmark-suites-defectpl-compare-json-compare-yaml">7. Comparative Benchmark Suites (<code>defectpl compare-json</code> / <code>compare-yaml</code>)</h2>
+<p>Compiles and plots multiple calculated datasets side-by-side to benchmark modeling parameters.</p>
+<h3 id="a-json-spectra-comparisons-compare-json">A. JSON Spectra Comparisons (<code>compare-json</code>)</h3>
+<pre><code class="language-bash">defectpl compare-json \
+  --files &quot;run1/properties.json run2/properties.json&quot; \
+  --legends &quot;Functional-A,Functional-B&quot; \
+  --xmin 1.2 --xmax 2.2 \
+  --out_dir ./comparisons/
+
+</code></pre>
+<h3 id="b-raw-phonopy-input-comparisons-compare-yaml">B. Raw Phonopy Input Comparisons (<code>compare-yaml</code>)</h3>
+<p>Useful for evaluating lineshape variations against different phonon datasets without running separate pipeline loops manually.</p>
+<pre><code class="language-bash">defectpl compare-yaml \
+  --yamls &quot;phonon_90_atoms/band.yaml phonon_216_atoms/band.yaml&quot; \
+  --gs ./CONTCAR_GS --es ./CONTCAR_ES \
+  --ezpl 1.945 --xmin 1.0 --xmax 2.5
+
+</code></pre>
+<hr />
+<h2 id="8-phonon-and-lattice-utilities">8. Phonon and Lattice Utilities</h2>
+<p>Exposes administrative shortcuts for mapping Gamma-point lattice frequencies directly within your processing directories.</p>
+<h3 id="a-extract-force-constants-phonon-fc">A. Extract Force Constants (<code>phonon-fc</code>)</h3>
+<p>Parses VASP XML traces to generate standard Phonopy force tracking files.</p>
+<pre><code class="language-bash">defectpl phonon-fc ./vasprun.xml --hdf5
+
+</code></pre>
+<h3 id="b-extract-phonon-irreducible-representations-phonon-symm">B. Extract Phonon Irreducible Representations (<code>phonon-symm</code>)</h3>
+<p>Identifies the point-group irreducible representation labels for calculated Gamma-point modes.</p>
+<pre><code class="language-bash">defectpl phonon-symm --poscar ./POSCAR --fc ./FORCE_CONSTANTS --dim &quot;1 1 1&quot;
+
+</code></pre>
+<h3 id="c-compile-band-target-structural-outputs-phonon-band">C. Compile Band Target Structural Outputs (<code>phonon-band</code>)</h3>
+<p>Evaluates eigenvalues at the Gamma point using standard force constants matrices, converting outputs natively into eV energy metrics.</p>
+<pre><code class="language-bash">defectpl phonon-band --poscar ./POSCAR --fc ./FORCE_CONSTANTS --dim &quot;1 1 1&quot; --out band.yaml
+
+</code></pre>
+<h3 id="d-re-serialize-band-properties-phonon-parse">D. Re-serialize Band Properties (<code>phonon-parse</code>)</h3>
+<p>Converts standard Phonopy configurations to eV and writes them to an MSONable JSON data model file.</p>
+<pre><code class="language-bash">defectpl phonon-parse ./band.yaml --json_out parsed_phonons.json
+
+</code></pre>
+<hr />
+<h2 id="9-kohn-sham-level-visualization-defectpl-ksplot">9. Kohn-Sham Level Visualization (<code>defectpl ksplot</code>)</h2>
+<p>Parses a VASP <code>EIGENVAL</code> file to screen degeneracies, handle spin-polarization tracks, and plot single-particle electronic defect states within the bandgap.</p>
+<pre><code class="language-bash">defectpl ksplot ./EIGENVAL \
+  --vbm 9.6747 \
+  --cbm 13.7934 \
+  --espan 1.5 \
+  --kidx 0 \
+  --out_img bandgap_levels.png \
+  --out_json defect_states.json
+
+</code></pre>
+<ul>
+<li><code>--vbm</code>: Calculated energy value of the Valence Band Maximum in eV <em>(Required)</em>.</li>
+<li><code>--cbm</code>: Calculated energy value of the Conduction Band Minimum in eV <em>(Required)</em>.</li>
+<li><code>--espan</code>: Energy canvas buffer padding depth evaluated above and below the band edges in eV <em>(Default: <code>1.0</code>)</em>.</li>
+<li><code>--kidx</code>: Sequence array index tracking target k-point coordinates <em>(Default: <code>0</code>)</em>.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../usage/" class="btn btn-neutral float-left" title="Usage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../plots_gallery/" class="btn btn-neutral float-right" title="Plots Gallery">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../usage/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../plots_gallery/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/mathjax.js"></script>
+      <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

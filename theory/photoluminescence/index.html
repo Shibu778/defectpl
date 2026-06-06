@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://github.com/Shibu778/defectpl/theory/photoluminescence/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>Photoluminescence - defectpl</title>
+    <title>Photoluminescence Lineshape Calculation: A Theoretical Tutorial - defectpl</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Photoluminescence";
+        var mkdocs_page_name = "Photoluminescence Lineshape Calculation: A Theoretical Tutorial";
         var mkdocs_page_input_path = "theory\\photoluminescence.md";
         var mkdocs_page_url = "/Shibu778/defectpl/theory/photoluminescence/";
       </script>
@@ -56,6 +56,10 @@
                 </li>
               </ul>
               <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../command_line_interface/">Command Line Interface</a>
+                </li>
+              </ul>
+              <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../../plots_gallery/">Plots Gallery</a>
                 </li>
               </ul>
@@ -68,7 +72,11 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../../api_reference/">API</a>
+                <li class="toctree-l1"><a class="reference internal" href="../../benchmark/">Benchmark</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../api_reference/">API Reference</a>
                 </li>
               </ul>
       </div>
@@ -85,7 +93,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
-      <li class="breadcrumb-item active">Photoluminescence</li>
+      <li class="breadcrumb-item active">Photoluminescence Lineshape Calculation: A Theoretical Tutorial</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -94,7 +102,100 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="photoluminescence">Photoluminescence</h1>
+                <h1 id="photoluminescence-lineshape-calculation-a-theoretical-tutorial">Photoluminescence Lineshape Calculation: A Theoretical Tutorial</h1>
+<p><strong>Framework Implementation Guide for <code>defectpl</code></strong></p>
+<p>This tutorial presents the quantum mechanical and atomistic framework used to compute the photoluminescence (PL) lineshape of localized defects in semiconductors and insulators from first principles. The equations, approximations, and algorithms below follow the formalisms established by Alkauskas <em>et al.</em> (2014) [1, 2] and establish the mathematical basis for the <code>defectpl</code> package.</p>
+<hr />
+<h2 id="1-core-physical-approximations">1. Core Physical Approximations</h2>
+<p>To simulate the optical response of deep-level defects under an electronic transition from an initial excited state (<span class="arithmatex">\(e\)</span>) to a final ground state (<span class="arithmatex">\(g\)</span>), three baseline physical approximations are conventionally applied:</p>
+<ol>
+<li><strong>The Franck-Condon Approximation:</strong> The transition dipole moment <span class="arithmatex">\(\vec{\mu}_{eg}\)</span> between the initial and final electronic states is assumed to depend weakly on the nuclear coordinates <span class="arithmatex">\(\mathbf{R}\)</span>. It is treated as a constant evaluated at the equilibrium configuration [1].</li>
+<li><strong>The Linear Electron-Phonon Coupling Model:</strong> The electronic energy depends linearly on atomic displacements around the equilibrium configuration. Complex non-linearities such as the dynamic Jahn-Teller (JT) effect are neglected when resolving the broad phonon sideband [1].</li>
+<li><strong>The Harmonic Approximation:</strong> The nuclear potential energy surfaces of both the ground and excited states are assumed to be harmonic [1, 2].</li>
+</ol>
+<p>Under these definitions, the absolute luminescence intensity <span class="arithmatex">\(I(\hbar\omega)\)</span> (representing photons emitted per unit time per unit energy) at temperature <span class="arithmatex">\(T\)</span> is governed by Fermi's Golden Rule [1]:</p>
+<div class="arithmatex">\[I(\hbar\omega) = \frac{n_{D}\omega^{3}}{3\epsilon_{0}\pi c^{3}\hbar}|\vec{\mu}_{eg}|^{2} \sum_{m,n} w_{n} |\langle\chi_{gm}|\chi_{en}\rangle|^{2} \delta(E_{\text{ZPL}} + E_{en} - E_{gm} - \hbar\omega)\]</div>
+<p>Where:
+* <span class="arithmatex">\(n_{D}\)</span> is the refractive index of the host material [1].
+* <span class="arithmatex">\(w_{n}\)</span> is the statistical Boltzmann weight of the initial vibrational state <span class="arithmatex">\(n\)</span> in the electronic excited state manifold [1, 2].
+* <span class="arithmatex">\(\chi_{en}\)</span> and <span class="arithmatex">\(\chi_{gm}\)</span> represent the vibrational states of the excited and ground electronic states, respectively [1, 2].
+* <span class="arithmatex">\(E_{\text{ZPL}}\)</span> is the Zero-Phonon Line energy [1].
+* <span class="arithmatex">\(E_{en}\)</span> and <span class="arithmatex">\(E_{gm}\)</span> represent the discrete vibrational energies within their respective manifolds [1, 2].</p>
+<p>The <span class="arithmatex">\(\omega^{3}\)</span> prefactor stems directly from the photon density of states (<span class="arithmatex">\(\sim\omega^{2}\)</span>) scaled by the electric field perturbation energy (<span class="arithmatex">\(|\vec{E}|^{2}\sim\omega\)</span>) [1]. Because measuring absolute intensity is experimentally challenging, <code>defectpl</code> models the normalized luminescence intensity <span class="arithmatex">\(L(\hbar\omega)\)</span> [1]:</p>
+<div class="arithmatex">\[L(\hbar\omega) = C \omega^{3} A(\hbar\omega)\]</div>
+<p>where <span class="arithmatex">\(C\)</span> is a normalization constant (<span class="arithmatex">\(C^{-1} = \int A(\hbar\omega)\omega^{3} d(\hbar\omega)\)</span>), and <span class="arithmatex">\(A(\hbar\omega)\)</span> is the fundamental <strong>optical spectral function</strong> containing the vibrational overlap integrals [1]:</p>
+<div class="arithmatex">\[A(\hbar\omega) = \sum_{m,n} w_{n} |\langle\chi_{gm}|\chi_{en}\rangle|^{2} \delta(E_{\text{ZPL}} + E_{en} - E_{gm} - \hbar\omega)\]</div>
+<hr />
+<h2 id="2-multi-mode-formalism-identical-hessian-approximation">2. Multi-Mode Formalism (Identical Hessian Approximation)</h2>
+<p>When expanding to a full multi-mode treatment involving thousands of crystal lattice degrees of freedom, the <strong>identical Hessian approximation</strong> (<span class="arithmatex">\(\omega_{k}^{(e)} \approx \omega_{k}^{(g)} \equiv \omega_{k}\)</span>) is introduced to make the problem computationally tractable [1]. At <span class="arithmatex">\(T = 0\text{ K}\)</span>, all initial population resides in the lowest vibrational state (<span class="arithmatex">\(n=0\)</span>), mapping the optical spectral function to the <strong>spectral function of electron-phonon coupling</strong> <span class="arithmatex">\(S(\hbar\omega)\)</span> [1]:</p>
+<div class="arithmatex">\[S(\hbar\omega) = \sum_{k} S_{k} \delta(\hbar\omega - \hbar\omega_{k})\]</div>
+<p>where <span class="arithmatex">\(S_{k} = \frac{\omega_{k} q_{k}^{2}}{2\hbar}\)</span> represents the partial Huang-Rhys (HR) factor for a discrete phonon mode <span class="arithmatex">\(k\)</span> [1]. The variable <span class="arithmatex">\(q_{k}\)</span> is the mode-displaced configuration coordinate. The <code>defectpl</code> package supports two equivalent mathematical paths to compute <span class="arithmatex">\(q_{k}\)</span> based on the raw data available from first-principles calculations:</p>
+<h3 id="path-a-displacement-mode">Path A: Displacement Mode</h3>
+<p>When the explicit equilibrium atomic coordinates of both the excited state (<span class="arithmatex">\(\mathbf{R}_{e}\)</span>) and ground state (<span class="arithmatex">\(\mathbf{R}_{g}\)</span>) are known, <span class="arithmatex">\(q_{k}\)</span> is evaluated via structural differences [1]:</p>
+<div class="arithmatex">\[q_{k} = \sum_{a, i} m_{a}^{1/2} \left(R_{e;a,i} - R_{g;a,i}\right) \Delta r_{k;a,i}\]</div>
+<p>Here, <span class="arithmatex">\(a\)</span> indexes the atoms, <span class="arithmatex">\(i \in \{x, y, z\}\)</span> represents the Cartesian directions, <span class="arithmatex">\(m_{a}\)</span> is the atomic mass, and <span class="arithmatex">\(\Delta r_{k;a,i}\)</span> is the normalized displacement vector of atom <span class="arithmatex">\(a\)</span> along direction <span class="arithmatex">\(i\)</span> in phonon mode <span class="arithmatex">\(k\)</span> (the eigenvectors of the mass-weighted Hessian matrix) [1].</p>
+<h3 id="path-b-force-mode">Path B: Force Mode</h3>
+<p>Alternatively, the coordinate translation can be expressed via differences in Hellmann-Feynman forces acting on fixed atomic sites [1]:</p>
+<div class="arithmatex">\[q_{k} = \frac{1}{\omega_{k}^{2}} \sum_{a, i} \frac{1}{m_{a}^{1/2}} \left(F_{e;a,i} - F_{g;a,i}\right) \Delta r_{k;a,i}\]</div>
+<p>where <span class="arithmatex">\(F_{e;a,i} - F_{g;a,i}\)</span> represents the change in forces when the electronic state shifts instantly at a fixed spatial geometry [1]. This is equivalent to the displacement formulation under a strict harmonic potential since <span class="arithmatex">\((\vec{R}_{e} - \vec{R}_{g}) = -\hat{H}^{-1}(\vec{F}_{e} - \vec{F}_{g})\)</span>, where <span class="arithmatex">\(\hat{H}\)</span> is the mass-unweighted Hessian [1].</p>
+<p><em>Note: In <code>defectpl</code>, when evaluating an engine state running in Force Mode, spatial displacement scalars like <span class="arithmatex">\(\Delta Q\)</span> and <span class="arithmatex">\(\Delta R\)</span> are omitted during diagnostic text generation to preserve mathematical consistency with the force-derived fields.</em></p>
+<p>Integrating the entire spectral density function yields the <strong>total Huang-Rhys factor</strong> (<span class="arithmatex">\(S\)</span>) for the optical transition [1]:</p>
+<div class="arithmatex">\[S = \int_{0}^{\infty} S(\hbar\omega) d(\hbar\omega) = \sum_{k} S_{k}\]</div>
+<hr />
+<h2 id="3-the-generating-function-approach">3. The Generating Function Approach</h2>
+<p>Rather than calculating explicitly convoluted multi-phonon combination states term by term, <code>defectpl</code> resolves <span class="arithmatex">\(A(\hbar\omega)\)</span> using the time-dependent generating function approach developed by Lax, Kubo, and Toyozawa [1]. </p>
+<p>The optical spectral function is calculated via the Fourier transform of a time-domain generating function <span class="arithmatex">\(G(t)\)</span> [1]:</p>
+<div class="arithmatex">\[A(E_{\text{ZPL}} - \hbar\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} G(t) e^{i\omega t - \gamma |t|} dt\]</div>
+<p>where <span class="arithmatex">\(\gamma\)</span> is a semi-empirical broadening parameter applied to reproduce the finite experimental width of the Zero-Phonon Line (arising from homogeneous thermal interactions or inhomogeneous sample strain) [1]. </p>
+<p>The generating function <span class="arithmatex">\(G(t)\)</span> is computed directly from the electron-phonon coupling spectrum [1]:</p>
+<div class="arithmatex">\[G(t) = e^{S(t) - S(0)}\]</div>
+<p>where <span class="arithmatex">\(S(t)\)</span> is the Fourier transform of the spectral density [1]:</p>
+<div class="arithmatex">\[S(t) = \int_{0}^{\infty} S(\hbar\omega) e^{-i\omega t} d(\hbar\omega)\]</div>
+<p>and <span class="arithmatex">\(S(0) \equiv S = \int_{0}^{\infty} S(\hbar\omega) d(\hbar\omega)\)</span> is the total HR factor [1].</p>
+<h3 id="physical-metrics-derived-from-the-sideband">Physical Metrics Derived from the Sideband</h3>
+<ul>
+<li><strong>Debye-Waller Factor (<span class="arithmatex">\(w_{\text{ZPL}}\)</span>):</strong> Represents the fractional intensity or weight contained strictly within the Zero-Phonon Line relative to the total emission profile [1]. Under identical ground and excited state potentials, it evaluates to [1]:
+  <span class="arithmatex">\(<span class="arithmatex">\(w_{\text{ZPL}} = e^{-S}\)</span>\)</span></li>
+<li><strong>Experimental Apparent HR Factor (<span class="arithmatex">\(\tilde{S}\)</span>):</strong> If deduced directly from the log-weight of the ZPL in a recorded spectrum, <span class="arithmatex">\(\tilde{S} = -\ln(w_{\text{ZPL}})\)</span> [1]. Because the real physical emission intensity <span class="arithmatex">\(L(\hbar\omega)\)</span> is skewed toward higher energies by the <span class="arithmatex">\(\omega^{3}\)</span> prefactor compared to the bare spectral shape <span class="arithmatex">\(A(\hbar\omega)\)</span>, <span class="arithmatex">\(\tilde{S}\)</span> typically underestimates the true total theoretical coupling factor <span class="arithmatex">\(S\)</span> (<span class="arithmatex">\(\tilde{S} &lt; S\)</span>) [1].</li>
+</ul>
+<hr />
+<h2 id="4-1d-harmonic-approximation-lineshape">4. 1D Harmonic Approximation Lineshape</h2>
+<p>For simple validation or handling localized systems dominated by a single effective vibrational mode, a 1D harmonic model can simulate lineshapes. This is implemented in the <code>VibrationalSpectra1D</code> class of <code>defectpl</code>. This model abandons the identical-Hessian restriction, explicitly allowing the effective phonon frequency of the ground state (<span class="arithmatex">\(\omega_{1}\)</span>) to differ from that of the excited state (<span class="arithmatex">\(\omega_{2}\)</span>) [1, 2].</p>
+<h3 id="a-configuration-coordinate-parameters-and-unit-conversions">A. Configuration Coordinate Parameters and Unit Conversions</h3>
+<p>The calculation begins with an input mass-weighted configuration coordinate offset <span class="arithmatex">\(\Delta Q\)</span>, expressed in units of <span class="arithmatex">\(\text{amu}^{1/2}\cdot\text{Å}\)</span> [1, 2]. To translate this value into a dimensionless displacement parameter <span class="arithmatex">\(\rho\)</span> appropriate for evaluating quantum mechanical harmonic oscillator wavefunctions, a unified conversion factor (<span class="arithmatex">\(\text{FACTOR}\)</span>) is established using standard SI constants [2]:</p>
+<div class="arithmatex">\[\text{FACTOR} = \frac{\sqrt{\text{AMU}_{kG}} \cdot \text{ANG}_{M}}{\hbar_{J\cdot S}} = \frac{\sqrt{1.66053906 \times 10^{-27}\text{ kg}} \cdot 10^{-10}\text{ m}}{1.054571817 \times 10^{-34}\text{ J}\cdot\text{s}} \approx 15.46484755\]</div>
+<p>Using an effective reduced frequency <span class="arithmatex">\(\omega\)</span> determined by both electronic states:</p>
+<div class="arithmatex">\[\omega = \frac{\omega_{1}\omega_{2}}{\omega_{1} + \omega_{2}}\]</div>
+<p>the dimensionless displacement parameter <span class="arithmatex">\(\rho\)</span> governing the structural offset is computed as [2]:</p>
+<div class="arithmatex">\[\rho = \text{FACTOR} \cdot \sqrt{\frac{\omega}{2}} \cdot \Delta Q\]</div>
+<p>The vertical relaxation energies (Franck-Condon shifts) associated with the ground state (<span class="arithmatex">\(E_{\text{rel},1}\)</span>) and the excited state (<span class="arithmatex">\(E_{\text{rel},2}\)</span>) are derived quadratically [2]:</p>
+<div class="arithmatex">\[E_{\text{rel},1} = \frac{1}{2} (\text{FACTOR})^{2} \cdot \omega_{1}^{2} \cdot (\Delta Q)^{2}\]</div>
+<div class="arithmatex">\[E_{\text{rel},2} = \frac{1}{2} (\text{FACTOR})^{2} \cdot \omega_{2}^{2} \cdot (\Delta Q)^{2}\]</div>
+<h3 id="b-franck-condon-matrix-elements-with-frequency-distortion">B. Franck-Condon Matrix Elements with Frequency Distortion</h3>
+<p>Because <span class="arithmatex">\(\omega_{1} \neq \omega_{2}\)</span>, the vibrational wavefunctions are both translated in space and altered in width (distorted) [2]. The mixing of states is parameterized by rotation-like parameters <span class="arithmatex">\(\cos\phi\)</span> and <span class="arithmatex">\(\sin\phi\)</span> defined via the frequencies [2]:</p>
+<div class="arithmatex">\[\cos\phi = \sqrt{\frac{\omega_{1}}{\omega_{1} + \omega_{2}}}, \quad \sin\phi = \sqrt{\frac{\omega_{2}}{\omega_{1} + \omega_{2}}}\]</div>
+<p>The transition overlap matrix element mapping the <span class="arithmatex">\(i\)</span>-th vibrational level of the initial excited state to the <span class="arithmatex">\(j\)</span>-th vibrational level of the final ground state, <span class="arithmatex">\(M_{i,j} = \langle\chi_{g,j}|\chi_{e,i}\rangle\)</span>, is evaluated sequentially. For the zero-zero transition (<span class="arithmatex">\(i=0, j=0\)</span>), the baseline overlap equals [2]:</p>
+<div class="arithmatex">\[M_{0,0} = \sqrt{2\cos\phi\sin\phi} \cdot \exp\left(-\frac{\rho^{2}}{2}\right)\]</div>
+<p>Higher-order matrix elements are computed dynamically through explicit coordinate transformations or corresponding Hermite polynomial relations implemented in <code>utils.calculate_overlap_element</code>, referencing the initial structural state displacement variables [2].</p>
+<h3 id="c-thermal-distribution-and-lineshape-convolution">C. Thermal Distribution and Lineshape Convolution</h3>
+<p>At a finite temperature <span class="arithmatex">\(T\)</span>, the initial excited-state vibrational levels are populated according to a grand canonical Boltzmann distribution. The partition function <span class="arithmatex">\(Z\)</span> and the statistical weights <span class="arithmatex">\(W_{i}\)</span> for the excited state are quantified via [2]:</p>
+<div class="arithmatex">\[Z = \frac{1}{1 - \exp\left(-\frac{\omega_{1}}{k_{B}T}\right)}, \quad W_{i} = \frac{1}{Z} \exp\left(-\frac{i \cdot \omega_{1}}{k_{B}T}\right)\]</div>
+<p>The discrete contribution <span class="arithmatex">\(C_{i,j}\)</span> and corresponding transition energy <span class="arithmatex">\(E_{i,j}\)</span> for each pair are resolved across predefined limits (up to <span class="arithmatex">\(i = N_{1}\)</span> and <span class="arithmatex">\(j = N_{2}\)</span>) [1, 2]:</p>
+<div class="arithmatex">\[C_{i,j} = W_{i} \cdot |M_{i,j}|^{2}, \quad E_{i,j} = E_{\text{ZPL}} - j\omega_{2} + i\omega_{1}\]</div>
+<p>The code verifies the closure relation of the calculated manifold matrix space by ensuring the total probability sums to unity (<span class="arithmatex">\(\sum_{i,j} C_{i,j} \approx 1.0\)</span>) [2].</p>
+<p>Finally, the continuous density of states (DOS) and normalized luminescence curves <span class="arithmatex">\(L(\hbar\omega)\)</span> are projected onto a uniform grid with resolution <span class="arithmatex">\(dE\)</span> by convoluting the discrete line spectrum with a Gaussian profile of width <span class="arithmatex">\(\sigma = 0.70 \cdot \omega_{2}\)</span> [1]:</p>
+<div class="arithmatex">\[\text{DOS}(E) = \sum_{i,j} C_{i,j} \cdot \frac{1}{\sigma\sqrt{2\pi}} \exp\left( -\frac{(E_{i,j} - E)^{2}}{2\sigma^{2}} \right)\]</div>
+<div class="arithmatex">\[L(E) = \text{DOS}(E) \cdot E^{3}\]</div>
+<hr />
+<h2 id="5-software-pipeline-mapping">5. Software Pipeline Mapping</h2>
+<p>The math detailed in this tutorial maps directly to modules in the <code>defectpl</code> repository:
+* <strong><code>defectpl.defectpl.Photoluminescence</code></strong>: Rehydrates the cached JSON properties (frequencies <span class="arithmatex">\(\omega_{k}\)</span>, partial factors <span class="arithmatex">\(S_{k}\)</span>, force matrices, and energy grids), manages the evaluation of equations for <span class="arithmatex">\(S(\hbar\omega)\)</span>, and executes the numeric integration of <span class="arithmatex">\(G(t)\)</span> to transform it into the final luminescence vector <span class="arithmatex">\(L(\hbar\omega)\)</span>.
+* <strong><code>defectpl.defectpl.VibrationalSpectra1D</code></strong>: Handles standalone effective coordinate lineshape synthesis using parameterized 1D potentials.
+* <strong><code>defectpl.utils.extract_important_properties</code></strong>: Formats and extracts the single-value scalar properties (<span class="arithmatex">\(E_{\text{ZPL}}\)</span>, <span class="arithmatex">\(S\)</span>, <span class="arithmatex">\(w_{\text{ZPL}}\)</span>, <span class="arithmatex">\(\Delta Q\)</span>, <span class="arithmatex">\(\Delta R\)</span>) and labels the run mode based on whether displacement or force-based tracking was invoked.</p>
+<hr />
+<h2 id="references">References</h2>
+<p>[1] Alkauskas, A., Buckley, B. B., Awschalom, D. D., &amp; Van de Walle, C. G. (2014). First-principles theory of the luminescence lineshape for the triplet transition in diamond NV centres. <em>New Journal of Physics</em>, 16(7), 073026. https://doi.org/10.1088/1367-2630/16/7/073026</p>
+<p>[2] Alkauskas, A., Yan, Q., &amp; Van de Walle, C. G. (2014). First-principles theory of nonradiative carrier capture via multiphonon emission. <em>Physical Review B</em>, 90(7), 075202. https://doi.org/10.1103/PhysRevB.90.075202</p>
               
             </div>
           </div><footer>

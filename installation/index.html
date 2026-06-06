@@ -50,11 +50,29 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Installation</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">📋 Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation-options">🚀 Installation Options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#option-1-via-pypi-recommended-for-standard-users">Option 1: Via PyPI (Recommended for standard users)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#option-2-via-conda-anaconda">Option 2: Via Conda / Anaconda</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#option-3-from-github-source-recommended-for-developers">Option 3: From GitHub Source (Recommended for developers)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#verification">Verification</a>
+    </li>
     </ul>
                 </li>
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="../usage/">Usage</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../command_line_interface/">Command Line Interface</a>
                 </li>
               </ul>
               <ul>
@@ -70,7 +88,11 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API</a>
+                <li class="toctree-l1"><a class="reference internal" href="../benchmark/">Benchmark</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
                 </li>
               </ul>
       </div>
@@ -96,18 +118,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>The package can be found in pypi. You can install it using <code>pip</code>.</p>
-<h4 id="installation">Installation</h4>
+                <h1 id="installation-guide">Installation Guide</h1>
+<p>This page covers the different methods available to install <strong>DefectPL</strong>, depending on your workflow requirements.</p>
+<hr />
+<h2 id="prerequisites">📋 Prerequisites</h2>
+<p>Before installing, ensure your environment meets the following requirements:
+- <strong>Python:</strong> version 3.9 or higher (fully optimized for Python 3.12+)
+- <strong>Core Dependencies:</strong> <code>numpy</code>, <code>scipy</code>, <code>matplotlib</code>, <code>pymatgen</code>, <code>monty</code>, and <code>pyyaml</code> (these will be automatically configured during installation)</p>
+<hr />
+<h2 id="installation-options">🚀 Installation Options</h2>
+<h3 id="option-1-via-pypi-recommended-for-standard-users">Option 1: Via PyPI (Recommended for standard users)</h3>
+<p>The easiest way to install the stable release of DefectPL is directly from the Python Package Index using <code>pip</code>:</p>
 <pre><code class="language-bash">pip install defectpl
+
 </code></pre>
-<p>Using <code>conda</code></p>
+<h3 id="option-2-via-conda-anaconda">Option 2: Via Conda / Anaconda</h3>
+<p>If you use Anaconda or a localized conda environment architecture, you can pull the pre-compiled package from the <code>conda-forge</code> channel:</p>
 <pre><code class="language-bash">conda install conda-forge::defectpl
+
 </code></pre>
-<p>Using the GitHub clone</p>
-<pre><code class="language-bash">git clone https://github.com/Shibu778/defectpl.git
-cd defectpl/defectpl
+<h3 id="option-3-from-github-source-recommended-for-developers">Option 3: From GitHub Source (Recommended for developers)</h3>
+<p>If you want to contribute to the package, inspect the code, or work with the latest development branches, clone the repository directly and execute an editable installation:</p>
+<pre><code class="language-bash"># Clone the repository
+git clone [https://github.com/Shibu778/defectpl.git](https://github.com/Shibu778/defectpl.git)
+
+# Move into the root directory tracking setup files
+cd defectpl
+
+# Install in editable/development mode
 pip install -e .
+
 </code></pre>
+<hr />
+<h2 id="verification">Verification</h2>
+<p>To verify that the installation was successful and the package pathways are accessible globally, open a terminal window or environment shell and run:</p>
+<pre><code class="language-bash">python -c &quot;import defectpl; print(defectpl.__version__)&quot;
+
+</code></pre>
+<p>If it prints the package version number without throwing an <code>ImportError</code>, your development suite is completely ready to run photoluminescence calculations.</p>
               
             </div>
           </div><footer>

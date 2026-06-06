@@ -55,9 +55,59 @@
                 <li class="toctree-l1"><a class="reference internal" href="../usage/">Usage</a>
                 </li>
               </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../command_line_interface/">Command Line Interface</a>
+                </li>
+              </ul>
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Plots Gallery</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#properties-summary">📋 Properties Summary</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#track-1-emission-intensities-peak-profiles">🌌 Track 1: Emission Intensities &amp; Peak Profiles</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-macroscopic-intensity-sideband">1. Macroscopic Intensity Sideband</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-effective-one-dimensional-model-for-high-degree-of-electron-phonon-coupling">2. Effective One-Dimensional Model for High Degree of Electron-Phonon Coupling</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#track-2-electron-phonon-ep-spectral-function-with-other-variables">🎛️ Track 2: Electron-Phonon (EP) Spectral Function with Other Variables</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#3-ep-spectral-function-with-phr-and-localization-ratio">3. EP Spectral Function with pHR and Localization Ratio</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-ep-spectral-function-with-phr-and-inverse-participation-ratio">4. EP Spectral Function with pHR and Inverse Participation Ratio</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-ep-spectral-function-partial-hr-factor">5. EP Spectral Function &amp; Partial HR Factor</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#track-3-phonon-and-vibrational-displacement">🔬 Track 3: Phonon and Vibrational Displacement</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#6-generalized-vibrational-displacement">6. Generalized Vibrational Displacement</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-phonon-eigenvalues-vs-mode">7. Phonon Eigenvalues vs. Mode</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#track-4-phonon-localization-metrics">🧩 Track 4: Phonon Localization Metrics</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#8-inverse-participation-ratio-ipr">8. Inverse Participation Ratio (IPR)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#9-spatial-localization-ratio">9. Spatial Localization Ratio</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#track-5-partial-hr-factor-and-spectral-density-function">📈 Track 5: Partial HR Factor and Spectral Density Function</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#10-partial-huang-rhys-factor-s_k-profile">10. Partial Huang-Rhys Factor (\(S_k\)) Profile</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#11-pure-spectral-density-function">11. Pure Spectral Density Function</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#image-references">🔗 Image References</a>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -70,7 +120,11 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API</a>
+                <li class="toctree-l1"><a class="reference internal" href="../benchmark/">Benchmark</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_reference/">API Reference</a>
                 </li>
               </ul>
       </div>
@@ -96,63 +150,108 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="plots-gallery">Plots Gallery</h1>
-<p>Following plots can be obtained using <code>defectpl</code> package.</p>
+                <h1 id="visualizations-gallery">📊 Visualizations Gallery</h1>
+<p><strong>Source Directory:</strong> <code>defectpl/examples/NV_diamond/hse06_out/zpl_ems_force_mode</code></p>
+<hr />
+<h2 id="properties-summary">📋 Properties Summary</h2>
+<p>The table below summarizes the key scalar physical properties and simulation parameters extracted from the dataset located at the path variable specified above.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: center;"></th>
-<th style="text-align: center;"></th>
+<th style="text-align: left;">Property</th>
+<th style="text-align: left;">Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">Intensity vs Phonon Energy</td>
-<td style="text-align: center;">Spectral Function, Partial HR factor and Localization Ratio</td>
+<td style="text-align: left;"><strong>Calculation Run Mode</strong></td>
+<td style="text-align: left;">Force Mode</td>
 </tr>
 <tr>
-<td style="text-align: center;"><img alt="intensity-photon-energy" src="../plots/intensity_vs_penergy.svg" /></td>
-<td style="text-align: center;"><img alt="somega-pHR-locrat-penergy" src="../plots/S_omega_HRf_loc_rat_vs_penergy.svg" /></td>
+<td style="text-align: left;"><strong>Zero-Phonon Line (ZPL) Energy</strong></td>
+<td style="text-align: left;">1.991 eV</td>
 </tr>
 <tr>
-<td style="text-align: center;">Vibrational Displacement</td>
-<td style="text-align: center;">Phonon Energy</td>
+<td style="text-align: left;"><strong>Total Huang-Rhys (HR) Factor</strong></td>
+<td style="text-align: left;">3.439309</td>
 </tr>
 <tr>
-<td style="text-align: center;"><img alt="vibrational-displacement" src="../plots/qk_vs_penergy.svg" /></td>
-<td style="text-align: center;"><img alt="phonon-energy" src="../plots/penergy_vs_pmode.svg" /></td>
+<td style="text-align: left;"><strong>Debye-Waller (DW) Factor</strong></td>
+<td style="text-align: left;">3.2087\%</td>
 </tr>
 <tr>
-<td style="text-align: center;">Inverse Participation Ratio</td>
-<td style="text-align: center;">Localization Ratio</td>
+<td style="text-align: left;"><strong>Total Number of Atoms (natoms)</strong></td>
+<td style="text-align: left;">215</td>
 </tr>
 <tr>
-<td style="text-align: center;"><img alt="ipr" src="../plots/ipr_vs_penergy.svg" /></td>
-<td style="text-align: center;"><img alt="loc_ratio" src="../plots/loc_rat_vs_penergy.svg" /></td>
+<td style="text-align: left;"><strong>ZPL Broadening Factor (<span class="arithmatex">\(\gamma\)</span>)</strong></td>
+<td style="text-align: left;">2.00 meV</td>
 </tr>
 <tr>
-<td style="text-align: center;">Partial HR factor (pHR)</td>
-<td style="text-align: center;">Spectral Function, pHR</td>
+<td style="text-align: left;"><strong>Gaussian Broadening (<span class="arithmatex">\(\sigma\)</span>)</strong></td>
+<td style="text-align: left;">0.006000 eV</td>
 </tr>
 <tr>
-<td style="text-align: center;"><img alt="pHR" src="../plots/HR_factor_vs_penergy.svg" /></td>
-<td style="text-align: center;"><img alt="S_pHR" src="../plots/S_omega_vs_penergy.svg" /></td>
-</tr>
-<tr>
-<td style="text-align: center;">Spectral Function, Partial HR factor and IPR</td>
-<td style="text-align: center;">One Dimensional Vibrational Spectra</td>
-</tr>
-<tr>
-<td style="text-align: center;"><img alt="S_ipr" src="../plots/S_omega_HRf_ipr_vs_penergy.svg" /></td>
-<td style="text-align: center;"><img alt="oned" src="../plots/one_d_lineshape.svg" /></td>
+<td style="text-align: left;"><strong>Energy Mesh Resolution</strong></td>
+<td style="text-align: left;">1000 points/eV</td>
 </tr>
 </tbody>
 </table>
+<hr />
+<h2 id="track-1-emission-intensities-peak-profiles">🌌 Track 1: Emission Intensities &amp; Peak Profiles</h2>
+<p>These plots capture the macroscopic optical output of your quantum emitter, tracking the transition lineshape from multi-phonon couplings down to individual core configuration coordinate equivalents.</p>
+<h3 id="1-macroscopic-intensity-sideband">1. Macroscopic Intensity Sideband</h3>
+<p><img alt="intensity-photon-energy" src="../plots/intensity_vs_penergy.svg" /></p>
+<p><em>Figure 1: Photoluminescence intensity vs. photon energy.</em></p>
+<h3 id="2-effective-one-dimensional-model-for-high-degree-of-electron-phonon-coupling">2. Effective One-Dimensional Model for High Degree of Electron-Phonon Coupling</h3>
+<p><img alt="oned" src="../plots/one_d_lineshape.svg" /></p>
+<p><em>Figure 2: Effective single-mode configuration coordinate lineshape representation under 1D harmonic approximation.</em></p>
+<hr />
+<h2 id="track-2-electron-phonon-ep-spectral-function-with-other-variables">🎛️ Track 2: Electron-Phonon (EP) Spectral Function with Other Variables</h2>
+<p>These figures combine a twin <span class="arithmatex">\(y\)</span>-axis framework with continuous color-mapped scatter overlays or unified curves to show relationships between energy levels, coupling matrices, and localized defect dynamics.</p>
+<h3 id="3-ep-spectral-function-with-phr-and-localization-ratio">3. EP Spectral Function with pHR and Localization Ratio</h3>
+<p><img alt="somega-pHR-locrat-penergy" src="../plots/S_omega_HRf_loc_rat_vs_penergy.svg" /></p>
+<p><em>Figure 3: Joint spectral function <span class="arithmatex">\(S(\omega)\)</span> and partial Huang-Rhys factors <span class="arithmatex">\(S_k\)</span> mapped directly by atomic spatial localization ratio across the phonon energy spectrum.</em></p>
+<h3 id="4-ep-spectral-function-with-phr-and-inverse-participation-ratio">4. EP Spectral Function with pHR and Inverse Participation Ratio</h3>
+<p><img alt="S_ipr" src="../plots/S_omega_HRf_ipr_vs_penergy.svg" /></p>
+<p><em>Figure 4: Joint spectral function <span class="arithmatex">\(S(\omega)\)</span> and partial Huang-Rhys factors <span class="arithmatex">\(S_k\)</span> mapped by Inverse Participation Ratio (IPR).</em></p>
+<h3 id="5-ep-spectral-function-partial-hr-factor">5. EP Spectral Function &amp; Partial HR Factor</h3>
+<p><img alt="S_omega_Sks" src="../plots/S_omega_Sks_vs_penergy.svg" /></p>
+<p><em>Figure 5: Clean dual-axis overlay matching continuous spectral density <span class="arithmatex">\(S(\omega)\)</span> directly against discrete <span class="arithmatex">\(S_k\)</span> weights.</em></p>
+<hr />
+<h2 id="track-3-phonon-and-vibrational-displacement">🔬 Track 3: Phonon and Vibrational Displacement</h2>
+<p>These diagnostics inspect internal lattice dynamics, showing where the crystal structure deforms upon vertical electronic transition.</p>
+<h3 id="6-generalized-vibrational-displacement">6. Generalized Vibrational Displacement</h3>
+<p><img alt="vibrational-displacement" src="../plots/qk_vs_penergy.svg" /></p>
+<p><em>Figure 6: Vibration displacement <span class="arithmatex">\(q_k\)</span> for each phonon mode.</em></p>
+<h3 id="7-phonon-eigenvalues-vs-mode">7. Phonon Eigenvalues vs. Mode</h3>
+<p><img alt="phonon-energy" src="../plots/penergy_vs_pmode.svg" /></p>
+<p><em>Figure 7: Phonon energy vs. index.</em></p>
+<hr />
+<h2 id="track-4-phonon-localization-metrics">🧩 Track 4: Phonon Localization Metrics</h2>
+<p>Isolated metrics used to contrast localized deep-defect states against bulk-like host crystal vibrations.</p>
+<h3 id="8-inverse-participation-ratio-ipr">8. Inverse Participation Ratio (IPR)</h3>
+<p><img alt="ipr" src="../plots/ipr_vs_penergy.svg" /></p>
+<p><em>Figure 8: IPR vs. phonon energy.</em></p>
+<h3 id="9-spatial-localization-ratio">9. Spatial Localization Ratio</h3>
+<p><img alt="loc_ratio" src="../plots/loc_rat_vs_penergy.svg" /></p>
+<p><em>Figure 9: Localization ratio versus phonon energies.</em></p>
+<hr />
+<h2 id="track-5-partial-hr-factor-and-spectral-density-function">📈 Track 5: Partial HR Factor and Spectral Density Function</h2>
+<p>Standalone profiles highlighting fundamental coupling signatures before peak broadening or convolution.</p>
+<h3 id="10-partial-huang-rhys-factor-s_k-profile">10. Partial Huang-Rhys Factor (<span class="arithmatex">\(S_k\)</span>) Profile</h3>
+<p><img alt="pHR" src="../plots/HR_factor_vs_penergy.svg" /></p>
+<p><em>Figure 10: Raw coupling weight contribution (<span class="arithmatex">\(S_k\)</span>) per individual vibrational mode.</em></p>
+<h3 id="11-pure-spectral-density-function">11. Pure Spectral Density Function</h3>
+<p><img alt="S_pHR" src="../plots/S_omega_vs_penergy.svg" /></p>
+<p><em>Figure 11: Electron-Phonon Spectral Function <span class="arithmatex">\(S(\omega)\)</span> vs. the phonon energies.</em></p>
+<hr />
+<h2 id="image-references">🔗 Image References</h2>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../usage/" class="btn btn-neutral float-left" title="Usage"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../command_line_interface/" class="btn btn-neutral float-left" title="Command Line Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../tutorials/" class="btn btn-neutral float-right" title="Tutorials">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
@@ -176,7 +275,7 @@
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../usage/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../command_line_interface/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../tutorials/" style="color: #fcfcfc">Next &raquo;</a></span>
