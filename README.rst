@@ -2,15 +2,11 @@
 DefectPL
 ========
 
-A comprehensive toolkit for calculating and visualizing photoluminescence spectra of quantum defects. It also supports the analysis of other optical properties of point defects in insulators and semiconductors.
+A high-performance computational toolkit for calculating and visualizing the photoluminescence (PL) spectra, electron-phonon coupling characteristics, and optical lineshapes of quantum defect centers in insulators and semiconductors.
 
-.. image:: https://img.shields.io/pypi/v/defectpl.svg
-   :target: https://pypi.python.org/pypi/defectpl
+.. image:: https://img.shields.io/pypi/v/defectpl.svg?color=blue
+   :target: https://pypi.org/pypi/defectpl
    :alt: PyPI Version
-
-.. image:: https://static.pepy.tech/badge/defectpl
-   :target: https://pepy.tech/project/defectpl
-   :alt: Downloads
 
 .. image:: https://img.shields.io/badge/recipe-defectpl-green.svg
    :target: https://github.com/conda-forge/defectpl-feedstock
@@ -18,61 +14,76 @@ A comprehensive toolkit for calculating and visualizing photoluminescence spectr
 
 .. image:: https://anaconda.org/conda-forge/defectpl/badges/version.svg
    :target: https://anaconda.org/conda-forge/defectpl
-   :alt: Anaconda
+   :alt: Anaconda Version
+
+.. image:: https://static.pepy.tech/badge/defectpl
+   :target: https://pepy.tech/project/defectpl
+   :alt: Downloads
 
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://opensource.org/licenses/MIT
    :alt: License: MIT
 
-.. warning::
-   This package is currently under active development.
+.. attention::
+   **Development Status:** This package is under active development. Features, APIs, and documentation are subject to rapid updates.
 
 ---
 
-Purpose
-=======
+Overview & Key Features
+=======================
 
-**DefectPL** is designed to compute the photoluminescence (PL) lineshape and electronic-vibrational coupling profiles of point defects in solids using the formal 1D configuration coordinate model methodologies (*New J. Phys.* **16** 073026 (2014)).
+**DefectPL** implements a photoluminescence calculation framework based on standard generating function methodologies (*New J. Phys.* **16** 073026 (2014)) to evaluate electronic-vibrational coupling profiles of point defects in solids from first-principles data. It bridges ab initio electronic structure outputs with experimentally observable optical lineshapes, specifically supporting high Huang-Rhys (HR) factor regimes.
 
-The package features an automated calculation pipeline to compute, serialize, and visualize:
+The core engine provides automated pipelines to compute, serialize, and visualize:
 
-* Full photoluminescence spectra lineshapes in high Huang-Rhys (HR) factor regimes
-* Total & Partial Huang-Rhys factors ($S_k$) alongside Debye-Waller factors ($I_{\text{ZPL}}/I_{\text{tot}}$)
-* Phonon localization metrics via Inverse Participation Ratios (IPR) and Localization Ratios
-* Multi-mode Electron-Phonon Spectral Densities $S(\omega)$
-* Isotope substitution effects on electronic-vibrational coupling pathways
-
-If you use this package in your research, please consider citing:
-
-  `Carbon with Stone-Wales Defect as Quantum Emitter in h-BN <https://doi.org/10.1103/PhysRevB.111.104109>`_, *Phys. Rev. B* **111**, 104109 (2025)
-
-  `High-throughput Computational Search for Group-IV-related Quantum Defects as Spin-photon Interfaces in 4H-SiC <https://doi.org/10.1103/PhysRevB.112.184112>`_, *Phys. Rev. B* **112**, 184112 (2025)
+* **Macroscopic Optical Lineshapes:** Full photoluminescence (PL) spectra sidebands accounting for multi-phonon convolutions.
+* **Coupling Parameters:** Quantified total and mode-resolved partial Huang-Rhys factors :math:`S_k`, alongside temperature-dependent Debye-Waller factors (:math:`I_{\text{ZPL}}/I_{\text{tot}}`).
+* **Phonon Localization Metrics:** Spatial confinement analytics via Inverse Participation Ratios (IPR) and structural localization index mappings.
+* **Spectral Density Mapping:** Multi-mode Electron-Phonon Spectral Density functions, :math:`S(\omega)`.
+* **Isotope Engineering:** Analytical evaluation of localized isotope substitution impacts on vibrational mode coupling pathways.
 
 ---
 
-Documentation
-=============
+Documentation & Reference
+=========================
 
-Full documentation is available at: https://Shibu778.github.io/defectpl/
+For comprehensive API references, mathematical formulations, and step-by-step tutorials, visit the official documentation portal:
+👉 `https://Shibu778.github.io/defectpl/ <https://Shibu778.github.io/defectpl/>`_
+
+Citation
+--------
+
+If you utilize DefectPL in your peer-reviewed scientific workflows, please cite the following original research works:
+
+.. note::
+   📄 **Carbon with Stone-Wales Defect as Quantum Emitter in h-BN**, *Phys. Rev. B* **111**, 104109 (2025). `DOI: 10.1103/PhysRevB.111.104109 <https://doi.org/10.1103/PhysRevB.111.104109>`_
+
+.. note::
+   📄 **High-throughput Computational Search for Group-IV-related Quantum Defects as Spin-photon Interfaces in 4H-SiC**, *Phys. Rev. B* **112**, 184112 (2025). `DOI: 10.1103/PhysRevB.112.184112 <https://doi.org/10.1103/PhysRevB.112.184112>`_
 
 ---
 
 Installation
 ============
 
-Install via **pip**:
+DefectPL can be seamlessly integrated via your preferred package manager ecosystem.
+
+Standard Installation via PyPI
+------------------------------
 
 .. code-block:: bash
 
    pip install defectpl
 
-Install via **conda**:
+Stable Pre-compiled Binaries via Conda-Forge
+--------------------------------------------
 
 .. code-block:: bash
 
    conda install conda-forge::defectpl
 
-Install from **GitHub (Development Mode)**:
+Editable Source Build (For Developers)
+--------------------------------------
 
 .. code-block:: bash
 
@@ -82,13 +93,15 @@ Install from **GitHub (Development Mode)**:
 
 ---
 
-Example Usage
-=============
+Architectural Tracks & Examples
+===============================
 
-DefectPL natively provides **two calculation paths**: **Displacement Mode** (for structural geometries) and **Force Mode** (for vertical electronic excitation structures). It also inherits from Monty's ``MSONable`` to safely serialize parameter states directly to lightweight JSON metadata payloads.
+DefectPL natively exposes **two core calculation modalities**: **Displacement Mode** (evaluating structural coordinate shift vectors) and **Force Mode** (evaluating vertical electronic excitation forces). All core engine classes inherit from Monty’s ``MSONable``, ensuring atomic state serialization into lightweight JSON formats.
 
-1. Displacement Mode (Structure Coordinates Vector Track)
------------------------------------------------------------
+1. Displacement Mode (Structure Coordinates Tracking)
+------------------------------------------------------
+
+Ideal when relaxed atomic geometries for both the ground state (GS) and excited state (ES) are completely resolved alongside Phonopy supercell calculations.
 
 .. code-block:: python
 
@@ -100,31 +113,33 @@ DefectPL natively provides **two calculation paths**: **Displacement Mode** (for
    from defectpl.vasp_wrapper import calc_dR
    from defectpl.defectpl import Photoluminescence
 
-   # 1. Parse your input geometries and Phonopy band coordinates
+   # 1. Parse ground/excited state geometry and Phonopy coordinates
    struct_gs = Structure.from_file("CONTCAR_GS")
    struct_es = Structure.from_file("CONTCAR_ES")
    frequencies, eigenvectors, masses = read_band_yaml("band.yaml")
 
-   # 2. Extract PBC-safe displacement vectors matrix (dR)
+   # 2. Extract periodic-boundary-condition safe displacement matrices
    dR = calc_dR(struct_gs, struct_es)
 
-   # 3. Instantiate core engine
+   # 3. Initialize core execution engine
    pl_engine = Photoluminescence(
        frequencies=frequencies,
        eigenvectors=eigenvectors,
        masses=masses,
-       dR=dR,          # Pass dR for Displacement mode
+       dR=dR,          # Pass dR matrix for Displacement mode
        dF=None,
        EZPL=1.95,
        gamma=2.0
    )
 
-   # 4. Generate graphics & Serialize safe properties to JSON via Monty
+   # 4. Generate publication-quality graphics & serialize configuration states
    pl_engine.generate_plots(out_dir="./plots", fig_format="png")
    dumpfn(pl_engine, "properties.json", indent=4)
 
-2. Force Mode (Force Difference Vector Track)
-----------------------------------------------
+2. Force Mode (Force Difference Matrix Tracking)
+-------------------------------------------------
+
+Ideal for high-throughput pipelines, utilizing the force landscape acting on the ground-state structure under a vertical electronic excitation constraint.
 
 .. code-block:: python
 
@@ -132,37 +147,47 @@ DefectPL natively provides **two calculation paths**: **Displacement Mode** (for
    from defectpl.defectpl import Photoluminescence
    from defectpl.phonon import read_band_yaml
 
+   # 1. Parse standard Phonopy baseline calculations
    frequencies, eigenvectors, masses = read_band_yaml("band.yaml")
 
-   # Extract vertical force differences (dF = F_excited - F_ground) from OUTCARs
+   # 2. Extract force difference vectors (dF = F_excited - F_ground) from VASP output streams
    dF = prepare_dF_files("OUTCAR_GS", "OUTCAR_ES")
 
+   # 3. Execute solver via Force Matrix track
    pl_engine = Photoluminescence(
        frequencies=frequencies,
        eigenvectors=eigenvectors,
        masses=masses,
        dR=None,
-       dF=dF,          # Pass dF for Force mode
+       dF=dF,          # Pass dF matrix for Force mode
        EZPL=1.95,
        gamma=2.0
    )
    pl_engine.generate_plots(out_dir="./plots", fig_format="png")
 
+---
 
-Contributing
-============
+Contributing & Bug Reporting
+============================
 
-Contributions, suggestions, and bug reports are welcome!  
-If you encounter any issues, please open an issue or submit a pull request.
+We welcome community contributions, optimization proposals, and workflow suggestions! If you uncover numerical bugs or wish to request feature additions, please systematically log them through our official `GitHub Issues <https://github.com/Shibu778/defectpl/issues>`_ portal or submit a structured Pull Request.
 
 ---
 
-Author
-======
+Maintainers & Acknowledgements
+==============================
 
-**Main Maintainers:** Shibu Meher, Manoj Dey
+**Project Lead Maintainers:**
 
-Acknowledgements
-================
+* **Shibu Meher**
+* **Manoj Dey**
 
-We gratefully acknowledge the use of several excellent open-source tools that have contributed to the development of this package. This work is inspired by the ``PyPhotonics`` package, which motivated the development of a more flexible framework for calculating defect-related optical properties using multiple first-principles codes. The ``defectpl.mplstyle`` file is adapted from the ``base.mplstyle`` provided in the ``sumo`` package. We appreciate the high-quality plotting aesthetics and design philosophy of ``sumo``, which significantly influenced the visualization components of this project.
+Special Acknowledgements
+------------------------
+
+The development of this software was supported and inspired by several foundational open-source packages within the materials physics community:
+
+* ``PyPhotonics``
+* ``nonrad``
+* ``sumo``
+* ``phonopy``
