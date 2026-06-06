@@ -23,7 +23,7 @@ class KohnShamPlotData(MSONable):
     """
     An MSONable data container storing processed spin-polarized eigenvalues.
 
-    Stores energy data, occupations, degeneracy properties, and lateral layout 
+    Stores energy data, occupations, degeneracy properties, and lateral layout
     coordinates required for plotting electronic levels near the band edges.
 
     Parameters
@@ -250,7 +250,9 @@ def get_homo_lumo_idx(eigenval: List[List[float]], thr: float = 0.6) -> Tuple[in
     ev_array = np.array(eigenval)
     occupations = ev_array[:, 1]
     if len(set(occupations)) > 2:
-        warnings.warn(f"Fractional occupancies detected inside dataset. Threshold: {thr} applied.")
+        warnings.warn(
+            f"Fractional occupancies detected inside dataset. Threshold: {thr} applied."
+        )
 
     homo_idx = max(i for i, occ in enumerate(occupations) if occ > thr)
     lumo_idx = min(i for i, occ in enumerate(occupations) if occ < thr)
@@ -258,7 +260,9 @@ def get_homo_lumo_idx(eigenval: List[List[float]], thr: float = 0.6) -> Tuple[in
     return homo_idx, lumo_idx
 
 
-def truncate_eigenval(eigenval: List[List[float]], emin: float, emax: float) -> Tuple[List[List[float]], List[int]]:
+def truncate_eigenval(
+    eigenval: List[List[float]], emin: float, emax: float
+) -> Tuple[List[List[float]], List[int]]:
     """
     Truncate an eigenvalues array to a specified energy range.
 
@@ -283,7 +287,9 @@ def truncate_eigenval(eigenval: List[List[float]], emin: float, emax: float) -> 
     return trunc_eig, index
 
 
-def find_degenerate_eigenvalues(eigenval: List[List[float]], tol: float = 1e-3) -> List[List[int]]:
+def find_degenerate_eigenvalues(
+    eigenval: List[List[float]], tol: float = 1e-3
+) -> List[List[int]]:
     """
     Group eigenvalues into clusters based on an energy tolerance threshold.
 
@@ -314,7 +320,9 @@ def find_degenerate_eigenvalues(eigenval: List[List[float]], tol: float = 1e-3) 
     return degenerate_groups
 
 
-def split_energy_occupation(eigenval: List[List[float]]) -> Tuple[List[float], List[float]]:
+def split_energy_occupation(
+    eigenval: List[List[float]],
+) -> Tuple[List[float], List[float]]:
     """
     Separate paired state entries into distinct energy and occupancy vectors.
 
@@ -335,7 +343,9 @@ def split_energy_occupation(eigenval: List[List[float]]) -> Tuple[List[float], L
     return energies, occupations
 
 
-def xpos_evaluation(npoint: int, max_div: int, sep: float = 0.1, lim: float = 10.0) -> List[float]:
+def xpos_evaluation(
+    npoint: int, max_div: int, sep: float = 0.1, lim: float = 10.0
+) -> List[float]:
     """
     Calculate lateral positions to resolve degenerate levels along the X-axis.
 
@@ -373,7 +383,9 @@ def xpos_evaluation(npoint: int, max_div: int, sep: float = 0.1, lim: float = 10
         return xpos
 
 
-def get_x_values(deg_group: List[List[int]], max_div: int, sep: float = 0.1, lim: float = 10.0) -> List[float]:
+def get_x_values(
+    deg_group: List[List[int]], max_div: int, sep: float = 0.1, lim: float = 10.0
+) -> List[float]:
     """
     Aggregate layout offsets sequentially across a cluster array sequence.
 
@@ -401,7 +413,10 @@ def get_x_values(deg_group: List[List[int]], max_div: int, sep: float = 0.1, lim
 
 
 def get_occupied_unoccupied_split(
-    occupations: List[float], xvalues: List[float], energies: List[float], threshold: float = 0.6
+    occupations: List[float],
+    xvalues: List[float],
+    energies: List[float],
+    threshold: float = 0.6,
 ) -> Tuple[Dict[str, List[float]], Dict[str, List[float]]]:
     """
     Categorize states into occupied and unoccupied coordinate dictionaries.
@@ -437,12 +452,17 @@ def get_occupied_unoccupied_split(
 
 
 def extract_ksplot_data(
-    eigenval_data: Dict[str, Any], vbm: float, cbm: float, espan: float = 1.0, sep: float = 0.1, lim: float = 10.0
+    eigenval_data: Dict[str, Any],
+    vbm: float,
+    cbm: float,
+    espan: float = 1.0,
+    sep: float = 0.1,
+    lim: float = 10.0,
 ) -> KohnShamPlotData:
     """
     Process raw k-point eigenvalue metrics to build a complete plotting data model.
 
-    Extracts windows, maps degeneracy spacing matrices, updates offsets, 
+    Extracts windows, maps degeneracy spacing matrices, updates offsets,
     and returns a serialized data model container.
 
     Parameters
@@ -467,58 +487,79 @@ def extract_ksplot_data(
     """
     emin = vbm - espan
     emax = cbm + espan
-    
+
     up_trunc, up_idx = truncate_eigenval(eigenval_data["up"], emin, emax)
     down_trunc, down_idx = truncate_eigenval(eigenval_data["down"], emin, emax)
-    
+
     up_energies, up_occupations = split_energy_occupation(up_trunc)
     down_energies, down_occupations = split_energy_occupation(down_trunc)
-    
+
     degenerate_up = find_degenerate_eigenvalues(up_trunc)
     degenerate_down = find_degenerate_eigenvalues(down_trunc)
-    
+
     max_div_up = max(len(g) for g in degenerate_up) if degenerate_up else 1
     max_div_down = max(len(g) for g in degenerate_down) if degenerate_down else 1
-    
+
     xvalues_up = [-x for x in get_x_values(degenerate_up, max_div_up, sep, lim)]
     xvalues_down = get_x_values(degenerate_down, max_div_down, sep, lim)
 
-    occupied_up, unoccupied_up = get_occupied_unoccupied_split(up_occupations, xvalues_up, up_energies)
-    occupied_down, unoccupied_down = get_occupied_unoccupied_split(down_occupations, xvalues_down, down_energies)
+    occupied_up, unoccupied_up = get_occupied_unoccupied_split(
+        up_occupations, xvalues_up, up_energies
+    )
+    occupied_down, unoccupied_down = get_occupied_unoccupied_split(
+        down_occupations, xvalues_down, down_energies
+    )
 
     min_div = min(max_div_up, max_div_down)
     w = (lim - sep) / min_div - sep if min_div > 0 else (lim - sep)
-    
+
     meta_info = {
         "selected_kpoint": eigenval_data.get("selected_kpoint"),
         "spin_multiplicity": eigenval_data.get("spin_multiplicity"),
-        "nelect": eigenval_data.get("nelect")
+        "nelect": eigenval_data.get("nelect"),
     }
 
     return KohnShamPlotData(
-        up=up_trunc, down=down_trunc, up_idx=up_idx, down_idx=down_idx,
-        up_energies=up_energies, up_occupations=up_occupations,
-        down_energies=down_energies, down_occupations=down_occupations,
-        degenerate_up=degenerate_up, degenerate_down=degenerate_down,
-        max_div_up=max_div_up, max_div_down=max_div_down,
-        xvalues_up=xvalues_up, xvalues_down=xvalues_down,
-        occupied_up=occupied_up, unoccupied_up=unoccupied_up,
-        occupied_down=occupied_down, unoccupied_down=unoccupied_down,
-        vbm=vbm, cbm=cbm, emin=emin, emax=emax, espan=espan, sep=sep, lim=lim, w=w,
-        meta_info=meta_info
+        up=up_trunc,
+        down=down_trunc,
+        up_idx=up_idx,
+        down_idx=down_idx,
+        up_energies=up_energies,
+        up_occupations=up_occupations,
+        down_energies=down_energies,
+        down_occupations=down_occupations,
+        degenerate_up=degenerate_up,
+        degenerate_down=degenerate_down,
+        max_div_up=max_div_up,
+        max_div_down=max_div_down,
+        xvalues_up=xvalues_up,
+        xvalues_down=xvalues_down,
+        occupied_up=occupied_up,
+        unoccupied_up=unoccupied_up,
+        occupied_down=occupied_down,
+        unoccupied_down=unoccupied_down,
+        vbm=vbm,
+        cbm=cbm,
+        emin=emin,
+        emax=emax,
+        espan=espan,
+        sep=sep,
+        lim=lim,
+        w=w,
+        meta_info=meta_info,
     )
 
 
 def plot_spin_resolved_levels(
-    data: KohnShamPlotData, 
-    output_filename: Union[str, Path] = "ks_plot.png", 
+    data: KohnShamPlotData,
+    output_filename: Union[str, Path] = "ks_plot.png",
     style_file: Optional[str] = None,
-    ax: Optional[plt.Axes] = None
+    ax: Optional[plt.Axes] = None,
 ) -> Optional[plt.Axes]:
     """
     Plot Kohn-Sham energy levels with separate spin-up and spin-down panels.
 
-    Renders energy levels alongside shaded regions for the valence and conduction 
+    Renders energy levels alongside shaded regions for the valence and conduction
     bands, and marks state occupancy. Supports native Matplotlib Axes injection.
 
     Parameters
@@ -530,21 +571,21 @@ def plot_spin_resolved_levels(
     style_file : str, optional
         An optional path to a matplotlib `.mplstyle` configuration file.
     ax : matplotlib.axes.Axes, optional
-        An existing Matplotlib Axes object to paint the plot on. If None, a new 
+        An existing Matplotlib Axes object to paint the plot on. If None, a new
         standalone figure is instantiated and written to output_filename.
 
     Returns
     -------
     matplotlib.axes.Axes or None
-        Returns the active axes object if an ax argument was injected; otherwise 
+        Returns the active axes object if an ax argument was injected; otherwise
         saves the figure to disk and returns None.
     """
     if style_file and os.path.exists(style_file):
         plt.style.use(style_file)
-        
+
     figsize = (6, 6)
     vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.5}
-    
+
     standalone = ax is None
     if standalone:
         fig, target_ax = plt.subplots(figsize=figsize)
@@ -554,31 +595,61 @@ def plot_spin_resolved_levels(
     target_ax.set_xlim(-data.lim, data.lim)
     target_ax.set_ylim(data.emin, data.emax)
     target_ax.axvline(0, color="black", linestyle="--", alpha=0.5)
-    
+
     # Shade bulk band edges regions
-    target_ax.axhspan(data.emin, data.vbm, color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
-    target_ax.axhspan(data.cbm, data.emax, color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
+    target_ax.axhspan(
+        data.emin, data.vbm, color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"]
+    )
+    target_ax.axhspan(
+        data.cbm, data.emax, color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"]
+    )
 
     # Adjust marker line layout scaling dynamically
     s = data.w * 200 * (figsize[0] / 6.0)
     target_ax.scatter(data.xvalues_up, data.up_energies, color="black", marker="_", s=s)
-    target_ax.scatter(data.xvalues_down, data.down_energies, color="black", marker="_", s=s)
-    
+    target_ax.scatter(
+        data.xvalues_down, data.down_energies, color="black", marker="_", s=s
+    )
+
     electron_markers = {"occupied": "o", "unoccupied": "x", "s": s / 25.0}
-    
+
     # Draw electron occupation dots and holes representations
-    target_ax.scatter(data.occupied_up["xvalues"], data.occupied_up["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    target_ax.scatter(data.unoccupied_up["xvalues"], data.unoccupied_up["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
-    target_ax.scatter(data.occupied_down["xvalues"], data.occupied_down["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    target_ax.scatter(data.unoccupied_down["xvalues"], data.unoccupied_down["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
+    target_ax.scatter(
+        data.occupied_up["xvalues"],
+        data.occupied_up["energies"],
+        color="k",
+        marker=electron_markers["occupied"],
+        s=electron_markers["s"],
+    )
+    target_ax.scatter(
+        data.unoccupied_up["xvalues"],
+        data.unoccupied_up["energies"],
+        color="k",
+        marker=electron_markers["unoccupied"],
+        s=electron_markers["s"],
+    )
+    target_ax.scatter(
+        data.occupied_down["xvalues"],
+        data.occupied_down["energies"],
+        color="k",
+        marker=electron_markers["occupied"],
+        s=electron_markers["s"],
+    )
+    target_ax.scatter(
+        data.unoccupied_down["xvalues"],
+        data.unoccupied_down["energies"],
+        color="k",
+        marker=electron_markers["unoccupied"],
+        s=electron_markers["s"],
+    )
 
     target_ax.set_ylabel("Energy (eV)")
     target_ax.set_xticks([])
     target_ax.set_xticklabels([])
-    
+
     if standalone:
         plt.savefig(Path(output_filename), dpi=300, bbox_inches="tight")
         plt.close()
         return None
-        
+
     return target_ax

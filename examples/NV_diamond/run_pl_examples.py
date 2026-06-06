@@ -21,7 +21,7 @@ def clean_existing_output_directories(base_out_path: Path):
         print(f"==> [CLEANUP] Found existing target directory: {base_out_path}")
         print("              Wiping contents for a fresh execution baseline...")
         shutil.rmtree(base_out_path)
-    
+
     # Recreate clean base path
     base_out_path.mkdir(parents=True, exist_ok=True)
 
@@ -47,9 +47,7 @@ def prepare_and_unzip_data(
         else source_gz_path.name
     )
     unzipped_name = (
-        f"{source_gz_path.stem}_{safe_suffix}"
-        if safe_suffix
-        else source_gz_path.stem
+        f"{source_gz_path.stem}_{safe_suffix}" if safe_suffix else source_gz_path.stem
     )
 
     copied_gz_path = target_data_dir / copied_gz_name
@@ -120,7 +118,9 @@ def execute_pipeline(
 
     # 3. Remove the uncompressed file to save space
     output_json_path.unlink()
-    print(f"Data state records successfully exported and compressed to: {output_gz_path}")
+    print(
+        f"Data state records successfully exported and compressed to: {output_gz_path}"
+    )
 
 
 def run_pl_analysis(
@@ -196,9 +196,7 @@ def run_pl_analysis(
         # ==========================================
         # Pipeline 1: abs_gs_force_mode
         # ==========================================
-        print(
-            f"Extracting vertical force differences ({gs_dir} vs {abs_dir})...."
-        )
+        print(f"Extracting vertical force differences ({gs_dir} vs {abs_dir})....")
         dF_abs_gs = prepare_dF_files(str(outcar_gs_path), str(outcar_abs_path))
         execute_pipeline(
             pipeline_name="abs_gs_force_mode",
@@ -235,9 +233,7 @@ def run_pl_analysis(
         # ==========================================
         # Pipeline 3: zpl_ems_force_mode
         # ==========================================
-        print(
-            f"Extracting vertical force differences ({ems_dir} vs {zpl_dir})..."
-        )
+        print(f"Extracting vertical force differences ({ems_dir} vs {zpl_dir})...")
         dF_zpl_ems = prepare_dF_files(str(outcar_ems_path), str(outcar_zpl_path))
         execute_pipeline(
             pipeline_name="zpl_ems_force_mode",
@@ -272,7 +268,9 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # Example 1: Calculation with PBE functional and complete electron excitation
-    EX1_OUT = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/pbe_out")
+    EX1_OUT = Path(
+        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/pbe_out"
+    )
     clean_existing_output_directories(EX1_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -287,7 +285,9 @@ if __name__ == "__main__":
     )
 
     # Example 2: Calculation with PBE functional and fractional electron excitation
-    EX2_OUT = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_pbe_out")
+    EX2_OUT = Path(
+        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_pbe_out"
+    )
     clean_existing_output_directories(EX2_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -306,7 +306,9 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # Example 3: Calculation with HSE06 functional and complete electron excitation
-    EX3_OUT = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/hse06_out")
+    EX3_OUT = Path(
+        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/hse06_out"
+    )
     clean_existing_output_directories(EX3_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -321,7 +323,9 @@ if __name__ == "__main__":
     )
 
     # Example 4: Calculation with HSE06 functional and fractional electron excitation
-    EX4_OUT = Path("/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_hse06_out")
+    EX4_OUT = Path(
+        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_hse06_out"
+    )
     clean_existing_output_directories(EX4_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,

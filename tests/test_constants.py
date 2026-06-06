@@ -20,6 +20,7 @@ from defectpl.constants import (
 # TEST CASES
 # ==============================================================================
 
+
 def test_foundational_constants():
     """
     Validates exact CODATA values for primary foundational constants.
@@ -54,7 +55,7 @@ def test_reduced_planck_constants():
 def test_frequency_to_energy_conversion():
     """
     Validates that the THz to eV conversion factor matches standard physics.
-    
+
     Formula: E (eV) = (h * 10^12 Hz) / e
     """
     expected_thz2ev = (PLANCK_CONSTANT * 1e12) / ELEMENTARY_CHARGE

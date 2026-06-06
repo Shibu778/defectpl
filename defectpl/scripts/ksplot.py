@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 
+
 def get_homo_lumo_idx(eigenval, thr=0.6):
     """
     Find homo lumo position.
@@ -29,9 +30,11 @@ def get_homo_lumo_idx(eigenval, thr=0.6):
 
     return homo_idx, lumo_idx
 
+
 def get_spin_multiplicity(homo_up_idx, homo_down_idx):
     S = abs(homo_up_idx - homo_down_idx) / 2
     return 2 * S + 1
+
 
 def read_eigenval_file(filename, k_idx=0):
     """
@@ -59,8 +62,11 @@ def read_eigenval_file(filename, k_idx=0):
     data["nbands"] = eig.nbands
     data["nkpt"] = eig.nkpt
     data["selected_kpoint"] = [k_idx, eig.kpoints[k_idx]]
-    data["spin_multiplicity"] = get_spin_multiplicity(data["homo_up_idx"], data["homo_down_idx"])
+    data["spin_multiplicity"] = get_spin_multiplicity(
+        data["homo_up_idx"], data["homo_down_idx"]
+    )
     return data
+
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -68,14 +74,17 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return super().default(obj)
 
+
 def write_json(data, filename):
     with open(filename, "w") as f:
         json.dump(data, f, cls=NumpyEncoder)
 
+
 def load_json(filename):
     with open(filename, "r") as f:
         return json.load(f)
-    
+
+
 def truncate_eigenval(eigenval, emin, emax):
     """
     Truncate the eigenvalues to a specified energy range.
@@ -87,6 +96,7 @@ def truncate_eigenval(eigenval, emin, emax):
     index = [i for i, (e, o) in enumerate(eigenval) if emin <= e <= emax]
     trunc_eig = [eigenval[i] for i in index]
     return trunc_eig, index
+
 
 def find_degenerate_eigenvalues(eigenval, tol=1e-3):
     """
@@ -112,6 +122,7 @@ def find_degenerate_eigenvalues(eigenval, tol=1e-3):
             degenerate_groups.append(group)
     return degenerate_groups
 
+
 def split_energy_occupation(eigenval):
     """
     Split the eigenvalues into separate lists of energies and occupations.
@@ -124,6 +135,7 @@ def split_energy_occupation(eigenval):
     occupations = [o for e, o in eigenval]
     return energies, occupations
 
+
 def find_max_div_in_plot(degenrate_groups):
     """
     Find the maximum number of degenerate eigenvalues in any group, which can be used to adjust the plot spacing.
@@ -135,8 +147,10 @@ def find_max_div_in_plot(degenrate_groups):
     max_div = max(len(group) for group in degenrate_groups)
     return max_div
 
+
 def is_odd(n):
     return n % 2 == 1
+
 
 def xpos_evaluation(npoint, max_div, sep=0.1, lim=10):
     """
@@ -161,16 +175,17 @@ def xpos_evaluation(npoint, max_div, sep=0.1, lim=10):
 
     if npoint == 1:
         return [midpos]
-    elif is_odd(npoint): # odd number of points
+    elif is_odd(npoint):  # odd number of points
         xpos = [midpos]
-        xpos += [midpos + i*w/2 + i*sep/2 for i in range(2, npoint, 2)]
-        xpos += [midpos - i*w/2 - i*sep/2 for i in range(2, npoint, 2)]
+        xpos += [midpos + i * w / 2 + i * sep / 2 for i in range(2, npoint, 2)]
+        xpos += [midpos - i * w / 2 - i * sep / 2 for i in range(2, npoint, 2)]
         return xpos
-    elif not is_odd(npoint): # even number of points
-        xpos = [midpos + i*w/2 + i*sep/2 for i in range(1, npoint, 2)]
-        xpos += [midpos - i*w/2 - i*sep/2 for i in range(1, npoint, 2)]
+    elif not is_odd(npoint):  # even number of points
+        xpos = [midpos + i * w / 2 + i * sep / 2 for i in range(1, npoint, 2)]
+        xpos += [midpos - i * w / 2 - i * sep / 2 for i in range(1, npoint, 2)]
         return xpos
-    
+
+
 def get_x_values(deg_group, max_div, sep=0.1, lim=10):
     npoints = [len(group) for group in deg_group]
     xvalues = []
@@ -178,13 +193,15 @@ def get_x_values(deg_group, max_div, sep=0.1, lim=10):
         xvalues += xpos_evaluation(npoint, max_div, sep, lim)
     return xvalues
 
+
 def negative_x_values(xvalues):
     return [-x for x in xvalues]
+
 
 def get_occupied_unoccupied_split(occupations, xvalues, energies, threshold=0.6):
     occupied = {"xvalues": [], "energies": []}
     unoccupied = {"xvalues": [], "energies": []}
-    for (occ, x, energy) in zip(occupations, xvalues, energies):
+    for occ, x, energy in zip(occupations, xvalues, energies):
         if occ > threshold:
             occupied["xvalues"].append(x)
             occupied["energies"].append(energy)
@@ -192,6 +209,7 @@ def get_occupied_unoccupied_split(occupations, xvalues, energies, threshold=0.6)
             unoccupied["xvalues"].append(x)
             unoccupied["energies"].append(energy)
     return occupied, unoccupied
+
 
 def extract_ksplot_data(eigenval_data, vbm, cbm, espan=1.0, sep=0.1, lim=10):
     """
@@ -201,23 +219,47 @@ def extract_ksplot_data(eigenval_data, vbm, cbm, espan=1.0, sep=0.1, lim=10):
     emax = cbm + espan
     ks_plot_data = eigenval_data.copy()
     ks_plot_data["up"], up_idx = truncate_eigenval(eigenval_data["up"], emin, emax)
-    ks_plot_data["down"], down_idx = truncate_eigenval(eigenval_data["down"], emin, emax)
+    ks_plot_data["down"], down_idx = truncate_eigenval(
+        eigenval_data["down"], emin, emax
+    )
     ks_plot_data["up_idx"] = up_idx
     ks_plot_data["down_idx"] = down_idx
-    ks_plot_data["up_energies"], ks_plot_data["up_occupations"] = split_energy_occupation(ks_plot_data["up"])
-    ks_plot_data["down_energies"], ks_plot_data["down_occupations"] = split_energy_occupation(ks_plot_data["down"])
-    
+    ks_plot_data["up_energies"], ks_plot_data["up_occupations"] = (
+        split_energy_occupation(ks_plot_data["up"])
+    )
+    ks_plot_data["down_energies"], ks_plot_data["down_occupations"] = (
+        split_energy_occupation(ks_plot_data["down"])
+    )
+
     # Group degenerate eigenvalues for plotting purposes
     ks_plot_data["degenerate_up"] = find_degenerate_eigenvalues(ks_plot_data["up"])
     ks_plot_data["degenerate_down"] = find_degenerate_eigenvalues(ks_plot_data["down"])
     ks_plot_data["max_div_up"] = find_max_div_in_plot(ks_plot_data["degenerate_up"])
     ks_plot_data["max_div_down"] = find_max_div_in_plot(ks_plot_data["degenerate_down"])
-    ks_plot_data["xvalues_up"] = negative_x_values(get_x_values(ks_plot_data["degenerate_up"], ks_plot_data["max_div_up"], sep, lim))
-    ks_plot_data["xvalues_down"] = get_x_values(ks_plot_data["degenerate_down"], ks_plot_data["max_div_down"], sep, lim)
+    ks_plot_data["xvalues_up"] = negative_x_values(
+        get_x_values(
+            ks_plot_data["degenerate_up"], ks_plot_data["max_div_up"], sep, lim
+        )
+    )
+    ks_plot_data["xvalues_down"] = get_x_values(
+        ks_plot_data["degenerate_down"], ks_plot_data["max_div_down"], sep, lim
+    )
 
     # Occupied and unoccupied split
-    ks_plot_data["occupied_up"], ks_plot_data["unoccupied_up"] = get_occupied_unoccupied_split(ks_plot_data["up_occupations"], ks_plot_data["xvalues_up"], ks_plot_data["up_energies"])
-    ks_plot_data["occupied_down"], ks_plot_data["unoccupied_down"] = get_occupied_unoccupied_split(ks_plot_data["down_occupations"], ks_plot_data["xvalues_down"], ks_plot_data["down_energies"])
+    ks_plot_data["occupied_up"], ks_plot_data["unoccupied_up"] = (
+        get_occupied_unoccupied_split(
+            ks_plot_data["up_occupations"],
+            ks_plot_data["xvalues_up"],
+            ks_plot_data["up_energies"],
+        )
+    )
+    ks_plot_data["occupied_down"], ks_plot_data["unoccupied_down"] = (
+        get_occupied_unoccupied_split(
+            ks_plot_data["down_occupations"],
+            ks_plot_data["xvalues_down"],
+            ks_plot_data["down_energies"],
+        )
+    )
 
     # Basic information
     ks_plot_data["vbm"] = vbm
@@ -227,13 +269,17 @@ def extract_ksplot_data(eigenval_data, vbm, cbm, espan=1.0, sep=0.1, lim=10):
     ks_plot_data["espan"] = espan
     ks_plot_data["sep"] = sep
     ks_plot_data["lim"] = lim
-    ks_plot_data["w"] = (lim - sep) / min(ks_plot_data["max_div_up"], ks_plot_data["max_div_down"]) - sep
+    ks_plot_data["w"] = (lim - sep) / min(
+        ks_plot_data["max_div_up"], ks_plot_data["max_div_down"]
+    ) - sep
     return ks_plot_data
+
 
 def initialize_plt_args(**kwargs):
     plt_args = {}
 
     return plt_args
+
 
 def plot_spin_resolved_levels(data, style_file="ksplot_template.mplstyle", **kwargs):
     """
@@ -253,7 +299,7 @@ def plot_spin_resolved_levels(data, style_file="ksplot_template.mplstyle", **kwa
     style_file: The path to a matplotlib style file for customizing the plot appearance.
     """
     plt.style.use(style_file)
-    figsize=(6, 6)
+    figsize = (6, 6)
     vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.5}
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -261,30 +307,62 @@ def plot_spin_resolved_levels(data, style_file="ksplot_template.mplstyle", **kwa
     ax.set_ylim(data["emin"], data["emax"])
     ax.axvline(0, color="black", linestyle="--", alpha=0.5)
     # ax.axhline(data["vbm"], color=vbm_cbm_color["vbm"], linestyle="--", label="VBM")
-    ax.axhspan(data["emin"], data["vbm"], color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
+    ax.axhspan(
+        data["emin"],
+        data["vbm"],
+        color=vbm_cbm_color["vbm"],
+        alpha=vbm_cbm_color["alpha"],
+    )
     # ax.axhline(data["cbm"], color=vbm_cbm_color["cbm"], linestyle="--", label="CBM")
-    ax.axhspan(data["cbm"], data["emax"], color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
+    ax.axhspan(
+        data["cbm"],
+        data["emax"],
+        color=vbm_cbm_color["cbm"],
+        alpha=vbm_cbm_color["alpha"],
+    )
 
-    s = data["w"] * 200 * (figsize[0] / 6) # Adjust marker size based on the width of the plot and the number of degenerate levels    
+    s = (
+        data["w"] * 200 * (figsize[0] / 6)
+    )  # Adjust marker size based on the width of the plot and the number of degenerate levels
     ax.scatter(data["xvalues_up"], data["up_energies"], color="black", marker="_", s=s)
-    ax.scatter(data["xvalues_down"], data["down_energies"], color="black", marker="_", s=s)
-    
-    
-    electron_markers = {"occupied": 'o', "unoccupied": 'x', "s": s /25}
-    ax.scatter(data["occupied_up"]["xvalues"], data["occupied_up"]["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    ax.scatter(data["unoccupied_up"]["xvalues"], data["unoccupied_up"]["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
-    ax.scatter(data["occupied_down"]["xvalues"], data["occupied_down"]["energies"], color="k", marker=electron_markers["occupied"], s=electron_markers["s"])
-    ax.scatter(data["unoccupied_down"]["xvalues"], data["unoccupied_down"]["energies"], color="k", marker=electron_markers["unoccupied"], s=electron_markers["s"])
+    ax.scatter(
+        data["xvalues_down"], data["down_energies"], color="black", marker="_", s=s
+    )
+
+    electron_markers = {"occupied": "o", "unoccupied": "x", "s": s / 25}
+    ax.scatter(
+        data["occupied_up"]["xvalues"],
+        data["occupied_up"]["energies"],
+        color="k",
+        marker=electron_markers["occupied"],
+        s=electron_markers["s"],
+    )
+    ax.scatter(
+        data["unoccupied_up"]["xvalues"],
+        data["unoccupied_up"]["energies"],
+        color="k",
+        marker=electron_markers["unoccupied"],
+        s=electron_markers["s"],
+    )
+    ax.scatter(
+        data["occupied_down"]["xvalues"],
+        data["occupied_down"]["energies"],
+        color="k",
+        marker=electron_markers["occupied"],
+        s=electron_markers["s"],
+    )
+    ax.scatter(
+        data["unoccupied_down"]["xvalues"],
+        data["unoccupied_down"]["energies"],
+        color="k",
+        marker=electron_markers["unoccupied"],
+        s=electron_markers["s"],
+    )
 
     ax.set_ylabel("Energy (eV)")
     ax.set_xticks([])
     ax.set_xticklabels([])
     plt.savefig("ks_plot.png", dpi=300)
-    
-
-    
-    
-    
 
 
 if __name__ == "__main__":

@@ -18,6 +18,7 @@ from pymatgen.electronic_structure.core import Spin
 # Kohn-Sham Eigenvalue & Electronic Parsing Functions
 # =====================================================================
 
+
 def get_spin_multiplicity(homo_up_idx: int, homo_down_idx: int) -> float:
     """
     Calculate the spin multiplicity of the electronic configuration.
@@ -52,7 +53,7 @@ def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, 
     Returns
     -------
     dict
-        A data block payload containing keys mapping spin channels, index boundaries, 
+        A data block payload containing keys mapping spin channels, index boundaries,
         gaps, and calculation metrics.
 
     Raises
@@ -67,29 +68,31 @@ def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, 
     eig = Eigenval(filename, separate_spins=True)
     if eig.ispin != 2:
         raise ValueError("The calculation is not spin polarized.")
-        
+
     print(f"Selecting the {k_idx}-th k-point from {eig.nkpt} k-points.")
     print(f"Selected k-point: {eig.kpoints[k_idx]}")
-    
+
     data["up"] = list(eig.eigenvalues[Spin.up][k_idx])
     data["down"] = list(eig.eigenvalues[Spin.down][k_idx])
-    
+
     data["homo_up_idx"], data["lumo_up_idx"] = get_homo_lumo_idx(data["up"])
     data["homo_down_idx"], data["lumo_down_idx"] = get_homo_lumo_idx(data["down"])
-    
+
     data["homo_up"] = eig.eigenvalue_band_properties[2][0]
     data["homo_down"] = eig.eigenvalue_band_properties[2][1]
     data["lumo_up"] = eig.eigenvalue_band_properties[1][0]
     data["lumo_down"] = eig.eigenvalue_band_properties[1][1]
     data["hl_gap_up"] = eig.eigenvalue_band_properties[0][0]
     data["hl_gap_down"] = eig.eigenvalue_band_properties[0][1]
-    
+
     data["nelect"] = eig.nelect
     data["nbands"] = eig.nbands
     data["nkpt"] = eig.nkpt
     data["selected_kpoint"] = [k_idx, list(eig.kpoints[k_idx])]
-    data["spin_multiplicity"] = get_spin_multiplicity(data["homo_up_idx"], data["homo_down_idx"])
-    
+    data["spin_multiplicity"] = get_spin_multiplicity(
+        data["homo_up_idx"], data["homo_down_idx"]
+    )
+
     return data
 
 
@@ -97,12 +100,13 @@ def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, 
 # Trajectory & Output Text File Parsing Functions
 # =====================================================================
 
+
 def check_outcar_convergence(outcar_path: Union[str, Path]) -> Dict[str, bool]:
     """
     Checks whether a VASP calculation converged electronically and structurally.
 
-    Scans the OUTCAR file to find structural convergence tokens and looks at 
-    the final electronic step count to ensure it didn't stop because it hit 
+    Scans the OUTCAR file to find structural convergence tokens and looks at
+    the final electronic step count to ensure it didn't stop because it hit
     NELM (maximum electronic steps limit).
 
     Parameters
@@ -114,7 +118,7 @@ def check_outcar_convergence(outcar_path: Union[str, Path]) -> Dict[str, bool]:
     -------
     dict
         A dictionary containing the convergence status results:
-        
+
         - ``"structural_converged"`` (bool): True if ionic steps converged.
         - ``"electronic_converged"`` (bool): True if the final SCF cycle converged.
         - ``"finished_cleanly"`` (bool): True if VASP reached its normal end of run.
@@ -131,14 +135,14 @@ def check_outcar_convergence(outcar_path: Union[str, Path]) -> Dict[str, bool]:
     results = {
         "structural_converged": False,
         "electronic_converged": True,  # Assumed True until proven stuck
-        "finished_cleanly": False
+        "finished_cleanly": False,
     }
 
     # Use a deque to scan the tail without loading the entire file into memory
     tail_lines: deque = deque(maxlen=100)
     has_content = False
 
-    with open(outcar_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(outcar_path, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
             has_content = True
             tail_lines.append(line)
@@ -153,7 +157,7 @@ def check_outcar_convergence(outcar_path: Union[str, Path]) -> Dict[str, bool]:
     for line in tail_lines:
         if "reached required accuracy" in line:
             results["structural_converged"] = True
-        
+
         tokens = line.split()
         if len(tokens) >= 2 and ("User" in tokens[0] and "time" in tokens[1]):
             results["finished_cleanly"] = True
@@ -188,11 +192,11 @@ def get_nions(outcar_path: Union[str, Path]) -> int:
     if not outcar_path.is_file():
         raise FileNotFoundError(f"OUTCAR file not found at {outcar_path}")
 
-    with open(outcar_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(outcar_path, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
-            if 'NIONS =' in line:
-                return int(line.split('=')[-1])
-                
+            if "NIONS =" in line:
+                return int(line.split("=")[-1])
+
     raise ValueError(f"Could not find 'NIONS =' token within {outcar_path}")
 
 
@@ -200,8 +204,8 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
     """
     Extracts the atomic species list from an OUTCAR file to build an atom index map.
 
-    Handles multi-occurrence or interleaved POTCAR definitions (e.g., N, C, N, C) 
-    by aligning the element type sequence exactly with the length of the 
+    Handles multi-occurrence or interleaved POTCAR definitions (e.g., N, C, N, C)
+    by aligning the element type sequence exactly with the length of the
     'ions per type' array printed by VASP.
 
     Parameters
@@ -219,7 +223,7 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
     FileNotFoundError
         If the specified OUTCAR file does not exist.
     ValueError
-        If species definitions or ion counts cannot be successfully determined 
+        If species definitions or ion counts cannot be successfully determined
         from the file stream.
     """
     outcar_path = Path(outcar_path)
@@ -229,18 +233,18 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
     species_types = []
     ions_per_type = []
 
-    with open(outcar_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(outcar_path, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
             # 1. Capture all POTCAR type lines sequentially as they appear
-            if 'POTCAR:' in line and 'PAW' in line:
+            if "POTCAR:" in line and "PAW" in line:
                 tokens = line.split()
                 if len(tokens) >= 3:
-                    element = tokens[2].split('_')[0]
+                    element = tokens[2].split("_")[0]
                     species_types.append(element)
 
             # 2. Capture how many ions exist for each type definition
-            if 'ions per type =' in line:
-                ions_per_type = [int(x) for x in line.split('=')[-1].split()]
+            if "ions per type =" in line:
+                ions_per_type = [int(x) for x in line.split("=")[-1].split()]
                 break
 
     if not species_types or not ions_per_type:
@@ -248,7 +252,7 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
             f"Could not fully parse species maps from {outcar_path}. "
             f"Found species types: {species_types}, Counts: {ions_per_type}"
         )
-        
+
     if len(species_types) < len(ions_per_type):
         raise ValueError(
             f"OUTCAR processing error: Parsed fewer POTCAR species entries ({len(species_types)}) "
@@ -256,7 +260,7 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
         )
 
     # Slice the raw species array to match the actual number of active blocks
-    species_types = species_types[:len(ions_per_type)]
+    species_types = species_types[: len(ions_per_type)]
 
     # Reconstruct the full index map sequence
     species_map = []
@@ -267,8 +271,7 @@ def get_species_and_index_map(outcar_path: Union[str, Path]) -> List[str]:
 
 
 def get_structures_and_forces(
-    outcar_path: Union[str, Path], 
-    poscar_path: Optional[Union[str, Path]] = None
+    outcar_path: Union[str, Path], poscar_path: Optional[Union[str, Path]] = None
 ) -> Tuple[List[Structure], List[np.ndarray]]:
     """
     Extracts all structures and forces from the OUTCAR file as a standalone function.
@@ -290,7 +293,7 @@ def get_structures_and_forces(
     structures : list of pymatgen.core.Structure
         A list of Structure objects representing each ionic step with correct dynamic lattices.
     forces : list of numpy.ndarray
-        A list of 2D NumPy arrays of shape (NIONS, 3) representing the total 
+        A list of 2D NumPy arrays of shape (NIONS, 3) representing the total
         forces (eV/Å) at each corresponding ionic step.
 
     Raises
@@ -298,7 +301,7 @@ def get_structures_and_forces(
     FileNotFoundError
         If either the outcar_path or poscar_path do not exist.
     ValueError
-        If position indices are requested prior to matrix processing, or if 
+        If position indices are requested prior to matrix processing, or if
         the data stream terminates prematurely.
     """
     outcar_path = Path(outcar_path)
@@ -316,50 +319,58 @@ def get_structures_and_forces(
     structures = []
     forces = []
 
-    with open(outcar_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(outcar_path, "r", encoding="utf-8", errors="ignore") as f:
         iterator = iter(f)
-        
+
         for line in iterator:
             try:
                 # Catch dynamic lattice block
                 if "VOLUME and BASIS-vectors are now :" in line:
                     for _ in range(4):
                         next(iterator)
-                    
+
                     lattice_matrix = []
                     for _ in range(3):
-                        lattice_matrix.append([float(x) for x in next(iterator).split()[:3]])
+                        lattice_matrix.append(
+                            [float(x) for x in next(iterator).split()[:3]]
+                        )
                     current_lattice = np.array(lattice_matrix)
 
                 # Catch coordinate and trajectory forces data blocks
-                if 'POSITION' in line and 'TOTAL-FORCE' in line:
+                if "POSITION" in line and "TOTAL-FORCE" in line:
                     if current_lattice is None:
                         raise ValueError(
                             f"Parsed a POSITION block before finding a lattice matrix "
                             f"in {outcar_path}. The file layout might be corrupted."
                         )
-                    
+
                     next(iterator)  # Skip dashed line border
-                    
+
                     coords = np.zeros((natoms, 3))
                     step_forces = np.zeros((natoms, 3))
-                    
+
                     for i in range(natoms):
                         data = next(iterator).split()
                         coords[i] = [float(data[0]), float(data[1]), float(data[2])]
-                        step_forces[i] = [float(data[3]), float(data[4]), float(data[5])]
-                    
+                        step_forces[i] = [
+                            float(data[3]),
+                            float(data[4]),
+                            float(data[5]),
+                        ]
+
                     struct = Structure(
                         lattice=current_lattice,
                         species=species,
                         coords=coords,
-                        coords_are_cartesian=True
+                        coords_are_cartesian=True,
                     )
                     structures.append(struct)
                     forces.append(step_forces)
-                    
+
             except StopIteration:
-                raise ValueError(f"Premature end of file encountered while parsing {outcar_path}")
+                raise ValueError(
+                    f"Premature end of file encountered while parsing {outcar_path}"
+                )
 
     return structures, forces
 
@@ -373,6 +384,7 @@ class OutcarParser(Outcar):
     filename : str or pathlib.Path
         The path filename pointing to the targeting VASP OUTCAR run.
     """
+
     def __init__(self, filename: Union[str, Path]):
         filename_str = str(Path(filename).resolve())
         super().__init__(filename_str)
@@ -392,8 +404,7 @@ class OutcarParser(Outcar):
         return self.natoms
 
     def get_structures_and_forces(
-        self, 
-        poscar_path: Optional[Union[str, Path]] = None
+        self, poscar_path: Optional[Union[str, Path]] = None
     ) -> Tuple[List[Structure], List[np.ndarray]]:
         """
         Wrapper method pulling all configurations and corresponding forces.
@@ -413,8 +424,7 @@ class OutcarParser(Outcar):
         return get_structures_and_forces(self.filename_path, poscar_path=poscar_path)
 
     def get_final_structure_and_forces(
-        self, 
-        poscar_path: Optional[Union[str, Path]] = None
+        self, poscar_path: Optional[Union[str, Path]] = None
     ) -> Tuple[Structure, np.ndarray]:
         """
         Extracts only the final structural step and force values from the OUTCAR.
@@ -433,7 +443,7 @@ class OutcarParser(Outcar):
         """
         structures, forces = self.get_structures_and_forces(poscar_path=poscar_path)
         return structures[-1], forces[-1]
-    
+
     def check_convergence(self) -> Dict[str, bool]:
         """
         Executes standard convergence and processing sanity runs on the active file.
@@ -444,11 +454,10 @@ class OutcarParser(Outcar):
             Status reporting flag values tracking internal convergence goals.
         """
         return check_outcar_convergence(self.filename_path)
-    
+
 
 def get_final_structure_and_forces_from_outcar(
-    outcar_path: Union[str, Path], 
-    poscar_path: Optional[Union[str, Path]] = None
+    outcar_path: Union[str, Path], poscar_path: Optional[Union[str, Path]] = None
 ) -> Tuple[Structure, np.ndarray]:
     """
     A standalone function to extract only the final structure and forces from the OUTCAR file.
@@ -472,8 +481,7 @@ def get_final_structure_and_forces_from_outcar(
 
 
 def get_first_structure_and_forces_from_outcar(
-    outcar_path: Union[str, Path], 
-    poscar_path: Optional[Union[str, Path]] = None
+    outcar_path: Union[str, Path], poscar_path: Optional[Union[str, Path]] = None
 ) -> Tuple[Structure, np.ndarray]:
     """
     A standalone function to extract only the first structure and forces from the OUTCAR file.

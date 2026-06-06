@@ -14,7 +14,7 @@ from pymatgen.core import Structure, Lattice
 from defectpl.defectpl import (
     Photoluminescence,
     VibrationalSpectra1D,
-    ConfigurationCoordinateDiagram
+    ConfigurationCoordinateDiagram,
 )
 
 
@@ -23,8 +23,8 @@ class TestPhotoluminescence(unittest.TestCase):
     def setUp(self):
         """Set up dummy array data configurations for Photoluminescence testing."""
         self.frequencies = np.array([0.02, 0.04, 0.06])  # eV
-        self.eigenvectors = np.ones((3, 2, 3))          # (nmodes, natoms, 3)
-        self.masses = np.array([12.011, 14.007])         # C and N atom mock masses
+        self.eigenvectors = np.ones((3, 2, 3))  # (nmodes, natoms, 3)
+        self.masses = np.array([12.011, 14.007])  # C and N atom mock masses
         self.dR = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0]])
         self.dF = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
         self.EZPL = 2.5
@@ -41,7 +41,10 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_S_omega.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_St.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_Gts.return_value = np.linspace(0, 1, 100)
-        mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(100), np.ones(100) * 5)
+        mock_utils.calc_Spectrum_Intensity.return_value = (
+            np.ones(100),
+            np.ones(100) * 5,
+        )
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -52,7 +55,7 @@ class TestPhotoluminescence(unittest.TestCase):
             EZPL=self.EZPL,
             gamma=self.gamma,
             resolution=10,
-            max_energy=2.0
+            max_energy=2.0,
         )
 
         self.assertEqual(pl.natoms, 2)
@@ -67,9 +70,9 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_qks_force_mode.return_value = np.array([0.1, 0.2, 0.3])
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
-        
+
         active_dF = np.array([[0.5, 0.0, 0.0], [0.0, 0.5, 0.0]])
-        
+
         pl = Photoluminescence(
             frequencies=self.frequencies,
             eigenvectors=self.eigenvectors,
@@ -77,7 +80,7 @@ class TestPhotoluminescence(unittest.TestCase):
             dR=None,
             dF=active_dF,
             EZPL=self.EZPL,
-            gamma=self.gamma
+            gamma=self.gamma,
         )
         mock_utils.calc_qks_force_mode.assert_called_once()
 
@@ -86,7 +89,7 @@ class TestPhotoluminescence(unittest.TestCase):
         """Test both standard loading (instant state restore) and expensive regeneration methods."""
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
-        
+
         pl = Photoluminescence(
             frequencies=self.frequencies,
             eigenvectors=self.eigenvectors,
@@ -94,7 +97,7 @@ class TestPhotoluminescence(unittest.TestCase):
             dR=self.dR,
             dF=None,
             EZPL=self.EZPL,
-            gamma=self.gamma
+            gamma=self.gamma,
         )
 
         d = pl.as_dict()
@@ -122,10 +125,15 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
 
         pl = Photoluminescence(
-            frequencies=self.frequencies, eigenvectors=self.eigenvectors,
-            masses=self.masses, dR=self.dR, dF=None, EZPL=self.EZPL, gamma=self.gamma
+            frequencies=self.frequencies,
+            eigenvectors=self.eigenvectors,
+            masses=self.masses,
+            dR=self.dR,
+            dF=None,
+            EZPL=self.EZPL,
+            gamma=self.gamma,
         )
-        
+
         pl.generate_plots(out_dir="/tmp/test_plots")
         self.assertTrue(mock_plotter.plot_penergy_vs_pmode.called)
         self.assertTrue(mock_plotter.plot_intensity_vs_penergy.called)
@@ -144,7 +152,7 @@ class TestVibrationalSpectra1D(unittest.TestCase):
         """Verify matrix instantiation maps parameters down cleanly."""
         mock_calc.return_value = 0.05
         self.spectra.compute_overlap_matrix()
-        
+
         expected_shape = (self.spectra.NN1 + 1, self.spectra.NN2 + 1)
         self.assertEqual(self.spectra.overlap_matrix.shape, expected_shape)
         self.assertAlmostEqual(self.spectra.overlap_matrix[0, 0], 0.05)
@@ -153,14 +161,14 @@ class TestVibrationalSpectra1D(unittest.TestCase):
         """Verify vector calculations populate spectra metrics without failing."""
         self.spectra.overlap_data = {
             "contributions": [0.5, 0.5],
-            "energies": [2.0, 1.95]
+            "energies": [2.0, 1.95],
         }
         self.spectra.compute_lineshape()
-        
+
         self.assertIn("energies", self.spectra.spectral_data)
         self.assertIn("dosw3", self.spectra.spectral_data)
         self.assertEqual(len(self.spectra.spectral_data["energies"]), 100)
-        
+
         peak_e, _ = self.spectra.get_peak_position()
         fwhm = self.spectra.get_fwhm()
         self.assertIsInstance(peak_e, float)
@@ -188,7 +196,7 @@ class TestConfigurationCoordinateDiagram(unittest.TestCase):
         mock_dq.return_value = 0.2
         ccd = ConfigurationCoordinateDiagram(self.struct_g, self.struct_e)
         g_list, e_list = ccd.generate_structures(displacements=[-0.5, 0.5])
-        
+
         self.assertEqual(len(g_list), 2)
         self.assertEqual(len(e_list), 2)
 
@@ -199,15 +207,15 @@ class TestConfigurationCoordinateDiagram(unittest.TestCase):
         """Assert file outputs parse configurations across coordinated targets safely."""
         mock_dq.return_value = 0.1
         mock_get_q.return_value = 1.2
-        
+
         mock_vr = MagicMock()
         mock_vr.structures = [self.struct_g]
         mock_vr.final_energy = -10.5
         mock_vasprun_cls.return_value = mock_vr
-        
+
         ccd = ConfigurationCoordinateDiagram(self.struct_g, self.struct_e)
         q_vals, e_vals = ccd.extract_pes_profile(["path/to/vasprun.xml"])
-        
+
         np.testing.assert_array_equal(q_vals, [1.2])
         np.testing.assert_array_equal(e_vals, [0.0])
 
@@ -216,10 +224,12 @@ class TestConfigurationCoordinateDiagram(unittest.TestCase):
         """Ensure energy transition thresholds are accurately computed using physical constants."""
         mock_dq.return_value = 0.3
         ccd = ConfigurationCoordinateDiagram(self.struct_g, self.struct_e)
-        
+
         with self.assertRaises(ValueError):
-            ccd.estimate_vertical_transitions(ground_omega=0.0, excited_omega=0.05, dE=2.0)
-            
+            ccd.estimate_vertical_transitions(
+                ground_omega=0.0, excited_omega=0.05, dE=2.0
+            )
+
         e_abs, e_em, fc_e, fc_g = ccd.estimate_vertical_transitions(
             ground_omega=0.04, excited_omega=0.04, dE=2.5
         )

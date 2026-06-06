@@ -26,6 +26,7 @@ from defectpl.constants import THZ2EV
 # FIXTURES & MOCK DATA GENERATION
 # ==============================================================================
 
+
 @pytest.fixture(scope="module", autouse=True)
 def setup_mock_phonon_files():
     """
@@ -101,9 +102,10 @@ def setup_mock_phonon_files():
 # TEST CASES
 # ==============================================================================
 
+
 def test_read_band_yaml():
     """
-    Validates that frequencies are converted to eV, negative acoustic modes are 
+    Validates that frequencies are converted to eV, negative acoustic modes are
     clamped to 0.0, and eigenvectors are correctly unphased and flattened.
     """
     freqs, evecs, masses = read_band_yaml(MOCK_BAND_YAML_PATH, q_idx=0)
@@ -116,7 +118,7 @@ def test_read_band_yaml():
 
     # 2. Flattened Matrix check: shape must be (nmodes, natoms * 3) -> (6, 2 * 3) = (6, 6)
     assert evecs.shape == (6, 6)
-    
+
     # Mode 4 specific layout validation: [0.5, 0, 0, -0.5, 0, 0]
     np.testing.assert_allclose(evecs[3], [0.5, 0.0, 0.0, -0.5, 0.0, 0.0], atol=1e-5)
 
@@ -127,7 +129,7 @@ def test_read_band_yaml():
 
 def test_extract_gamma_phonon_data():
     """
-    Ensures the factory function successfully generates an instance of 
+    Ensures the factory function successfully generates an instance of
     GammaPhononData with full list conversions.
     """
     phonon_data = extract_gamma_phonon_data(MOCK_BAND_YAML_PATH)
@@ -138,7 +140,7 @@ def test_extract_gamma_phonon_data():
     assert len(phonon_data.frequencies) == 6
     assert isinstance(phonon_data.frequencies, list)
     assert isinstance(phonon_data.eigenvectors, list)
-    
+
     # Check that nested vectors are flat (length 6)
     assert len(phonon_data.eigenvectors[0]) == 6
     assert phonon_data.meta_info["source_file"] == str(MOCK_BAND_YAML_PATH)
@@ -150,7 +152,7 @@ def test_gamma_phonon_data_serialization():
     and completely survives round-trip dictionary serialization.
     """
     phonon_data = extract_gamma_phonon_data(MOCK_BAND_YAML_PATH)
-    
+
     # Run serialization path
     data_dict = phonon_data.as_dict()
     assert data_dict["@module"] == "defectpl.phonon"
@@ -164,5 +166,7 @@ def test_gamma_phonon_data_serialization():
     assert reconstructed_data.natoms == phonon_data.natoms
     assert reconstructed_data.nmodes == phonon_data.nmodes
     np.testing.assert_allclose(reconstructed_data.frequencies, phonon_data.frequencies)
-    np.testing.assert_allclose(reconstructed_data.eigenvectors, phonon_data.eigenvectors)
+    np.testing.assert_allclose(
+        reconstructed_data.eigenvectors, phonon_data.eigenvectors
+    )
     np.testing.assert_allclose(reconstructed_data.masses, phonon_data.masses)

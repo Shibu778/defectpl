@@ -51,10 +51,10 @@ class TestKohnShamAnalysis(unittest.TestCase):
         self.mock_up_bands = [
             [-5.0, 1.0],  # 0: Core state
             [-1.2, 1.0],  # 1: VBM state
-            [0.1, 1.0],   # 2: Defect level (filled)
-            [0.1, 1.0],   # 3: Degenerate defect level (filled)
-            [1.5, 0.0],   # 4: Defect level (empty)
-            [3.0, 0.0],   # 5: CBM state
+            [0.1, 1.0],  # 2: Defect level (filled)
+            [0.1, 1.0],  # 3: Degenerate defect level (filled)
+            [1.5, 0.0],  # 4: Defect level (empty)
+            [3.0, 0.0],  # 5: CBM state
         ]
         self.mock_down_bands = [
             [-5.0, 1.0],
@@ -64,7 +64,7 @@ class TestKohnShamAnalysis(unittest.TestCase):
             [1.6, 0.0],
             [3.2, 0.0],
         ]
-        
+
         # Ensure output directory exists for plot dumps
         OUTPUT_PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -102,11 +102,13 @@ class TestKohnShamAnalysis(unittest.TestCase):
 
         serialized_dict = data_instance.as_dict()
         self.assertEqual(serialized_dict["@class"], "KohnShamPlotData")
-        
+
         reconstructed_instance = KohnShamPlotData.from_dict(serialized_dict)
         self.assertEqual(reconstructed_instance.vbm, data_instance.vbm)
         self.assertEqual(reconstructed_instance.cbm, data_instance.cbm)
-        self.assertListEqual(reconstructed_instance.up_energies, data_instance.up_energies)
+        self.assertListEqual(
+            reconstructed_instance.up_energies, data_instance.up_energies
+        )
 
     def test_get_homo_lumo_idx(self):
         """Validates correct index boundaries resolution marking HOMO/LUMO separation."""
@@ -133,13 +135,13 @@ class TestKohnShamAnalysis(unittest.TestCase):
         mock_instance.nelect = 12.0
         mock_instance.nbands = 6
         mock_instance.kpoints = [[0.0, 0.0, 0.0]]
-        
+
         mock_instance.eigenvalue_band_properties = (
             [4.2, 4.6],
             [3.0, 3.2],
-            [-1.2, -1.4]
+            [-1.2, -1.4],
         )
-        
+
         mock_instance.eigenvalues = {
             Spin.up: [np.array(self.mock_up_bands)],
             Spin.down: [np.array(self.mock_down_bands)],
@@ -160,7 +162,7 @@ class TestKohnShamAnalysis(unittest.TestCase):
             mock_instance = MagicMock()
             mock_instance.ispin = 1
             mock_eigenval_class.return_value = mock_instance
-            
+
             with self.assertRaises(ValueError):
                 read_eigenval_file("dummy_path/EIGENVAL", k_idx=0)
 
@@ -205,8 +207,10 @@ class TestKohnShamAnalysis(unittest.TestCase):
         occupations = [1.0, 0.0, 1.0]
         xvalues = [-1.0, -2.0, -3.0]
         energies = [0.1, 0.2, 0.3]
-        
-        occ, unocc = get_occupied_unoccupied_split(occupations, xvalues, energies, threshold=0.6)
+
+        occ, unocc = get_occupied_unoccupied_split(
+            occupations, xvalues, energies, threshold=0.6
+        )
         self.assertListEqual(occ["energies"], [0.1, 0.3])
         self.assertListEqual(occ["xvalues"], [-1.0, -3.0])
         self.assertListEqual(unocc["energies"], [0.2])
@@ -218,11 +222,11 @@ class TestKohnShamAnalysis(unittest.TestCase):
             "down": self.mock_down_bands,
             "selected_kpoint": [0, [0.0, 0.0, 0.0]],
             "spin_multiplicity": 3.0,
-            "nelect": 12.0
+            "nelect": 12.0,
         }
-        
+
         plot_data = extract_ksplot_data(eigenval_data, vbm=-1.2, cbm=3.0, espan=1.0)
-        
+
         self.assertIsInstance(plot_data, KohnShamPlotData)
         self.assertEqual(plot_data.vbm, -1.2)
         self.assertEqual(plot_data.cbm, 3.0)
@@ -238,17 +242,21 @@ class TestKohnShamAnalysis(unittest.TestCase):
             "down": self.mock_down_bands,
             "selected_kpoint": [0, [0.0, 0.0, 0.0]],
             "spin_multiplicity": 3.0,
-            "nelect": 12.0
+            "nelect": 12.0,
         }
         plot_data = extract_ksplot_data(eigenval_data, vbm=-1.2, cbm=3.0, espan=1.0)
-        
+
         test_img_path = OUTPUT_PLOT_DIR / "test_ks_output.png"
-        
+
         try:
             plot_spin_resolved_levels(
                 data=plot_data,
                 output_filename=test_img_path,
-                style_file=str(CUSTOM_STYLE_FILE) if (CUSTOM_STYLE_FILE and CUSTOM_STYLE_FILE.exists()) else None
+                style_file=(
+                    str(CUSTOM_STYLE_FILE)
+                    if (CUSTOM_STYLE_FILE and CUSTOM_STYLE_FILE.exists())
+                    else None
+                ),
             )
             self.assertTrue(test_img_path.exists())
         finally:
@@ -260,14 +268,16 @@ class TestKohnShamAnalysis(unittest.TestCase):
     # =====================================================================
     def test_live_eigenval_file_parsing(self):
         """
-        Runs complete extraction pipeline validations using real EIGENVAL 
+        Runs complete extraction pipeline validations using real EIGENVAL
         files and the statically defined global band edge thresholds.
         """
         if REAL_EIGENVAL_PATH is None or not REAL_EIGENVAL_PATH.exists():
-            self.skipTest(f"Target EIGENVAL file missing at {REAL_EIGENVAL_PATH}. Skipping live file integration tests.")
-            
+            self.skipTest(
+                f"Target EIGENVAL file missing at {REAL_EIGENVAL_PATH}. Skipping live file integration tests."
+            )
+
         print(f"\nExecuting Live Integration Analysis against: {REAL_EIGENVAL_PATH}")
-        
+
         # 1. Parse raw k-point eigenvalues dictionary payload from filesystem
         live_raw_data = read_eigenval_file(REAL_EIGENVAL_PATH, k_idx=0)
         self.assertIn("up", live_raw_data)
@@ -276,28 +286,31 @@ class TestKohnShamAnalysis(unittest.TestCase):
 
         # 2. Extract layout dimensions using top-level configured VBM/CBM alignments
         processed_plot_data = extract_ksplot_data(
-            eigenval_data=live_raw_data, 
-            vbm=VBM_REAL, 
-            cbm=CBM_REAL, 
-            espan=1.5
+            eigenval_data=live_raw_data, vbm=VBM_REAL, cbm=CBM_REAL, espan=1.5
         )
-        
+
         # 3. Assert correct bounds enforcement matching our real PBE input constraints
         self.assertEqual(processed_plot_data.vbm, VBM_REAL)
         self.assertEqual(processed_plot_data.cbm, CBM_REAL)
         self.assertAlmostEqual(processed_plot_data.emin, VBM_REAL - 1.5)
         self.assertAlmostEqual(processed_plot_data.emax, CBM_REAL + 1.5)
-        
+
         # 4. Attempt rendering live parsed records to disk
         live_img_path = OUTPUT_PLOT_DIR / "live_ks_pbe_plot.png"
         try:
             plot_spin_resolved_levels(
                 data=processed_plot_data,
                 output_filename=live_img_path,
-                style_file=str(CUSTOM_STYLE_FILE) if (CUSTOM_STYLE_FILE and CUSTOM_STYLE_FILE.exists()) else None
+                style_file=(
+                    str(CUSTOM_STYLE_FILE)
+                    if (CUSTOM_STYLE_FILE and CUSTOM_STYLE_FILE.exists())
+                    else None
+                ),
             )
             self.assertTrue(live_img_path.exists())
-            print(f"Generated physical validation plot successfully at: {live_img_path}")
+            print(
+                f"Generated physical validation plot successfully at: {live_img_path}"
+            )
         finally:
             if live_img_path.exists():
                 live_img_path.unlink()

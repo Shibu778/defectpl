@@ -147,12 +147,16 @@ def calculate_phonon_symmetries(
     phonon = Phonopy(unitcell, supercell_matrix=np.diag(dim), symprec=symprec)
 
     if force_constants_path is not None:
-        phonon.force_constants = parse_FORCE_CONSTANTS(filename=str(force_constants_path))
+        phonon.force_constants = parse_FORCE_CONSTANTS(
+            filename=str(force_constants_path)
+        )
     elif force_sets_path is not None:
         phonon.dataset = parse_FORCE_SETS(filename=str(force_sets_path))
         phonon.produce_force_constants()
     else:
-        raise ValueError("Either force_constants_path or force_sets_path must be provided.")
+        raise ValueError(
+            "Either force_constants_path or force_sets_path must be provided."
+        )
 
     phonon.set_irreps(
         q=[0, 0, 0],
@@ -194,7 +198,9 @@ def calculate_gamma_phonon_to_band_yaml(
 
     unitcell = read_vasp(str(unitcell_filename))
     phonon = Phonopy(unitcell, supercell_matrix=np.diag(dim), symprec=symprec)
-    phonon.force_constants = parse_FORCE_CONSTANTS(filename=str(force_constants_filename))
+    phonon.force_constants = parse_FORCE_CONSTANTS(
+        filename=str(force_constants_filename)
+    )
 
     bands = [[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]]
     phonon.run_band_structure(bands, with_eigenvectors=True)
@@ -206,7 +212,7 @@ def read_band_yaml(
     q_idx: int = 0,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Parses a Phonopy band.yaml summary output file to extract Gamma-point 
+    Parses a Phonopy band.yaml summary output file to extract Gamma-point
     phonon frequencies, displacement eigenvectors, and atomic masses.
 
     Parameters
@@ -234,7 +240,7 @@ def read_band_yaml(
     # 1. Parse frequencies and safely bound acoustic/imaginary noise to 0.0
     gfrequencies = np.array(
         [band["phonon"][q_idx]["band"][i]["frequency"] for i in range(nmodes)],
-        dtype=float
+        dtype=float,
     )
     gfrequencies[gfrequencies < 0.0] = 0.0
     gfrequencies *= THZ2EV  # Convert THz -> eV
@@ -242,14 +248,15 @@ def read_band_yaml(
     # 2. Parse eigenvectors (shape from yaml is often (nmodes, natoms, 3, 2))
     geigenvecs = np.array(
         [band["phonon"][q_idx]["band"][i]["eigenvector"] for i in range(nmodes)],
-        dtype=complex
+        dtype=complex,
     )
     # Strip complex phase: (nmodes, natoms, 3, 2) -> (nmodes, natoms, 3)
     eigenvectors = np.array(geigenvecs[..., 0].real, dtype=float)
-    
 
     # 3. Gather masses
-    masses = np.asarray([band["points"][i]["mass"] for i in range(n_atoms)], dtype=float)
+    masses = np.asarray(
+        [band["points"][i]["mass"] for i in range(n_atoms)], dtype=float
+    )
 
     return gfrequencies, eigenvectors, masses
 
@@ -271,12 +278,12 @@ def extract_gamma_phonon_data(band_yaml_path: Union[str, Path]) -> GammaPhononDa
     freqs, evecs, masses = read_band_yaml(band_yaml_path, q_idx=0)
     natoms = len(masses)
     nmodes = len(freqs)
-    
+
     return GammaPhononData(
         frequencies=freqs.tolist(),
         eigenvectors=evecs.tolist(),
         masses=masses.tolist(),
         natoms=natoms,
         nmodes=nmodes,
-        meta_info={"source_file": str(band_yaml_path)}
+        meta_info={"source_file": str(band_yaml_path)},
     )

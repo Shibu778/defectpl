@@ -11,6 +11,7 @@ import numpy as np
 
 from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J, HBAR_JS
 
+
 def calc_delR(dR: np.ndarray) -> float:
     """
     Calculate the global norm of coordinate differences.
@@ -47,17 +48,19 @@ def calc_delQ(masses: np.ndarray, dR: np.ndarray) -> float:
     return float(np.sqrt(np.sum(masses * np.sum(dR**2, axis=1))))
 
 
-def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np.ndarray:
+def calc_qks(
+    masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray
+) -> np.ndarray:
     """
     Project atomic displacements onto phonon normal modes to find mode coordinates q_k.
 
-    This function uses a loop-based approach to calculate the dimensioned 
+    This function uses a loop-based approach to calculate the dimensioned
     configuration coordinates from real-space displacement vectors.
 
     Parameters
     ----------
     masses : np.ndarray
-        1D array of atomic masses for each atom in the system. 
+        1D array of atomic masses for each atom in the system.
         Shape: (N_atoms,). Unit: AMU.
     dR : np.ndarray
         2D array of atomic displacement vectors between two configurations.
@@ -71,7 +74,7 @@ def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np
     np.ndarray
         1D array of projected configuration coordinates for each mode k.
         Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
-        
+
     See Also
     --------
     calc_qks_vectorized : Faster, loopless alternative for this calculation.
@@ -79,39 +82,41 @@ def calc_qks(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np
     qks = []
     sqrt_m = np.sqrt(masses)
     for k in range(len(eigenvectors)):
-        qk = np.sum([sqrt_m[i] * np.dot(dR[i], eigenvectors[k][i]) for i in range(len(masses))])
+        qk = np.sum(
+            [sqrt_m[i] * np.dot(dR[i], eigenvectors[k][i]) for i in range(len(masses))]
+        )
         qk = qk * ANG2M * np.sqrt(AMU2KG)
         qks.append(qk)
     return np.array(qks)
 
 
 def calc_qks_force_mode(
-    masses: np.ndarray, 
-    forces: np.ndarray, 
-    eigenvectors: np.ndarray, 
-    frequencies_eV: np.ndarray
+    masses: np.ndarray,
+    forces: np.ndarray,
+    eigenvectors: np.ndarray,
+    frequencies_eV: np.ndarray,
 ) -> np.ndarray:
     """
     Project atomic force differences onto phonon normal modes using energies in eV.
 
-    This function calculates the dimensioned configuration coordinates using a 
-    loop-based approach, derived from the excited state forces acting on the 
-    ground state geometry. Acoustic or zero-frequency modes are protected to 
+    This function calculates the dimensioned configuration coordinates using a
+    loop-based approach, derived from the excited state forces acting on the
+    ground state geometry. Acoustic or zero-frequency modes are protected to
     prevent division-by-zero errors.
 
     Parameters
     ----------
     masses : np.ndarray
-        1D array of atomic masses for each atom in the system. 
+        1D array of atomic masses for each atom in the system.
         Shape: (N_atoms,). Unit: AMU.
     forces : np.ndarray
-        2D array containing the difference in force vectors between the excited 
+        2D array containing the difference in force vectors between the excited
         and ground states. Shape: (N_atoms, 3). Unit: eV/Angstrom (eV/Å).
     eigenvectors : np.ndarray
         3D array representing the normal mode eigenvectors matrix.
         Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
     frequencies_eV : np.ndarray
-        1D array of Gamma-point phonon mode energies. 
+        1D array of Gamma-point phonon mode energies.
         Shape: (N_modes,). Unit: Electron-volts (eV).
 
     Returns
@@ -119,53 +124,57 @@ def calc_qks_force_mode(
     np.ndarray
         1D array of projected configuration coordinates for each mode k.
         Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
-        
+
     See Also
     --------
     calc_qks_force_vectorized : Faster, loopless alternative for this calculation.
     """
     qks = []
     sqrt_m = np.sqrt(masses)
-    
+
     for k in range(len(eigenvectors)):
         freq_ev = frequencies_eV[k]
-        
+
         # Handle the acoustic/zero-frequency modes safely
         if np.isclose(freq_ev, 0.0, atol=1e-5):
             qks.append(0.0)
             continue
-            
+
         # 1. Raw projection: sum_i (1 / sqrt(M_i)) * dot(F_i, e_{k;i}) -> (eV / Angstrom) / sqrt(AMU)
-        proj_sum = np.sum([
-            (1.0 / sqrt_m[i]) * np.dot(forces[i], eigenvectors[k][i]) 
-            for i in range(len(masses))
-        ])
-        
+        proj_sum = np.sum(
+            [
+                (1.0 / sqrt_m[i]) * np.dot(forces[i], eigenvectors[k][i])
+                for i in range(len(masses))
+            ]
+        )
+
         # 2. Convert raw projection numerator to SI units -> (Joules / meter) / sqrt(kg)
         proj_sum_SI = proj_sum * (EV2J / ANG2M) / np.sqrt(AMU2KG)
-        
+
         # 3. Convert energy in eV to angular frequency omega_k (rad/s)
         omega_k = (freq_ev * EV2J) / HBAR_JS
-        
+
         # 4. Divide by omega_k^2 to find configuration coordinate
-        qk_SI = (1.0 / (omega_k ** 2)) * proj_sum_SI
-        
+        qk_SI = (1.0 / (omega_k**2)) * proj_sum_SI
+
         qks.append(qk_SI)
-        
+
     return np.array(qks)
 
 
-def calc_qks_vectorized(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray) -> np.ndarray:
+def calc_qks_vectorized(
+    masses: np.ndarray, dR: np.ndarray, eigenvectors: np.ndarray
+) -> np.ndarray:
     """
     Vectorized configuration coordinate calculation from displacements via Einstein summation.
 
-    Eliminates explicit Python loops by using `np.einsum` to project real-space 
+    Eliminates explicit Python loops by using `np.einsum` to project real-space
     atomic displacements onto the full normal mode space simultaneously.
 
     Parameters
     ----------
     masses : np.ndarray
-        1D array of atomic masses for each atom in the system. 
+        1D array of atomic masses for each atom in the system.
         Shape: (N_atoms,). Unit: AMU.
     dR : np.ndarray
         2D array of atomic displacement vectors between two configurations.
@@ -179,7 +188,7 @@ def calc_qks_vectorized(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.nda
     np.ndarray
         1D array of projected configuration coordinates for each mode k.
         Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
-        
+
     See Also
     --------
     calc_qks : The loop-based alternative for this displacement-based approach.
@@ -187,40 +196,40 @@ def calc_qks_vectorized(masses: np.ndarray, dR: np.ndarray, eigenvectors: np.nda
     # Scale displacements by sqrt(masses)
     sqrt_m = np.sqrt(masses)[:, np.newaxis]
     scaled_dR = dR * sqrt_m
-    
+
     # Project scaled dR onto eigenvectors: sum over atoms (i) and directions (j)
-    proj_sum = np.einsum('kij,ij->k', eigenvectors, scaled_dR)
-    
+    proj_sum = np.einsum("kij,ij->k", eigenvectors, scaled_dR)
+
     # Convert unit system from (Angstrom * sqrt(AMU)) to SI (meter * sqrt(kg))
     return proj_sum * ANG2M * np.sqrt(AMU2KG)
 
 
 def calc_qks_force_vectorized(
-    masses: np.ndarray, 
-    forces: np.ndarray, 
-    eigenvectors: np.ndarray, 
-    frequencies_eV: np.ndarray
+    masses: np.ndarray,
+    forces: np.ndarray,
+    eigenvectors: np.ndarray,
+    frequencies_eV: np.ndarray,
 ) -> np.ndarray:
     """
     Vectorized configuration coordinate calculation from forces using eV energies.
 
-    Utilizes `np.einsum` to bypass explicit loops and projects forces across all 
-    modes simultaneously. Implements high-throughput masking to safely neutralize 
+    Utilizes `np.einsum` to bypass explicit loops and projects forces across all
+    modes simultaneously. Implements high-throughput masking to safely neutralize
     acoustic and near-zero modes without inducing divide-by-zero exceptions.
 
     Parameters
     ----------
     masses : np.ndarray
-        1D array of atomic masses for each atom in the system. 
+        1D array of atomic masses for each atom in the system.
         Shape: (N_atoms,). Unit: AMU.
     forces : np.ndarray
-        2D array containing the difference in force vectors between the excited 
+        2D array containing the difference in force vectors between the excited
         and ground states. Shape: (N_atoms, 3). Unit: eV/Angstrom (eV/Å).
     eigenvectors : np.ndarray
         3D array representing the normal mode eigenvectors matrix.
         Shape: (N_modes, N_atoms, 3). Dimensionless (normalized).
     frequencies_eV : np.ndarray
-        1D array of Gamma-point phonon mode energies. 
+        1D array of Gamma-point phonon mode energies.
         Shape: (N_modes,). Unit: Electron-volts (eV).
 
     Returns
@@ -228,7 +237,7 @@ def calc_qks_force_vectorized(
     np.ndarray
         1D array of projected configuration coordinates for each mode k.
         Shape: (N_modes,). Unit: SI units (kg^{1/2} * m).
-        
+
     See Also
     --------
     calc_qks_force_mode : The loop-based alternative for this force-based approach.
@@ -236,25 +245,25 @@ def calc_qks_force_vectorized(
     # 1. Scale forces by 1/sqrt(masses)
     inv_sqrt_m = (1.0 / np.sqrt(masses))[:, np.newaxis]
     scaled_forces = forces * inv_sqrt_m
-    
+
     # 2. Project onto eigenvectors across all modes simultaneously
-    proj_sum = np.einsum('kij,ij->k', eigenvectors, scaled_forces)
-    
+    proj_sum = np.einsum("kij,ij->k", eigenvectors, scaled_forces)
+
     # 3. Convert eV energy values to SI omega squared (rad/s)^2
     omega = (frequencies_eV * EV2J) / HBAR_JS
-    omega_sq = omega ** 2
-    
+    omega_sq = omega**2
+
     # Safely mask zero frequency/acoustic modes
     acoustic_mask = np.isclose(frequencies_eV, 0.0, atol=1e-5)
-    omega_sq[acoustic_mask] = np.inf 
-    
+    omega_sq[acoustic_mask] = np.inf
+
     # 4. Conversion scalar: converts numerator from [eV / (A * sqrt(AMU))] to SI [J / (m * sqrt(kg))]
     to_SI_numerator = (EV2J / ANG2M) / np.sqrt(AMU2KG)
-    
+
     # 5. Calculate configuration coordinates
     qks = (proj_sum / omega_sq) * to_SI_numerator
     qks[acoustic_mask] = 0.0
-    
+
     return qks
 
 
@@ -297,11 +306,16 @@ def gaussian_broadening(
     float or np.ndarray
         The evaluated intensity of the Gaussian curve profile.
     """
-    return (1.0 / (sigma * np.sqrt(2.0 * np.pi))) * np.exp(-0.5 * ((omega - omega_k) / sigma) ** 2)
+    return (1.0 / (sigma * np.sqrt(2.0 * np.pi))) * np.exp(
+        -0.5 * ((omega - omega_k) / sigma) ** 2
+    )
 
 
 def calc_S_omega(
-    frequencies: np.ndarray, Sks: np.ndarray, omega_range: List[float], sigma: float = 6e-3
+    frequencies: np.ndarray,
+    Sks: np.ndarray,
+    omega_range: List[float],
+    sigma: float = 6e-3,
 ) -> np.ndarray:
     """
     Compute the continuous Huang-Rhys spectral density function S(omega) using broadening.
@@ -365,7 +379,9 @@ def calc_St(S_omega: np.ndarray) -> np.ndarray:
     return 2.0 * np.pi * np.fft.ifftshift(Sts)
 
 
-def calc_Gts(Sts: np.ndarray, total_HR: float, gamma: float, resolution: float) -> np.ndarray:
+def calc_Gts(
+    Sts: np.ndarray, total_HR: float, gamma: float, resolution: float
+) -> np.ndarray:
     """
     Compute the generating function G(t) tracking time-dependent correlations.
 
@@ -390,7 +406,9 @@ def calc_Gts(Sts: np.ndarray, total_HR: float, gamma: float, resolution: float) 
     return np.exp(Sts - total_HR) * np.exp(-gamma * np.abs(t))
 
 
-def calc_Spectrum_Intensity(Gts: np.ndarray, EZPL: float, resolution: float) -> Tuple[np.ndarray, np.ndarray]:
+def calc_Spectrum_Intensity(
+    Gts: np.ndarray, EZPL: float, resolution: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Transform the generating function back to frequency space to get final line intensities.
 
@@ -501,17 +519,21 @@ def calculate_overlap_element(
     return ix
 
 
-def extract_important_properties(pl_engine, filename: str = "important_properties.txt") -> None:
-    """Extracts single-value physical properties from a Photoluminescence engine 
+def extract_important_properties(
+    pl_engine, filename: str = "important_properties.txt"
+) -> None:
+    """Extracts single-value physical properties from a Photoluminescence engine
     instance and formats them into a structured text file.
-    
+
     Dynamically tracks the operational calculation mode (Force vs. Displacement)
     and drops coordinate-based displacement scalars if evaluating a force mode run.
     """
     import numpy as np
 
     # 1. Determine the calculation mode based on input state flags
-    is_force_mode = hasattr(pl_engine, 'dF') and pl_engine.dF is not None and np.any(pl_engine.dF)
+    is_force_mode = (
+        hasattr(pl_engine, "dF") and pl_engine.dF is not None and np.any(pl_engine.dF)
+    )
     calc_mode = "Force Mode" if is_force_mode else "Displacement Mode"
 
     # 2. Build the structural layout header
@@ -527,23 +549,27 @@ def extract_important_properties(pl_engine, filename: str = "important_propertie
 
     # 3. Conditional Step: Only inject spatial metrics if we are NOT in Force Mode
     if not is_force_mode:
-        lines.extend([
-            f"Mass-Weighted Delta Q (delQ)  : {getattr(pl_engine, 'delQ', 'N/A'):>12.6f} amu^(1/2)*Å",
-            f"Structural Delta R (delR)     : {getattr(pl_engine, 'delR', 'N/A'):>12.6f} Å",
-        ])
+        lines.extend(
+            [
+                f"Mass-Weighted Delta Q (delQ)  : {getattr(pl_engine, 'delQ', 'N/A'):>12.6f} amu^(1/2)*Å",
+                f"Structural Delta R (delR)     : {getattr(pl_engine, 'delR', 'N/A'):>12.6f} Å",
+            ]
+        )
 
     # 4. Append operational configuration tracking metadata
-    lines.extend([
-        "---------------------------------------------------",
-        f"Total Number of Atoms (natoms): {getattr(pl_engine, 'natoms', 'N/A'):>12}",
-        f"ZPL Broadening Factor (gamma) : {getattr(pl_engine, 'gamma', 'N/A'):>12.2f} meV",
-        f"Gaussian Broadening (sigma)   : {getattr(pl_engine, 'sigma', 'N/A'):>12.6f} eV",
-        f"Energy Mesh Resolution        : {getattr(pl_engine, 'resolution', 'N/A'):>12} points/eV",
-        "==================================================="
-    ])
-    
+    lines.extend(
+        [
+            "---------------------------------------------------",
+            f"Total Number of Atoms (natoms): {getattr(pl_engine, 'natoms', 'N/A'):>12}",
+            f"ZPL Broadening Factor (gamma) : {getattr(pl_engine, 'gamma', 'N/A'):>12.2f} meV",
+            f"Gaussian Broadening (sigma)   : {getattr(pl_engine, 'sigma', 'N/A'):>12.6f} eV",
+            f"Energy Mesh Resolution        : {getattr(pl_engine, 'resolution', 'N/A'):>12} points/eV",
+            "===================================================",
+        ]
+    )
+
     # Write cleanly to file out
     with open(filename, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
-        
+
     print(f"Important parameters successfully exported to text summary: {filename}")

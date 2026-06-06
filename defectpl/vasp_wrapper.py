@@ -16,8 +16,12 @@ from pymatgen.io.vasp.inputs import Poscar
 from pymatgen.util.coord import pbc_shortest_vectors
 
 from defectpl.phonon import read_band_yaml
-from defectpl.vasp import get_final_structure_and_forces_from_outcar, get_first_structure_and_forces_from_outcar
+from defectpl.vasp import (
+    get_final_structure_and_forces_from_outcar,
+    get_first_structure_and_forces_from_outcar,
+)
 from defectpl.utils import calc_delQ
+
 
 def generate_ccd_calculations(
     gs_structure,
@@ -29,13 +33,15 @@ def generate_ccd_calculations(
 ) -> None:
     """
     Generate linear interpolation structure configuration spaces for automated VASP execution parameters.
-    
-    This splits out structure interpolation and replicates input profiles (INCAR, POTCAR, KPOINTS) 
+
+    This splits out structure interpolation and replicates input profiles (INCAR, POTCAR, KPOINTS)
     from template directories for each step.
     """
     from defectpl.defectpl import ConfigurationCoordinateDiagram
 
-    ccd = ConfigurationCoordinateDiagram(ground_struct=gs_structure, excited_struct=es_structure)
+    ccd = ConfigurationCoordinateDiagram(
+        ground_struct=gs_structure, excited_struct=es_structure
+    )
     ccd.setup_calculations(
         displacements=displacements,
         output_dir=output_dir,
@@ -53,13 +59,15 @@ def analyze_ccd_framework(
     save_plot: Union[str, Path] = None,
 ) -> Tuple[float, float]:
     """
-    Fit calculated Potential Energy Surfaces data arrays, extract well parameters, 
+    Fit calculated Potential Energy Surfaces data arrays, extract well parameters,
     and report vertical transition metrics.
     """
     from defectpl.defectpl import ConfigurationCoordinateDiagram
 
-    ccd = ConfigurationCoordinateDiagram(ground_struct=gs_structure, excited_struct=es_structure)
-    
+    ccd = ConfigurationCoordinateDiagram(
+        ground_struct=gs_structure, excited_struct=es_structure
+    )
+
     paths_gs = [Path(p) for p in ground_vaspruns]
     paths_es = [Path(p) for p in excited_vaspruns]
 
@@ -69,12 +77,12 @@ def analyze_ccd_framework(
         excited_vaspruns=paths_es,
         dE=dE,
         plot=True,
-        save_plot=save_plot
+        save_plot=save_plot,
     )
-    
+
     # Print vertical absorption, emission, and Jahn-Teller parameters to the standard output log
     ccd.estimate_vertical_transitions(ground_omega=w_g, excited_omega=w_e, dE=dE)
-    
+
     return w_g, w_e
 
 
@@ -90,7 +98,7 @@ def run_dynamic_yaml_comparison(
     file_name: str,
 ) -> Path:
     """
-    Dynamically compile, build, and plot comparative intensities for lists of 
+    Dynamically compile, build, and plot comparative intensities for lists of
     phonopy band configuration inputs.
     """
     import matplotlib.pyplot as plt
@@ -110,31 +118,34 @@ def run_dynamic_yaml_comparison(
             EZPL=ezpl,
             gamma=gamma,
             max_energy=5.0,
-            sigma=6e-3
+            sigma=6e-3,
         )
         all_pl_runs.append(pl_run)
 
     plt.figure(figsize=(4, 4))
     for pl_run in all_pl_runs:
         plt.plot(pl_run.I.__abs__(), "k", lw=1.2)
-        
+
     plt.ylabel(r"$I(\hbar\omega)$")
     plt.xlabel(r"Photon energy (eV)")
     plt.xlim(xmin, xmax)
-    
+
     x_values, _ = plt.xticks()
-    resolution = all_pl_runs[0].resolution if hasattr(all_pl_runs[0], "resolution") else 1.0
+    resolution = (
+        all_pl_runs[0].resolution if hasattr(all_pl_runs[0], "resolution") else 1.0
+    )
     labels = [float(x) / resolution for x in x_values]
     plt.xticks(x_values, labels)
-    
+
     out_path = Path(out_dir) / file_name
     form = file_name.split(".")[-1]
     fmt = form.lower() if form else "pdf"
-    
+
     plt.savefig(out_path, dpi=300, bbox_inches="tight", format=fmt)
     plt.close()
-    
+
     return out_path
+
 
 def run_kohn_sham_analysis(
     eigenval_path: str,
@@ -146,7 +157,7 @@ def run_kohn_sham_analysis(
     output_json: str = None,
 ) -> None:
     """
-    Orchestrates the raw EIGENVAL parsing, structural energy level truncation, 
+    Orchestrates the raw EIGENVAL parsing, structural energy level truncation,
     degeneracy mapping, serialization, and plotting workflows.
 
     Parameters
@@ -187,6 +198,7 @@ def run_kohn_sham_analysis(
     # 4. Generate visual levels layout matrix
     plot_spin_resolved_levels(ks_model, output_filename=output_img)
 
+
 def run_pl_calc_vasp_displacement_mode(
     band_yaml,
     contcar_gs,
@@ -199,6 +211,7 @@ def run_pl_calc_vasp_displacement_mode(
 ):
     try:
         from defectpl.defectpl import Photoluminescence
+
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         struct_gs = Structure.from_file(contcar_gs)
         struct_es = Structure.from_file(contcar_es)
@@ -212,54 +225,60 @@ def run_pl_calc_vasp_displacement_mode(
             EZPL=ezpl,
             gamma=gamma,
             max_energy=5.0,
-            sigma=6e-3
+            sigma=6e-3,
         )
-        
+
         if plot_all:
             pl_engine.generate_plots(out_dir=out_dir, fig_format=fig_format)
-            
+
     except Exception as exc:
         raise RuntimeError(f"Calculation pipeline failure encountered: {exc}")
-    
+
+
 def calc_dF(ground_data, excited_data):
     """
     Given the forces at a structure, in ground and excited states, calculate the force difference vector dF, where
     dF = F_excited - F_ground at the same structure.
-    
+
     Parameters:
     -----------
     ground_data : dict
-        A dictionary containing structure and forces for the ground state. 
+        A dictionary containing structure and forces for the ground state.
         Expected keys: 'structure' (pymatgen Structure) and 'forces' (numpy array).
         Note: Take the last structure and forces from the ground state VASP run, which should correspond to the same structure
         as the vertical excitation point.
     excited_data : dict
-        A dictionary containing structure and forces for the excited state. 
+        A dictionary containing structure and forces for the excited state.
         Expected keys: 'structure' (pymatgen Structure) and 'forces' (numpy array).
 
         Note: Take the first structure and forces from the excited state VASP run, which should correspond to the same structure
         as the ground state structure at the vertical excitation point.
-    
+
     Returns:
     --------
     dF : numpy array
         The force difference vector, calculated as F_excited - F_ground.
     """
     # Check whether the structures are the same
-    if ground_data['structure'] != excited_data['structure']:
-        raise ValueError("Ground and excited state structures do not match. Cannot calculate dF.")
-    
+    if ground_data["structure"] != excited_data["structure"]:
+        raise ValueError(
+            "Ground and excited state structures do not match. Cannot calculate dF."
+        )
+
     # Extract forces
-    F_ground = ground_data['forces']
-    F_excited = excited_data['forces']
+    F_ground = ground_data["forces"]
+    F_excited = excited_data["forces"]
     # Calculate force difference
     dF = F_excited - F_ground
     return dF
-    
-def prepare_dF_files(ground_outcar, excited_outcar, ground_poscar=None, excited_poscar=None):
+
+
+def prepare_dF_files(
+    ground_outcar, excited_outcar, ground_poscar=None, excited_poscar=None
+):
     """
     Prepare the force difference vector dF by extracting forces from VASP OUTCAR files for both ground and excited states.
-    
+
     Parameters:
     -----------
     ground_outcar : str
@@ -270,24 +289,29 @@ def prepare_dF_files(ground_outcar, excited_outcar, ground_poscar=None, excited_
         Path to the POSCAR file for the ground state structure. Required if species information is needed.
     excited_poscar : str, optional
         Path to the POSCAR file for the excited state structure. Required if species information is needed.
-    
+
     Returns:
     --------
     dF : numpy array
         The calculated force difference vector dF.
     """
     # Extract structures and forces from OUTCAR files
-    ground_structure, ground_forces = get_final_structure_and_forces_from_outcar(ground_outcar, poscar_path=ground_poscar)
-    excited_structure, excited_forces = get_final_structure_and_forces_from_outcar(excited_outcar, poscar_path=excited_poscar)
-    
+    ground_structure, ground_forces = get_final_structure_and_forces_from_outcar(
+        ground_outcar, poscar_path=ground_poscar
+    )
+    excited_structure, excited_forces = get_final_structure_and_forces_from_outcar(
+        excited_outcar, poscar_path=excited_poscar
+    )
+
     # Prepare data dictionaries for dF calculation
-    ground_data = {'structure': ground_structure, 'forces': ground_forces}
-    excited_data = {'structure': excited_structure, 'forces': excited_forces}
-    
+    ground_data = {"structure": ground_structure, "forces": ground_forces}
+    excited_data = {"structure": excited_structure, "forces": excited_forces}
+
     # Calculate dF
     dF = calc_dF(ground_data, excited_data)
-    
+
     return dF
+
 
 def run_pl_calc_vasp_force_mode(
     band_yaml,
@@ -301,6 +325,7 @@ def run_pl_calc_vasp_force_mode(
 ):
     try:
         from defectpl.defectpl import Photoluminescence
+
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         dF = prepare_dF_files(outcar_gs, outcar_es)
 
@@ -312,15 +337,16 @@ def run_pl_calc_vasp_force_mode(
             EZPL=ezpl,
             gamma=gamma,
             max_energy=5.0,
-            sigma=6e-3
+            sigma=6e-3,
         )
-        
+
         if plot_all:
             pl_engine.generate_plots(out_dir=out_dir, fig_format=fig_format)
-            
+
     except Exception as exc:
         raise RuntimeError(f"Calculation pipeline failure encountered: {exc}")
-    
+
+
 def _to_structure(obj: Union[Structure, str, Path]) -> Structure:
     """Helper to convert a Structure, str, or Path into a pymatgen Structure."""
     if isinstance(obj, (str, Path)):
@@ -335,11 +361,10 @@ def _to_structure(obj: Union[Structure, str, Path]) -> Structure:
 
 
 def calc_dR(
-    constcar_gs: Union[Structure, str, Path],
-    contcar_es: Union[Structure, str, Path]
+    constcar_gs: Union[Structure, str, Path], contcar_es: Union[Structure, str, Path]
 ) -> np.ndarray:
     """
-    Calculates the shortest periodic boundary condition (PBC) safe displacement 
+    Calculates the shortest periodic boundary condition (PBC) safe displacement
     vectors between the ground state and excited state structures.
 
     Parameters:
@@ -352,7 +377,7 @@ def calc_dR(
     Returns:
     =================
     dR : np.ndarray
-        2D array of shape (n_atoms, 3) detailing Cartesian displacements 
+        2D array of shape (n_atoms, 3) detailing Cartesian displacements
         (Excited - Ground) in Å.
     """
     # Normalize both inputs to pymatgen Structure objects
@@ -360,19 +385,22 @@ def calc_dR(
     struct_es = _to_structure(contcar_es)
 
     if len(struct_gs) != len(struct_es):
-        raise ValueError("Lattice structure mismatch: Input configurations have differing site counts.")
+        raise ValueError(
+            "Lattice structure mismatch: Input configurations have differing site counts."
+        )
 
     length = len(struct_gs)
     lattice = struct_gs.lattice
     dR = np.vstack(
-            [
-                pbc_shortest_vectors(
-                    lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i]
-                )
-                for i in range(length)
-            ]
-        ).reshape(length, 3)
+        [
+            pbc_shortest_vectors(
+                lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i]
+            )
+            for i in range(length)
+        ]
+    ).reshape(length, 3)
     return dR
+
 
 def calc_delta_Q(struct1: Structure, struct2: Structure) -> float:
     """
@@ -414,7 +442,7 @@ def get_q_from_structure(
     nround: int = 4,
 ) -> float:
     """
-    Calculates the mass-weighted configuration coordinate (Q) value for a given 
+    Calculates the mass-weighted configuration coordinate (Q) value for a given
     displaced configuration relative to the equilibrium ground-state structure.
 
     Parameters:
@@ -426,7 +454,7 @@ def get_q_from_structure(
     struct : Structure, str, or Path
         The intermediate or displaced structure (or path to its file) to evaluate.
     tol : float, default 1e-4
-        Distance threshold filter cutoff (Å) to strip stationary lattice atoms 
+        Distance threshold filter cutoff (Å) to strip stationary lattice atoms
         out of the interpolation projection tracking step.
     nround : int, default 4
         Decimal rounding precision used when clustering atomic displacement ratios.
@@ -442,15 +470,19 @@ def get_q_from_structure(
         tstruct = struct
 
     if len(ground) != len(excited) or len(ground) != len(tstruct):
-        raise ValueError("Lattice structure mismatch: Input geometries have differing site counts.")
+        raise ValueError(
+            "Lattice structure mismatch: Input geometries have differing site counts."
+        )
 
     masses = np.array([site.specie.atomic_mass for site in ground], dtype=float)
     lattice = ground.lattice
-    
+
     # Vectorized PBC shortest vector layout matching calc_delta_Q
-    dr_excited_raw = pbc_shortest_vectors(lattice, ground.frac_coords, excited.frac_coords)
+    dr_excited_raw = pbc_shortest_vectors(
+        lattice, ground.frac_coords, excited.frac_coords
+    )
     dr_excited_raw = np.reshape(dr_excited_raw, (len(ground), 3))
-    
+
     total_dQ = float(np.sqrt(np.sum(masses * np.sum(dr_excited_raw**2, axis=1))))
 
     dx_excited = dr_excited_raw
@@ -458,13 +490,13 @@ def get_q_from_structure(
     dx_struct = np.reshape(dx_struct, (len(ground), 3))
 
     active_mask = np.abs(dx_excited) > tol
-    
+
     if not np.any(active_mask):
         return 0.0
 
     ratios = dx_struct[active_mask] / dx_excited[active_mask]
     rounded_ratios = np.round(ratios, decimals=nround)
-    
+
     values, counts = np.unique(rounded_ratios, return_counts=True)
     scaling_factor = float(values[np.argmax(counts)])
 
