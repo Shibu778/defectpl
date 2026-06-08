@@ -9,8 +9,8 @@ nav:
   - "Command Line Interface": command_line_interface.md
   - "Plots Gallery": plots_gallery.md
   - "Tutorials": tutorials.md
-  - "Theory": theory.md
-  - "Benchmark": benchmark.md
+  # - "Theory": theory.md
+  # - "Benchmark": benchmark.md
   - "API Reference": api_reference.md
 
 theme: readthedocs
