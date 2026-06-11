@@ -15,6 +15,9 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Physics",
     "Topic :: Scientific/Engineering :: Chemistry",
@@ -24,16 +27,17 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyYAML = "^6.0.2"
+pyyaml = "^6.0.2"
 numpy = "^2.1.2"
 pymatgen-core = "^2026.5.18"
 pymatgen = "^2026.5.4"
-pdoc3 = "^0.11.1"
 click = "^8.1.7"
 phonopy = "^2.35.0"
 matplotlib = "^3.8.0"
 monty = "^2026.5.18"
 
+[tool.poetry.group.dev.dependencies]
+pdoc3 = "^0.11.1"
 
 [build-system]
 requires = ["poetry-core"]
