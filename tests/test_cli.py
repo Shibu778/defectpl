@@ -28,8 +28,8 @@ def mock_dependencies():
     with (
         patch("defectpl.phonon.read_band_yaml") as mock_read,
         patch("pymatgen.core.Structure.from_file") as mock_struct,
-        patch("defectpl.vasp_wrapper.calc_dR") as mock_dr,
-        patch("defectpl.vasp_wrapper.prepare_dF_files") as mock_df,
+        patch("defectpl.io.vasp.calc_dR") as mock_dr,
+        patch("defectpl.io.vasp.prepare_dF_files") as mock_df,
         patch("defectpl.defectpl.Photoluminescence") as mock_pl,
         patch("defectpl.plot.Plotter") as mock_plotter,
         patch("monty.serialization.dumpfn") as mock_dump,

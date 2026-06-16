@@ -13,6 +13,6 @@ implementation.
 | [`defectpl.participation_ratio`](participation_ratio.md) | P-ratio / IPR from PROCAR |
 | [`defectpl.ks_analysis`](ks_analysis.md) | Kohn–Sham eigenvalue analysis and plotting |
 | [`defectpl.plot`](plot.md) | `Plotter` — all visualization methods |
-| [`defectpl.vasp`](vasp.md) | VASP file I/O (OUTCAR, EIGENVAL) |
+| [`defectpl.io.vasp`](vasp.md) | VASP file I/O (OUTCAR, EIGENVAL, displacements, workflow helpers) |
 | [`defectpl.defect_utils`](defect_utils.md) | `defect_entry.json`, `defect_structure_info.json` generators |
 | [`defectpl.constants`](constants.md) | Physical constants (CODATA) |

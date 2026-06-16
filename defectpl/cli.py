@@ -6,11 +6,29 @@ displacements, Configuration Coordinate Diagrams (CCD), and phonon properties.
 """
 
 import json
+import traceback
 from pathlib import Path
 import click
 
+_verbose = False
+
+
+def _set_verbose(ctx, param, value):
+    global _verbose
+    _verbose = value
+
 
 @click.group()
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    default=False,
+    is_eager=True,
+    expose_value=False,
+    callback=_set_verbose,
+    help="Show the full error traceback instead of a condensed message.",
+)
 def main():
     """defectpl command utility suite for defect photoluminescence modeling."""
     pass
@@ -106,7 +124,7 @@ def pl_displacement(
     """Run PL calculations using atomic structural shifts (Displacement Mode)."""
     from defectpl.phonon import read_band_yaml
     from pymatgen.core import Structure
-    from defectpl.vasp_wrapper import calc_dR
+    from defectpl.io.vasp import calc_dR
     from defectpl.defectpl import Photoluminescence
     from monty.serialization import dumpfn
 
@@ -146,6 +164,8 @@ def pl_displacement(
             )
 
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
 
 
@@ -227,7 +247,7 @@ def pl_force(
 ):
     """Run PL calculations using force-difference vectors at vertical excitation (Force Mode)."""
     from defectpl.phonon import read_band_yaml
-    from defectpl.vasp_wrapper import prepare_dF_files
+    from defectpl.io.vasp import prepare_dF_files
     from defectpl.defectpl import Photoluminescence
     from monty.serialization import dumpfn
 
@@ -265,6 +285,8 @@ def pl_force(
             )
 
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
 
 
@@ -353,6 +375,8 @@ def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
                 )
 
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Failed to generate custom standalone graphic: {exc}"
         )
@@ -385,13 +409,15 @@ def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
 def dq(structure1, structure2, out_path, out_format):
     """Calculate mass-weighted generalized configuration coordinate displacement delta Q."""
     from pymatgen.core import Structure
-    from defectpl.vasp_wrapper import calc_delta_Q
+    from defectpl.io.vasp import calc_delta_Q
 
     try:
         s1 = Structure.from_file(structure1)
         s2 = Structure.from_file(structure2)
         delta_q = calc_delta_Q(s1, s2)
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Failed to calculate mass-weighted deltaQ: {exc}")
 
     output_payload = {
@@ -506,6 +532,8 @@ def spectra1d(ezpl, w1, w2, dq_val, temp, e0, de, points, nn1, nn2, plot, save_p
         if plot:
             spec.plot_lineshape(save_file=f"{save_prefix}_plot.pdf")
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Analytical processing execution failed: {exc}")
 
 
@@ -570,6 +598,8 @@ def setup_ccd(gs, es, out_dir, tmpl_gs, tmpl_es, steps):
             f"Interpolated task configuration structures tree setup complete at: {out_dir}"
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Calculations generation workflow initialization failed: {exc}"
         )
@@ -632,6 +662,8 @@ def analyze_ccd(gs, es, gs_runs, es_runs, de, save_plot):
         click.echo(f"Ground state effective phonon frequency energy: {w_g:.4f} eV")
         click.echo(f"Excited state effective phonon frequency energy: {w_e:.4f} eV")
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Failed to fit potential energy curvature points: {exc}"
         )
@@ -691,6 +723,8 @@ def compare_json(files, xmin, xmax, legends, out_dir, fmt):
         )
         click.echo("Comparative property spectrum graph compiled successfully.")
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Comparison array aggregation processing failure encountered: {exc}"
         )
@@ -737,7 +771,7 @@ def compare_json(files, xmin, xmax, legends, out_dir, fmt):
 def compare_yaml(yamls, gs, es, out_dir, ezpl, gamma, xmin, xmax, file_name):
     """Dynamically compile, build, and plot comparative intensities for lists of phonopy inputs configurations."""
     from pymatgen.core import Structure
-    from defectpl.vasp_wrapper import run_dynamic_yaml_comparison
+    from defectpl.io.vasp import run_dynamic_yaml_comparison
 
     try:
         band_yaml_files = [Path(f.strip()) for f in yamls.split(" ") if f.strip()]
@@ -759,6 +793,8 @@ def compare_yaml(yamls, gs, es, out_dir, ezpl, gamma, xmin, xmax, file_name):
             f"Dynamic execution spectra comparison chart saved successfully to {out_path}."
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Dynamic multi-yaml calculation task execution dropped: {exc}"
         )
@@ -843,6 +879,8 @@ def phonon_symm(poscar, fc, fs, dim, symprec):
         click.echo("\nAll the IRs are saved into irreps.yaml file.")
 
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Symmetry parser pipeline execution failed: {exc}")
 
 
@@ -882,6 +920,8 @@ def phonon_band(poscar, fc, dim, out):
             f"Phonon path calculations complete. Records dumped safely to: {out}"
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Failed to compile single-point band structure output: {exc}"
         )
@@ -910,6 +950,8 @@ def phonon_parse(band_yaml, json_out):
             f"Energetic values converted to eV and database profile written to: {json_out}"
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Parsing engine dropped properties evaluation tasks: {exc}"
         )
@@ -963,7 +1005,7 @@ def ksplot(eigenval, vbm, cbm, espan, kidx, out_img, out_json):
     Usage:\n
       defectpl ksplot ./EIGENVAL --vbm 9.6747 --cbm 13.7934 --kidx 0 --out_img gap_levels.png
     """
-    from defectpl.vasp_wrapper import run_kohn_sham_analysis
+    from defectpl.io.vasp import run_kohn_sham_analysis
 
     try:
         click.echo(
@@ -989,6 +1031,8 @@ def ksplot(eigenval, vbm, cbm, espan, kidx, out_img, out_json):
             )
 
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(
             f"Kohn-Sham calculation plotting tracking layer crashed: {exc}"
         )
@@ -1211,6 +1255,8 @@ def pr_calc(procar, entry, dsi, poscar, cutoff, out, top_n, no_csv, native_proca
     try:
         result = calc.run()
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(str(exc))
 
     out_dir = Path(out)
@@ -1322,7 +1368,11 @@ def pr_batch(batch_dir, cutoff, no_csv, combined_csv, native_procar):
                             )
                         )
         except Exception as exc:
-            click.secho(f"  SKIPPED ({d.name}): {exc}", fg="yellow")
+            if _verbose:
+                click.secho(f"  ERROR in {d.name}:", fg="red", err=True)
+                click.echo(traceback.format_exc(), err=True)
+            else:
+                click.secho(f"  SKIPPED ({d.name}): {exc}", fg="yellow")
 
     if all_rows:
         csv_path = batch_path / combined_csv
@@ -1512,6 +1562,8 @@ def pr_make_entry(name, center, perfect, defect, site_tol, out):
             site_tol=site_tol,
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(str(exc))
 
     click.echo(f"Defect name   : {payload['name']}")
@@ -1577,6 +1629,8 @@ def pr_make_dsi(poscar, center, cutoff, out):
             out_path=out,
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(str(exc))
 
     click.echo(f"Neighbours found : {payload['n_neighbors']}")
@@ -1704,6 +1758,8 @@ def pr_plot(
                 out=out_path,
             )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(str(exc))
 
     click.secho(f"Saved: {out_path}", fg="green", bold=True)
@@ -1794,13 +1850,15 @@ def pr_ksplot(
             "matplotlib is required.  Install with: pip install matplotlib"
         )
 
-    from defectpl.vasp import read_eigenval_file
+    from defectpl.io.vasp import read_eigenval_file
     from defectpl.ks_analysis import extract_ksplot_data, plot_ks_with_pr
 
     try:
         eigenval_data = read_eigenval_file(eigenval, k_idx=kpt_idx)
         ks_data = extract_ksplot_data(eigenval_data, vbm=vbm, cbm=cbm, espan=espan)
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(f"Failed to read EIGENVAL: {exc}")
 
     with open(pr_json) as fh:
@@ -1819,6 +1877,8 @@ def pr_ksplot(
             output_filename=out,
         )
     except Exception as exc:
+        if _verbose:
+            raise
         raise click.ClickException(str(exc))
 
     click.secho(f"Saved: {out}", fg="green", bold=True)

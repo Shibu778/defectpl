@@ -82,7 +82,7 @@ from pymatgen.core import Structure
 from monty.serialization import dumpfn
 
 from defectpl.phonon import read_band_yaml
-from defectpl.vasp_wrapper import calc_dR
+from defectpl.io.vasp import calc_dR
 from defectpl.defectpl import Photoluminescence
 
 # 1. Parse ground/excited state geometry and Phonopy coordinates
@@ -115,7 +115,7 @@ dumpfn(pl_engine, "properties.json", indent=4)
 Ideal for high-throughput pipelines, utilizing the force landscape acting on the ground-state structure under a vertical electronic excitation constraint.
 
 ```python
-from defectpl.vasp_wrapper import prepare_dF_files
+from defectpl.io.vasp import prepare_dF_files
 from defectpl.defectpl import Photoluminescence
 from defectpl.phonon import read_band_yaml
 

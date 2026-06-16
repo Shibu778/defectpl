@@ -2,8 +2,7 @@
 """
 VASP-specific I/O layer for defectpl.
 
-Consolidates all VASP file parsing and workflow helpers that were previously
-split between ``defectpl.vasp`` and ``defectpl.vasp_wrapper``.  All
+Consolidates all VASP file parsing and workflow helpers.  All
 pymatgen imports are **lazy** (inside function bodies) so this module can
 be imported without pymatgen installed.
 

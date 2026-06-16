@@ -131,7 +131,7 @@ defectpl pr ksplot \
 ```python
 import json
 from defectpl.participation_ratio import plot_pr_vs_energy, plot_pr_vs_band_index
-from defectpl.vasp import read_eigenval_file
+from defectpl.io.vasp import read_eigenval_file
 from defectpl.ks_analysis import extract_ksplot_data, plot_ks_with_pr
 
 with open("participation_ratio.json") as f:

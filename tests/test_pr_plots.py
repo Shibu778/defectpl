@@ -609,7 +609,7 @@ class TestCliPrKsplot:
 
             # Patch at the source module (CLI uses lazy local imports inside the function)
             with (
-                patch("defectpl.vasp.read_eigenval_file") as mock_re,
+                patch("defectpl.io.vasp.read_eigenval_file") as mock_re,
                 patch("defectpl.ks_analysis.extract_ksplot_data") as mock_ek,
                 patch("defectpl.ks_analysis.plot_ks_with_pr") as mock_pk,
             ):

@@ -360,7 +360,7 @@ useful for focusing on the gap region.
 ### Kohn-Sham level plot with P-ratio colour code
 
 ```python
-from defectpl.vasp import read_eigenval_file
+from defectpl.io.vasp import read_eigenval_file
 from defectpl.ks_analysis import extract_ksplot_data, plot_ks_with_pr
 import json
 

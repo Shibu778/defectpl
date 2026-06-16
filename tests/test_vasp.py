@@ -20,7 +20,7 @@ MOCK_POSCAR_PATH = TEST_DIR / "POSCAR"
 MOCK_EIGENVAL_PATH = TEST_DIR / "EIGENVAL"
 
 # Import targets securely after path normalization
-from defectpl.vasp import (
+from defectpl.io.vasp import (
     OutcarParser,
     check_outcar_convergence,
     get_final_structure_and_forces_from_outcar,

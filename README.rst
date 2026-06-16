@@ -119,7 +119,7 @@ calculations.
    from monty.serialization import dumpfn
 
    from defectpl.phonon import read_band_yaml
-   from defectpl.vasp_wrapper import calc_dR
+   from defectpl.io.vasp import calc_dR
    from defectpl.defectpl import Photoluminescence
 
    # 1. Parse ground/excited state geometry and Phonopy coordinates
@@ -154,7 +154,7 @@ excitation constraint.
 
 .. code:: python
 
-   from defectpl.vasp_wrapper import prepare_dF_files
+   from defectpl.io.vasp import prepare_dF_files
    from defectpl.defectpl import Photoluminescence
    from defectpl.phonon import read_band_yaml
 

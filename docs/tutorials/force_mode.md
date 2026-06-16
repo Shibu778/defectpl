@@ -51,7 +51,7 @@ defectpl pl force \
 
 ```python
 from defectpl.phonon import read_band_yaml
-from defectpl.vasp_wrapper import prepare_dF_files
+from defectpl.io.vasp import prepare_dF_files
 from defectpl.defectpl import Photoluminescence
 from monty.serialization import dumpfn
 

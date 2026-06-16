@@ -7,7 +7,7 @@ from pathlib import Path
 from defectpl.defectpl import Photoluminescence
 from defectpl.phonon import read_band_yaml
 from defectpl.utils import extract_important_properties
-from defectpl.vasp_wrapper import calc_dR, prepare_dF_files
+from defectpl.io.vasp import calc_dR, prepare_dF_files
 from monty.serialization import dumpfn
 from pymatgen.core import Structure
 

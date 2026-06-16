@@ -36,7 +36,7 @@ from defectpl.ks_analysis import (
     extract_ksplot_data,
     plot_spin_resolved_levels,
 )
-from defectpl.vasp import get_spin_multiplicity, read_eigenval_file
+from defectpl.io.vasp import get_spin_multiplicity, read_eigenval_file
 
 
 class TestKohnShamAnalysis(unittest.TestCase):
