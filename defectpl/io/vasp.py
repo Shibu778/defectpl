@@ -277,7 +277,11 @@ def get_structures_and_forces(
                     for i in range(natoms):
                         data = next(iterator).split()
                         coords[i] = [float(data[0]), float(data[1]), float(data[2])]
-                        step_forces[i] = [float(data[3]), float(data[4]), float(data[5])]
+                        step_forces[i] = [
+                            float(data[3]),
+                            float(data[4]),
+                            float(data[5]),
+                        ]
 
                     struct = Structure(
                         lattice=current_lattice,
@@ -391,7 +395,9 @@ def calc_dR(
     lattice = struct_gs.lattice
     dR = np.vstack(
         [
-            pbc_shortest_vectors(lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i])
+            pbc_shortest_vectors(
+                lattice, struct_gs.frac_coords[i], struct_es.frac_coords[i]
+            )
             for i in range(n)
         ]
     ).reshape(n, 3)
@@ -445,7 +451,9 @@ def get_q_from_structure(
     masses = np.array([site.specie.atomic_mass for site in ground], dtype=float)
     lattice = ground.lattice
 
-    dr_excited_raw = pbc_shortest_vectors(lattice, ground.frac_coords, excited.frac_coords)
+    dr_excited_raw = pbc_shortest_vectors(
+        lattice, ground.frac_coords, excited.frac_coords
+    )
     dr_excited_raw = np.reshape(dr_excited_raw, (len(ground), 3))
 
     total_dQ = float(np.sqrt(np.sum(masses * np.sum(dr_excited_raw**2, axis=1))))
