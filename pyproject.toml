@@ -31,7 +31,7 @@ pyyaml = "^6.0.2"
 numpy = "^2.1.2"
 click = "^8.1.7"
 matplotlib = "^3.8.0"
-plotly = "^5.18.0"
+plotly = ">=5.18.0"
 monty = "^2026.5.18"
 pymatgen-core = { version = "^2026.5.18", optional = true }
 pymatgen = { version = "^2026.5.4", optional = true }
