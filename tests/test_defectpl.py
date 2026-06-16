@@ -104,17 +104,18 @@ class TestPhotoluminescence(unittest.TestCase):
         self.assertIn("intensity", d)
         self.assertIn("HR_factor", d)
 
-        mock_utils.calc_Spectrum_Intensity.reset_mock()
+        mock_utils.calc_qks.reset_mock()
 
-        # 1. Test standard from_dict
+        # 1. Test standard from_dict: loads pre-computed qks/Sks from dict, skips calc_qks
         restored_fast = Photoluminescence.from_dict(d)
         self.assertIsInstance(restored_fast, Photoluminescence)
-        mock_utils.calc_Spectrum_Intensity.assert_not_called()
+        mock_utils.calc_qks.assert_not_called()
 
-        # 2. Test from_dict_expensive
+        # 2. Test from_dict_expensive: recomputes everything from scratch via __post_init__
+        mock_utils.calc_qks.reset_mock()
         restored_expensive = Photoluminescence.from_dict_expensive(d)
         self.assertIsInstance(restored_expensive, Photoluminescence)
-        mock_utils.calc_Spectrum_Intensity.assert_called_once()
+        mock_utils.calc_qks.assert_called_once()
 
     @patch("defectpl.defectpl.Plotter")
     @patch("defectpl.defectpl.utils", autospec=True)

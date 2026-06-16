@@ -263,3 +263,164 @@ defectpl ksplot ./EIGENVAL \
 * `--cbm`: Calculated energy value of the Conduction Band Minimum in eV *(Required)*.
 * `--espan`: Energy canvas buffer padding depth evaluated above and below the band edges in eV *(Default: `1.0`)*.
 * `--kidx`: Sequence array index tracking target k-point coordinates *(Default: `0`)*.
+
+---
+
+## 10. `pr` — Participation Ratio
+
+The `pr` group computes electronic-state **P-ratio** and **IPR** from VASP PROCAR data, and provides utilities to generate all prerequisite JSON files without pydefect.
+
+```bash
+defectpl pr --help
+```
+
+### A. Generate `defect_entry.json` (`defectpl pr make-entry`)
+
+```bash
+# Manual (provide centre directly)
+defectpl pr make-entry --name Va_O1_2 --center 0.5,0.5,0.5
+
+# Auto-detect vacancy from perfect vs defect structure
+defectpl pr make-entry \
+    --name    Va_O1_2 \
+    --perfect ../perfect/POSCAR \
+    --defect  CONTCAR
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--name`, `-n` | *(required)* | Defect label, e.g. `Va_O1_2`. |
+| `--center`, `-c` | — | Fractional coordinates as `x,y,z`. |
+| `--perfect`, `-P` | — | Perfect supercell POSCAR for auto-detection. |
+| `--defect`, `-D` | — | Defect supercell POSCAR for auto-detection. |
+| `--site-tol` | `0.5` | Site-matching tolerance in Å. |
+| `--out`, `-o` | `defect_entry.json` | Output path. |
+
+### B. Generate `defect_structure_info.json` (`defectpl pr make-dsi`)
+
+```bash
+defectpl pr make-dsi \
+    --poscar CONTCAR \
+    --center 0.5,0.5,0.5 \
+    --cutoff 3.5
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--poscar`, `-p` | *(required)* | POSCAR/CONTCAR of the defect supercell. |
+| `--center`, `-c` | *(required)* | Fractional coordinates of the defect centre. |
+| `--cutoff`, `-r` | `3.5` | Neighbour search radius in Å. |
+| `--out`, `-o` | `defect_structure_info.json` | Output path. |
+
+### C. Run the P-ratio calculation (`defectpl pr calc`)
+
+```bash
+# Minimal (auto-detect all file paths in current directory)
+defectpl pr calc
+
+# Explicit paths
+defectpl pr calc \
+    --procar  Va_O1_2/PROCAR \
+    --entry   Va_O1_2/defect_entry.json \
+    --dsi     Va_O1_2/defect_structure_info.json \
+    --out     Va_O1_2/
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--procar`, `-p` | `PROCAR` | VASP PROCAR file. Needs `LORBIT=11` or `12`. |
+| `--entry`, `-e` | `defect_entry.json` | Path to defect_entry.json. |
+| `--dsi`, `-s` | auto-detect | Path to defect_structure_info.json. |
+| `--poscar` | auto-detect | POSCAR/CONTCAR for distance-based fallback. |
+| `--cutoff`, `-c` | `3.5` | Neighbour cut-off radius in Å (fallback only). |
+| `--out`, `-o` | `.` | Output directory. |
+| `--top` | `15` | Number of most-localised states to print. |
+| `--no-csv` | off | Skip writing the flat CSV file. |
+| `--native-procar` | off | Use built-in parser instead of pymatgen's. |
+
+### D. Batch processing (`defectpl pr batch`)
+
+```bash
+defectpl pr batch --dir defects/Va_O1/ --cutoff 4.0
+```
+
+Walks all immediate subdirectories of `--dir`, runs `pr calc` in each one
+that contains `PROCAR` + `defect_entry.json`, and writes a combined CSV.
+
+### E. Inspect results (`defectpl pr summary` / `defectpl pr top`)
+
+```bash
+# Pretty-print summary table
+defectpl pr summary Va_O1_2/participation_ratio.json --top 20
+
+# List top-5 most localised states by IPR
+defectpl pr top Va_O1_2/participation_ratio.json --n 5 --metric ipr
+```
+
+### F. Scatter plot (`defectpl pr plot`)
+
+Plot P-ratio or IPR against **energy** (default) or **band index**.
+
+```bash
+# P-ratio vs energy (default)
+defectpl pr plot Va_O1_2/participation_ratio.json
+
+# P-ratio vs band index
+defectpl pr plot Va_O1_2/participation_ratio.json --xaxis band
+
+# IPR vs energy with gap markers and energy window
+defectpl pr plot Va_O1_2/participation_ratio.json \
+    --metric ipr --xaxis energy \
+    --vbm 5.20 --cbm 8.10 \
+    --emin 4.0 --emax 9.5 \
+    --threshold 0.05 --out ipr.pdf
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `JSON_FILE` | `participation_ratio.json` | Input results file. |
+| `--xaxis`, `-x` | `energy` | X-axis: `energy` (eV) or `band` (index). |
+| `--metric`, `-m` | `p_ratio` | Y-axis quantity: `p_ratio` or `ipr`. |
+| `--threshold`, `-t` | `0.2` | Dashed horizontal threshold line. |
+| `--vbm` | — | VBM energy in eV — orange dotted vertical line (energy mode). |
+| `--cbm` | — | CBM energy in eV — green dotted vertical line (energy mode). |
+| `--emin` | — | Lower energy filter (eV). |
+| `--emax` | — | Upper energy filter (eV). |
+| `--kpt` | `0` | 0-based k-point index. |
+| `--out`, `-o` | auto | Output image (default: `pr_energy.png` or `pr_band.png`). |
+| `--title` | defect name | Plot title. |
+
+Filled markers = occupied (occ ≥ 0.5); open = empty.
+Spin channels: blue = spin ↑, red = spin ↓.
+
+### G. KS level diagram with P-ratio colour code (`defectpl pr ksplot`)
+
+Renders the standard Kohn-Sham level diagram where each horizontal bar
+is coloured by the P-ratio or IPR of that state (instead of plain black).
+A colorbar is added on the right.
+
+```bash
+defectpl pr ksplot \
+    --eigenval EIGENVAL \
+    --pr-json  Va_O1_2/participation_ratio.json \
+    --vbm 5.20 --cbm 8.10 \
+    --espan 1.5 \
+    --metric p_ratio \
+    --cmap RdYlGn_r \
+    --out ks_pr_plot.png
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--eigenval`, `-e` | `EIGENVAL` | VASP EIGENVAL file. |
+| `--pr-json` | `participation_ratio.json` | PR results from `pr calc`. |
+| `--vbm` | *(required)* | Valence Band Maximum energy (eV). |
+| `--cbm` | *(required)* | Conduction Band Minimum energy (eV). |
+| `--espan` | `1.0` | Energy padding above/below VBM/CBM (eV). |
+| `--metric`, `-m` | `p_ratio` | Colour-coding metric: `p_ratio` or `ipr`. |
+| `--cmap` | `RdYlGn_r` | Matplotlib colormap (green = delocalized, red = localized). |
+| `--vmin` | `0.0` | Colormap lower bound. |
+| `--vmax` | `1.0` | Colormap upper bound. |
+| `--kidx` | `0` | 0-based k-point index. |
+| `--out`, `-o` | `ks_pr_plot.png` | Output image file. |
+| `--title` | defect name | Plot title. |

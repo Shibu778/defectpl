@@ -1,61 +1,96 @@
-# Installation Guide
+# Installation
 
-This page covers the different methods available to install **DefectPL**, depending on your workflow requirements.
+## Prerequisites
 
----
-
-## 📋 Prerequisites
-
-Before installing, ensure your environment meets the following requirements:
-- **Python:** version 3.9 or higher (fully optimized for Python 3.12+)
-- **Core Dependencies:** `numpy`, `scipy`, `matplotlib`, `pymatgen`, `monty`, and `pyyaml` (these will be automatically configured during installation)
+- Python 3.10 or later
+- A working VASP installation is **not** required to run DefectPL — only to produce the input files
+  it reads.
 
 ---
 
-## 🚀 Installation Options
+## Install from PyPI
 
-### Option 1: Via PyPI (Recommended for standard users)
-The easiest way to install the stable release of DefectPL is directly from the Python Package Index using `pip`:
+### Core only (no DFT parser)
 
 ```bash
 pip install defectpl
-
 ```
 
-### Option 2: Via Conda / Anaconda
+Provides pure-math utilities, the native PROCAR parser, constants, and CLI commands that do not
+depend on pymatgen or phonopy.
 
-If you use Anaconda or a localized conda environment architecture, you can pull the pre-compiled package from the `conda-forge` channel:
+### With VASP file support
 
 ```bash
-conda install conda-forge::defectpl
-
+pip install "defectpl[vasp]"
 ```
 
-### Option 3: From GitHub Source (Recommended for developers)
+Adds pymatgen for reading POSCAR, CONTCAR, OUTCAR, EIGENVAL, and vasprun.xml files.
 
-If you want to contribute to the package, inspect the code, or work with the latest development branches, clone the repository directly and execute an editable installation:
+### With phonon support
 
 ```bash
-# Clone the repository
-git clone [https://github.com/Shibu778/defectpl.git](https://github.com/Shibu778/defectpl.git)
+pip install "defectpl[phonon]"
+```
 
-# Move into the root directory tracking setup files
+Adds phonopy for computing force constants and phonon band structures.
+
+### Full install (recommended)
+
+```bash
+pip install "defectpl[all]"
+```
+
+Equivalent to `defectpl[vasp,phonon]`.
+
+---
+
+## Install from conda-forge
+
+```bash
+conda install -c conda-forge defectpl
+```
+
+The conda package bundles all optional dependencies.
+
+---
+
+## Install from source
+
+```bash
+git clone https://github.com/Shibu778/defectpl.git
 cd defectpl
+pip install -e ".[all]"
+```
 
-# Install in editable/development mode
-pip install -e .
+The `-e` flag installs in editable mode so local changes take effect immediately without
+reinstalling.
 
+---
+
+## Verify the installation
+
+```bash
+defectpl --help
+python -c "import defectpl; print(defectpl.__version__)"
 ```
 
 ---
 
-## Verification
+## Optional extras summary
 
-To verify that the installation was successful and the package pathways are accessible globally, open a terminal window or environment shell and run:
+| Extra | Additional packages | When you need it |
+|-------|---------------------|-----------------|
+| `vasp` | pymatgen, pymatgen-core | Reading VASP output files |
+| `phonon` | phonopy | Phonon force constants, band.yaml |
+| `all` | pymatgen, pymatgen-core, phonopy | Full VASP workflow |
+
+---
+
+## Build the documentation locally
 
 ```bash
-python -c "import defectpl; print(defectpl.__version__)"
-
+pip install -r docs/requirements.txt
+mkdocs serve          # live-preview at http://127.0.0.1:8000
+mkdocs build          # static HTML in site/
 ```
-
-If it prints the package version number without throwing an `ImportError`, your development suite is completely ready to run photoluminescence calculations.

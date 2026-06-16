@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "defectpl"
-version = "0.2.1"
+version = "0.3.0"
 description = "A unified package for optical properties of point defects."
 authors = ["Shibu Meher <shibumeher@iisc.ac.in>"]
 readme = "README.md"
@@ -29,12 +29,18 @@ classifiers = [
 python = "^3.10"
 pyyaml = "^6.0.2"
 numpy = "^2.1.2"
-pymatgen-core = "^2026.5.18"
-pymatgen = "^2026.5.4"
 click = "^8.1.7"
-phonopy = "^2.35.0"
 matplotlib = "^3.8.0"
+plotly = "^5.18.0"
 monty = "^2026.5.18"
+pymatgen-core = { version = "^2026.5.18", optional = true }
+pymatgen = { version = "^2026.5.4", optional = true }
+phonopy = { version = "^2.35.0", optional = true }
+
+[tool.poetry.extras]
+vasp = ["pymatgen", "pymatgen-core"]
+phonon = ["phonopy"]
+all = ["pymatgen", "pymatgen-core", "phonopy"]
 
 [tool.poetry.group.dev.dependencies]
 pdoc3 = "^0.11.1"

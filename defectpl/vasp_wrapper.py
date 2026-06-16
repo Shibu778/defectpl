@@ -32,10 +32,27 @@ def generate_ccd_calculations(
     excited_template_dir: Union[str, Path],
 ) -> None:
     """
-    Generate linear interpolation structure configuration spaces for automated VASP execution parameters.
+    Generate interpolated VASP calculation directories along the configuration coordinate.
 
-    This splits out structure interpolation and replicates input profiles (INCAR, POTCAR, KPOINTS)
-    from template directories for each step.
+    Wraps :meth:`~defectpl.defectpl.ConfigurationCoordinateDiagram.setup_calculations`.
+    For each displacement step, creates a subdirectory containing an interpolated
+    POSCAR and copies INCAR, POTCAR, KPOINTS from the appropriate template directory.
+
+    Parameters
+    ----------
+    gs_structure : pymatgen.core.Structure
+        Ground-state equilibrium geometry.
+    es_structure : pymatgen.core.Structure
+        Excited-state equilibrium geometry.
+    displacements : list of float
+        Fractional displacements along the ground→excited path (0 = ground, 1 = excited).
+    output_dir : str or Path
+        Root output directory; ``ground/`` and ``excited/`` sub-trees are created here.
+    ground_template_dir : str or Path
+        Directory containing template VASP input files (INCAR, POTCAR, KPOINTS) for
+        ground-state calculations.
+    excited_template_dir : str or Path
+        Directory containing template VASP input files for excited-state calculations.
     """
     from defectpl.defectpl import ConfigurationCoordinateDiagram
 
@@ -59,8 +76,29 @@ def analyze_ccd_framework(
     save_plot: Union[str, Path] = None,
 ) -> Tuple[float, float]:
     """
-    Fit calculated Potential Energy Surfaces data arrays, extract well parameters,
-    and report vertical transition metrics.
+    Fit harmonic PES wells and report effective phonon frequencies.
+
+    Wraps :meth:`~defectpl.defectpl.ConfigurationCoordinateDiagram.analyze_ccd`.
+
+    Parameters
+    ----------
+    gs_structure : pymatgen.core.Structure
+        Ground-state equilibrium geometry.
+    es_structure : pymatgen.core.Structure
+        Excited-state equilibrium geometry.
+    ground_vaspruns : list of str or Path
+        ``vasprun.xml`` files for the ground-state PES images.
+    excited_vaspruns : list of str or Path
+        ``vasprun.xml`` files for the excited-state PES images.
+    dE : float, optional
+        Rigid energy offset applied to the excited-state PES in eV.  Default 0.
+    save_plot : str or Path, optional
+        If given, save the CCD figure here instead of showing it interactively.
+
+    Returns
+    -------
+    (omega_ground, omega_excited) : tuple of float
+        Fitted effective phonon frequencies in eV for the two parabolic wells.
     """
     from defectpl.defectpl import ConfigurationCoordinateDiagram
 
@@ -209,6 +247,33 @@ def run_pl_calc_vasp_displacement_mode(
     plot_all,
     fig_format,
 ):
+    """
+    Run a displacement-mode PL calculation from VASP CONTCAR and band.yaml inputs.
+
+    Parameters
+    ----------
+    band_yaml : str or Path
+        Phonopy band.yaml file containing Γ-point phonon data.
+    contcar_gs : str or Path
+        CONTCAR (or POSCAR) for the ground-state equilibrium geometry.
+    contcar_es : str or Path
+        CONTCAR (or POSCAR) for the excited-state equilibrium geometry.
+    out_dir : str or Path
+        Directory where output figures are written.
+    ezpl : float
+        Zero-phonon line energy in eV.
+    gamma : float
+        ZPL Lorentzian broadening in meV.
+    plot_all : bool
+        If True, call :meth:`~defectpl.defectpl.Photoluminescence.generate_plots`.
+    fig_format : str
+        Figure file format (e.g. ``"pdf"``, ``"png"``).
+
+    Raises
+    ------
+    RuntimeError
+        If any step in the calculation pipeline fails.
+    """
     try:
         from defectpl.defectpl import Photoluminescence
 
@@ -323,6 +388,37 @@ def run_pl_calc_vasp_force_mode(
     plot_all,
     fig_format,
 ):
+    """
+    Run a force-mode PL calculation from VASP OUTCAR and band.yaml inputs.
+
+    The force difference dF = F(excited state) − F(ground state) at the same
+    geometry is extracted from the two OUTCAR files and used to project onto
+    the phonon eigenvectors.
+
+    Parameters
+    ----------
+    band_yaml : str or Path
+        Phonopy band.yaml file containing Γ-point phonon data.
+    outcar_gs : str or Path
+        OUTCAR from the ground-state static calculation.
+    outcar_es : str or Path
+        OUTCAR from the excited-state (same geometry) calculation.
+    out_dir : str or Path
+        Directory where output figures are written.
+    ezpl : float
+        Zero-phonon line energy in eV.
+    gamma : float
+        ZPL Lorentzian broadening in meV.
+    plot_all : bool
+        If True, call :meth:`~defectpl.defectpl.Photoluminescence.generate_plots`.
+    fig_format : str
+        Figure file format (e.g. ``"pdf"``, ``"png"``).
+
+    Raises
+    ------
+    RuntimeError
+        If any step in the calculation pipeline fails.
+    """
     try:
         from defectpl.defectpl import Photoluminescence
 
@@ -364,21 +460,24 @@ def calc_dR(
     constcar_gs: Union[Structure, str, Path], contcar_es: Union[Structure, str, Path]
 ) -> np.ndarray:
     """
-    Calculates the shortest periodic boundary condition (PBC) safe displacement
-    vectors between the ground state and excited state structures.
+    Compute PBC-safe Cartesian displacement vectors ΔR = R(excited) − R(ground).
 
-    Parameters:
-    ===========
+    Parameters
+    ----------
     constcar_gs : Structure, str, or Path
-        Ground state equilibrium configuration (Structure object or file path).
+        Ground-state equilibrium geometry (pymatgen Structure or file path).
     contcar_es : Structure, str, or Path
-        Excited state equilibrium configuration (Structure object or file path).
+        Excited-state equilibrium geometry (pymatgen Structure or file path).
 
-    Returns:
-    =================
-    dR : np.ndarray
-        2D array of shape (n_atoms, 3) detailing Cartesian displacements
-        (Excited - Ground) in Å.
+    Returns
+    -------
+    np.ndarray, shape (natoms, 3)
+        Cartesian displacement vectors in **Å** using the minimum-image convention.
+
+    Raises
+    ------
+    ValueError
+        If the two structures have different numbers of atoms.
     """
     # Normalize both inputs to pymatgen Structure objects
     struct_gs = _to_structure(constcar_gs)

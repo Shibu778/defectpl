@@ -1,0 +1,137 @@
+name: Publish to PyPI
+
+# Triggered by pushing a version tag: git tag v0.3.0 && git push origin v0.3.0
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"        # matches v0.2.1, v1.0.0, etc.
+      - "v[0-9]+.[0-9]+.[0-9]+.post[0-9]+"  # post-releases
+      - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"     # release candidates
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. Run the full test suite before touching PyPI
+  # ──────────────────────────────────────────────────────────────────────────
+  test:
+    name: Pre-release tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package and test deps
+        run: pip install ".[all]" pytest
+
+      - name: Run tests
+        run: pytest tests/ -q --tb=short
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. Build distribution artefacts
+  # ──────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build wheel & sdist
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install build twine
+
+      - name: Build
+        run: python -m build
+
+      - name: Check distributions
+        run: twine check dist/*
+
+      - name: Upload artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 3. Publish to PyPI using OIDC trusted publishing (no API token needed)
+  #
+  # One-time setup in PyPI:
+  #   pypi.org → Project defectpl → Publishing → Add publisher
+  #   Provider: GitHub   Owner: Shibu778   Repo: defectpl
+  #   Workflow: publish.yml   Environment: release
+  # ──────────────────────────────────────────────────────────────────────────
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: build
+    environment: release          # matches the PyPI trusted-publisher environment name
+    permissions:
+      id-token: write             # required for OIDC
+
+    steps:
+      - name: Download artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # No username/password/token needed — OIDC handles authentication
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 4. Create a GitHub Release with the wheel and sdist attached
+  # ──────────────────────────────────────────────────────────────────────────
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: publish-pypi
+    permissions:
+      contents: write             # required to create releases
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog section for this release
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # Pull the section between "## [VERSION]" and the next "## [" heading
+          awk "/^## \[$VERSION\]/{found=1; next} found && /^## \[/{exit} found{print}" \
+            docs/changelog.md > release_notes.md
+          # Fall back to a minimal note if nothing was extracted
+          if [[ ! -s release_notes.md ]]; then
+            echo "See [CHANGELOG](https://Shibu778.github.io/defectpl/changelog/) for details." \
+              > release_notes.md
+          fi
+          echo "notes_file=release_notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "DefectPL ${{ steps.version.outputs.VERSION }}"
+          body_path: ${{ steps.changelog.outputs.notes_file }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'rc') }}
+          files: |
+            dist/*.whl
+            dist/*.tar.gz

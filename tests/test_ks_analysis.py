@@ -126,7 +126,7 @@ class TestKohnShamAnalysis(unittest.TestCase):
         self.assertEqual(get_spin_multiplicity(homo_up_idx=4, homo_down_idx=3), 2.0)
         self.assertEqual(get_spin_multiplicity(homo_up_idx=5, homo_down_idx=3), 3.0)
 
-    @patch("defectpl.ks_analysis.Eigenval")
+    @patch("pymatgen.io.vasp.outputs.Eigenval")
     def test_read_eigenval_file_mocked(self, mock_eigenval_class):
         """Verifies parsing routing and key injection structures using mock inputs."""
         mock_instance = MagicMock()
@@ -158,7 +158,7 @@ class TestKohnShamAnalysis(unittest.TestCase):
 
     def test_read_eigenval_file_non_spin_polarized_raises(self):
         """Confirms system abort instances throw errors if calculations are not spin-polarized."""
-        with patch("defectpl.ks_analysis.Eigenval") as mock_eigenval_class:
+        with patch("pymatgen.io.vasp.outputs.Eigenval") as mock_eigenval_class:
             mock_instance = MagicMock()
             mock_instance.ispin = 1
             mock_eigenval_class.return_value = mock_instance
