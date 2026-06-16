@@ -653,3 +653,179 @@ def plot_spin_resolved_levels(
         return None
 
     return target_ax
+
+
+def _lookup_pr_values(
+    pr_result: dict,
+    band_indices: List[int],
+    spin_label: str,
+    metric: str,
+    kpt_idx: int = 0,
+) -> List[float]:
+    """
+    Look up metric values from *pr_result* for a list of 0-based band indices.
+
+    Returns NaN for any band that is not found in the result.
+    """
+    kpt_label  = f"kpt_{kpt_idx + 1}"
+    spin_block = pr_result.get("data", {}).get(spin_label, {})
+    band_block = spin_block.get(kpt_label, {})
+    out = []
+    for bi in band_indices:
+        key = f"band_{bi + 1}"
+        val = band_block.get(key, {}).get(metric)
+        out.append(float(val) if val is not None else float("nan"))
+    return out
+
+
+def plot_ks_with_pr(
+    ks_data: KohnShamPlotData,
+    pr_result: dict,
+    metric: str = "p_ratio",
+    cmap: str = "RdYlGn_r",
+    vmin: float = 0.0,
+    vmax: float = 1.0,
+    threshold: Optional[float] = None,
+    kpt_idx: int = 0,
+    title: Optional[str] = None,
+    output_filename: Union[str, Path] = "ks_pr_plot.png",
+    figsize: Tuple[float, float] = (7, 6),
+    dpi: int = 300,
+    style_file: Optional[str] = None,
+) -> None:
+    """
+    Plot Kohn-Sham energy levels colour-coded by participation ratio (P-ratio or IPR).
+
+    The layout follows :func:`plot_spin_resolved_levels` (spin-up on the left,
+    spin-down on the right with a dividing vertical dashed line) but each
+    horizontal level bar is coloured by the *metric* value fetched from
+    *pr_result* instead of being drawn in uniform black.
+
+    Parameters
+    ----------
+    ks_data : KohnShamPlotData
+        Processed eigenvalue data container (from :func:`extract_ksplot_data`).
+    pr_result : dict
+        Nested participation-ratio result dict (loaded from
+        ``participation_ratio.json`` or returned by
+        :func:`compute_participation_ratios`).
+    metric : {"p_ratio", "ipr"}
+        The localization metric used for coloring.  Default ``"p_ratio"``.
+    cmap : str
+        Matplotlib colormap name.  Default ``"RdYlGn_r"`` (green = low, red = high).
+    vmin : float
+        Colormap lower bound.  Default 0.0.
+    vmax : float
+        Colormap upper bound.  Default 1.0.
+    threshold : float, optional
+        If provided, draw a horizontal dashed line at this metric value to
+        guide the eye — only meaningful when a dual-axis view is used.
+        (Currently the colour already encodes the metric, so this is optional.)
+    kpt_idx : int
+        0-based k-point index to use when looking up PR values.  Default 0.
+    title : str, optional
+        Figure title.  Defaults to the defect name stored in *pr_result*.
+    output_filename : str or Path
+        Destination file path.  Default ``"ks_pr_plot.png"``.
+    figsize : tuple of float
+        Figure size (width, height) in inches.
+    dpi : int
+        Image resolution.
+    style_file : str, optional
+        Optional matplotlib ``.mplstyle`` file path.
+
+    Returns
+    -------
+    None
+        Saves the figure to *output_filename*.
+    """
+    if style_file and os.path.exists(style_file):
+        plt.style.use(style_file)
+
+    import matplotlib.cm as cm
+    import matplotlib.colors as mcolors
+
+    norm       = mcolors.Normalize(vmin=vmin, vmax=vmax)
+    import matplotlib as _mpl
+    try:
+        colormap = _mpl.colormaps[cmap]
+    except AttributeError:
+        colormap = cm.get_cmap(cmap)  # matplotlib < 3.5 fallback
+    scalar_map = cm.ScalarMappable(norm=norm, cmap=colormap)
+    scalar_map.set_array([])
+
+    defect_name = pr_result.get("defect_name", "defect")
+
+    # ── figure layout ─────────────────────────────────────────────────────────
+    fig, target_ax = plt.subplots(figsize=figsize)
+
+    target_ax.set_xlim(-ks_data.lim, ks_data.lim)
+    target_ax.set_ylim(ks_data.emin, ks_data.emax)
+    target_ax.axvline(0, color="black", linestyle="--", alpha=0.5)
+
+    vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.35}
+    target_ax.axhspan(ks_data.emin, ks_data.vbm,
+                      color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
+    target_ax.axhspan(ks_data.cbm, ks_data.emax,
+                      color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
+
+    s = ks_data.w * 200 * (figsize[0] / 6.0)
+
+    # ── spin-up (left, spin_1) ────────────────────────────────────────────────
+    up_pr = _lookup_pr_values(
+        pr_result, ks_data.up_idx, "spin_1", metric, kpt_idx=kpt_idx
+    )
+    up_colors = [
+        scalar_map.to_rgba(v) if not (v != v) else "lightgray"   # NaN → gray
+        for v in up_pr
+    ]
+    target_ax.scatter(
+        ks_data.xvalues_up, ks_data.up_energies,
+        c=up_colors, marker="_", s=s, zorder=3, linewidths=2,
+    )
+
+    # ── spin-down (right, spin_2) ─────────────────────────────────────────────
+    spin2_label = "spin_2" if "spin_2" in pr_result.get("data", {}) else "spin_1"
+    down_pr = _lookup_pr_values(
+        pr_result, ks_data.down_idx, spin2_label, metric, kpt_idx=kpt_idx
+    )
+    down_colors = [
+        scalar_map.to_rgba(v) if not (v != v) else "lightgray"
+        for v in down_pr
+    ]
+    target_ax.scatter(
+        ks_data.xvalues_down, ks_data.down_energies,
+        c=down_colors, marker="_", s=s, zorder=3, linewidths=2,
+    )
+
+    # ── occupation markers ────────────────────────────────────────────────────
+    em = s / 25.0
+    for xv, en, occ in zip(ks_data.xvalues_up, ks_data.up_energies,
+                            ks_data.up_occupations):
+        mk = "o" if occ > 0.6 else "x"
+        target_ax.scatter([xv], [en], color="k", marker=mk, s=em, zorder=4)
+    for xv, en, occ in zip(ks_data.xvalues_down, ks_data.down_energies,
+                            ks_data.down_occupations):
+        mk = "o" if occ > 0.6 else "x"
+        target_ax.scatter([xv], [en], color="k", marker=mk, s=em, zorder=4)
+
+    # ── labels & colorbar ─────────────────────────────────────────────────────
+    metric_label = {"p_ratio": "P-ratio", "ipr": "IPR"}.get(metric, metric)
+    cbar = fig.colorbar(scalar_map, ax=target_ax, pad=0.02, fraction=0.04)
+    cbar.set_label(metric_label, fontsize=9)
+
+    target_ax.set_ylabel("Energy (eV)")
+    target_ax.set_xticks([])
+    target_ax.set_xticklabels([])
+
+    # Spin-channel labels below x-axis
+    target_ax.text(-ks_data.lim / 2, ks_data.emin, "spin ↑",
+                   ha="center", va="bottom", fontsize=8, color="gray")
+    target_ax.text( ks_data.lim / 2, ks_data.emin, "spin ↓",
+                   ha="center", va="bottom", fontsize=8, color="gray")
+
+    target_ax.set_title(title or defect_name)
+
+    fig.tight_layout()
+    fig.savefig(Path(output_filename), dpi=dpi, bbox_inches="tight")
+    plt.close(fig)

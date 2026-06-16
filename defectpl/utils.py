@@ -519,6 +519,44 @@ def calculate_overlap_element(
     return ix
 
 
+def calc_delta_Q(struct1, struct2) -> float:
+    """
+    Calculate the mass-weighted configuration coordinate displacement delta Q between two structures.
+
+    Parameters
+    ----------
+    struct1 : pymatgen.core.Structure
+        Initial reference equilibrium configuration.
+    struct2 : pymatgen.core.Structure
+        Final reference equilibrium configuration.
+
+    Returns
+    -------
+    float
+        Mass-weighted structural displacement delta Q in amu^(1/2) * Å.
+
+    Raises
+    ------
+    ValueError
+        If structures have unequal numbers of atoms.
+    """
+    if len(struct1) != len(struct2):
+        raise ValueError("Structures must have the same number of atoms.")
+
+    from pymatgen.util.coord import pbc_shortest_vectors
+
+    masses = np.array([site.specie.atomic_mass for site in struct1.sites])
+    lattice = struct1.lattice
+    n = len(struct1)
+    dR = np.vstack(
+        [
+            pbc_shortest_vectors(lattice, struct1.frac_coords[i], struct2.frac_coords[i])
+            for i in range(n)
+        ]
+    ).reshape(n, 3)
+    return calc_delQ(masses, dR)
+
+
 def extract_important_properties(
     pl_engine, filename: str = "important_properties.txt"
 ) -> None:

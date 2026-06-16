@@ -12,12 +12,24 @@ import numpy as np
 import yaml
 
 from monty.json import MSONable
-from phonopy import Phonopy
-from phonopy.file_IO import parse_FORCE_CONSTANTS, parse_FORCE_SETS
-from phonopy.interface.vasp import create_FORCE_CONSTANTS, read_vasp
 
 # Import energy rescaling metric conversion factors from constants
 from defectpl.constants import THZ2EV
+
+# phonopy is a declared dependency but may not be present in all environments.
+# All phonopy symbols are imported lazily inside the functions that need them so
+# that the rest of this module (GammaPhononData, read_band_yaml, etc.) works
+# without it.
+def _require_phonopy(fn_name: str = "") -> None:
+    """Raise a clear error when phonopy is missing."""
+    try:
+        import phonopy  # noqa: F401
+    except ImportError as exc:
+        msg = "phonopy is required for phonon calculations"
+        if fn_name:
+            msg += f" (needed by '{fn_name}')"
+        msg += ".  Install with:  pip install phonopy"
+        raise ImportError(msg) from exc
 
 
 class GammaPhononData(MSONable):
@@ -28,8 +40,8 @@ class GammaPhononData(MSONable):
     ----------
     frequencies : list of float
         Vibrational mode frequencies at the Gamma point, rescaled to eV.
-    eigenvectors : list of list of float
-        Real-component displacement eigenvectors matrix of shape (nmodes, natoms * 3).
+    eigenvectors : list of list of list of float
+        Real-component displacement eigenvectors of shape (nmodes, natoms, 3).
     masses : list of float
         Atomic masses per active crystal species site coordinate.
     natoms : int
@@ -102,6 +114,8 @@ def create_force_constants_from_vasprun(
     int
         0 on execution success, 1 on execution failure.
     """
+    _require_phonopy("create_force_constants_from_vasprun")
+    from phonopy.interface.vasp import create_FORCE_CONSTANTS
     return create_FORCE_CONSTANTS(str(vasprun_filename), is_hdf5, log_level)
 
 
@@ -138,6 +152,11 @@ def calculate_phonon_symmetries(
     is_little_cogroup : bool, default False
         Determines group representation parsing parameters.
     """
+    _require_phonopy("calculate_phonon_symmetries")
+    from phonopy import Phonopy
+    from phonopy.file_IO import parse_FORCE_CONSTANTS, parse_FORCE_SETS
+    from phonopy.interface.vasp import read_vasp
+
     if isinstance(dimension, str):
         dim = np.array([int(x) for x in dimension.split()])
     else:
@@ -191,6 +210,11 @@ def calculate_gamma_phonon_to_band_yaml(
     output_filename : str or pathlib.Path, default "band.yaml"
         Destination filename target for generating the Phonopy track output data file.
     """
+    _require_phonopy("calculate_gamma_phonon_to_band_yaml")
+    from phonopy import Phonopy
+    from phonopy.file_IO import parse_FORCE_CONSTANTS
+    from phonopy.interface.vasp import read_vasp
+
     if isinstance(dimension, str):
         dim = np.array([int(x) for x in dimension.split()])
     else:
@@ -227,7 +251,7 @@ def read_band_yaml(
     frequencies : numpy.ndarray
         A flat array of all parsed vibrational mode frequencies, rescaled to eV.
     eigenvectors : numpy.ndarray
-        Flattened real displacement vector matrix of shape (nmodes, natoms * 3).
+        Real displacement eigenvectors of shape (nmodes, natoms, 3).
     masses : numpy.ndarray
         Array containing mass metrics for each ion matching index layout configurations.
     """

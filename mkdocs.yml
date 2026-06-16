@@ -7,6 +7,7 @@ nav:
   - "Installation": installation.md
   - "Usage": usage.md
   - "Command Line Interface": command_line_interface.md
+  - "Participation Ratio": participation_ratio.md
   - "Plots Gallery": plots_gallery.md
   - "Tutorials": tutorials.md
   # - "Theory": theory.md

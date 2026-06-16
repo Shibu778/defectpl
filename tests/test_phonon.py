@@ -116,11 +116,11 @@ def test_read_band_yaml():
     assert freqs[1] == pytest.approx(3.5 * THZ2EV)
     assert freqs[5] == pytest.approx(8.8 * THZ2EV)
 
-    # 2. Flattened Matrix check: shape must be (nmodes, natoms * 3) -> (6, 2 * 3) = (6, 6)
-    assert evecs.shape == (6, 6)
+    # 2. Shape check: (nmodes, natoms, 3) — 3D form required by calc_qks / calc_IPR
+    assert evecs.shape == (6, 2, 3)
 
-    # Mode 4 specific layout validation: [0.5, 0, 0, -0.5, 0, 0]
-    np.testing.assert_allclose(evecs[3], [0.5, 0.0, 0.0, -0.5, 0.0, 0.0], atol=1e-5)
+    # Mode 4 specific layout validation: atom0=[0.5,0,0], atom1=[-0.5,0,0]
+    np.testing.assert_allclose(evecs[3], [[0.5, 0.0, 0.0], [-0.5, 0.0, 0.0]], atol=1e-5)
 
     # 3. Masses check
     assert len(masses) == 2
@@ -141,8 +141,8 @@ def test_extract_gamma_phonon_data():
     assert isinstance(phonon_data.frequencies, list)
     assert isinstance(phonon_data.eigenvectors, list)
 
-    # Check that nested vectors are flat (length 6)
-    assert len(phonon_data.eigenvectors[0]) == 6
+    # Each mode's eigenvectors: list of natoms (2) atom vectors
+    assert len(phonon_data.eigenvectors[0]) == 2
     assert phonon_data.meta_info["source_file"] == str(MOCK_BAND_YAML_PATH)
 
 
