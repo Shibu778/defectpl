@@ -1,0 +1,102 @@
+/* ─────────────────────────────────────────────────────────
+   DefectPL custom stylesheet
+   ───────────────────────────────────────────────────────── */
+
+/* Slightly larger base font for body text */
+.md-typeset {
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+
+/* Make equation blocks stand out slightly */
+.arithmatex {
+  overflow-x: auto;
+  padding: 0.4em 0;
+}
+
+/* API reference: mono font for parameter names */
+.doc-heading code,
+.doc-label code {
+  font-size: 0.85em;
+}
+
+/* Admonition title padding */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 4px;
+}
+
+/* Hero section on landing page */
+.hero {
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.hero p {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  max-width: 620px;
+  margin: 0 auto 1.6rem;
+}
+
+/* Badge row */
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Logo variants per color scheme
+   ───────────────────────────────────────────────────────── */
+
+/* In light mode: color mark in sidebar, hide white mark */
+.logo-white  { display: none; }
+.logo-color  { display: inline; }
+
+/* In dark mode: white mark in sidebar, hide color mark */
+[data-md-color-scheme="slate"] .logo-color { display: none; }
+[data-md-color-scheme="slate"] .logo-white { display: inline; }
+
+/* Landing page hero logo */
+.hero-logo {
+  display: block;
+  margin: 0 auto 1.8rem;
+  max-width: 420px;
+  width: 80%;
+}
+
+/* In dark mode swap to the reverse (white) horizontal logo */
+.hero-logo-light { display: block; }
+.hero-logo-dark  { display: none;  }
+
+[data-md-color-scheme="slate"] .hero-logo-light { display: none;  }
+[data-md-color-scheme="slate"] .hero-logo-dark  { display: block; }
+
+/* Feature grid on landing page */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+.feature-card {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 6px;
+  padding: 1.1rem 1.2rem;
+}
+.feature-card h3 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+.feature-card p {
+  margin-bottom: 0;
+  font-size: 0.82rem;
+  opacity: 0.85;
+}

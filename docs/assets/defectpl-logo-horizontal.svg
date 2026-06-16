@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 240">
+  <defs>
+    <radialGradient id="glow_h" cx="50%" cy="46%" r="55%">
+      <stop offset="0%" stop-color="#FFEAF6"></stop><stop offset="20%" stop-color="#FF6FB5"></stop>
+      <stop offset="54%" stop-color="#9B45F0"></stop><stop offset="100%" stop-color="#5B5BF5"></stop>
+    </radialGradient>
+    <linearGradient id="ring_h" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5B5BF5"></stop><stop offset="50%" stop-color="#9B45F0"></stop><stop offset="100%" stop-color="#E0479E"></stop>
+    </linearGradient>
+    <radialGradient id="halo_h" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#9B45F0" stop-opacity="0.20"></stop><stop offset="100%" stop-color="#9B45F0" stop-opacity="0"></stop>
+    </radialGradient></defs>
+  <g>
+  <circle cx="120" cy="120" r="64" fill="url(#halo_h)"></circle>
+  <g stroke="#C7CCD8" stroke-width="5" stroke-linecap="round"><line x1="186" y1="120" x2="208" y2="120"></line><line x1="153" y1="177.16" x2="164" y2="196.21"></line><line x1="87" y1="177.16" x2="76" y2="196.21"></line><line x1="54" y1="120" x2="32" y2="120"></line><line x1="87" y1="62.84" x2="76" y2="43.79"></line><line x1="153" y1="62.84" x2="164" y2="43.79"></line></g>
+  <g fill="#C7CCD8"><circle cx="208" cy="120" r="5"></circle><circle cx="164" cy="196.21" r="5"></circle><circle cx="76" cy="196.21" r="5"></circle><circle cx="32" cy="120" r="5"></circle><circle cx="76" cy="43.79" r="5"></circle><circle cx="164" cy="43.79" r="5"></circle></g>
+  <polygon points="186,120 153,177.16 87,177.16 54,120 87,62.84 153,62.84" fill="none" stroke="#0E1116" stroke-width="6" stroke-linejoin="round"></polygon>
+  <g fill="#0E1116"><circle cx="186" cy="120" r="11"></circle><circle cx="153" cy="177.16" r="11"></circle><circle cx="87" cy="177.16" r="11"></circle><circle cx="54" cy="120" r="11"></circle><circle cx="87" cy="62.84" r="11"></circle><circle cx="153" cy="62.84" r="11"></circle></g>
+  <circle cx="120" cy="120" r="50" fill="none" stroke="url(#ring_h)" stroke-width="2.5" opacity="0.32"></circle>
+  <circle cx="120" cy="120" r="34" fill="none" stroke="url(#ring_h)" stroke-width="3" opacity="0.6"></circle>
+  <circle cx="120" cy="120" r="15.5" fill="url(#glow_h)"></circle></g>
+  <text x="290" y="120" font-family="&#39;Space Grotesk&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="104" font-weight="600" letter-spacing="-3" dominant-baseline="central" fill="#0E1116">DefectPL</text>
+</svg>

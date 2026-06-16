@@ -1,25 +1,187 @@
-site_name: defectpl
-site_url: https://github.com/Shibu778/defectpl
+site_name: DefectPL
+site_url: https://Shibu778.github.io/defectpl/
+site_description: >-
+  First-principles photoluminescence lineshapes, electron-phonon coupling, and
+  electronic-state localization for point defects in semiconductors and insulators.
+site_author: Shibu Meher
 
+repo_name: Shibu778/defectpl
+repo_url: https://github.com/Shibu778/defectpl
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2024 Shibu Meher
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Theme — Material for MkDocs (free, open-source)
+# Install:  pip install mkdocs-material
+# ──────────────────────────────────────────────────────────────────────────────
+theme:
+  name: material
+  language: en
+  logo: assets/defectpl-mark-color.svg      # sidebar / header icon
+  favicon: assets/defectpl-appicon.svg      # browser tab
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant        # Single-page app feel
+    - navigation.instant.prefetch
+    - navigation.tracking       # Anchor tracking in URL
+    - navigation.tabs           # Top-level tabs
+    - navigation.tabs.sticky    # Tabs stay visible on scroll
+    - navigation.sections       # Grouped sidebar
+    - navigation.expand         # Expand sidebar groups
+    - navigation.top            # Back-to-top button
+    - navigation.footer         # Prev/Next at page bottom
+    - toc.follow                # TOC follows scroll
+    - toc.integrate             # TOC inline in sidebar
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.annotate     # Code block annotations
+    - content.code.copy         # Copy button on code blocks
+    - content.tabs.link         # Linked content tabs
+    - content.tooltips
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Navigation
+# ──────────────────────────────────────────────────────────────────────────────
 nav:
-  - "Home": index.md
-  - "Getting Started": getting_started.md
-  - "Installation": installation.md
-  - "Usage": usage.md
-  - "Command Line Interface": command_line_interface.md
-  - "Participation Ratio": participation_ratio.md
-  - "Plots Gallery": plots_gallery.md
-  - "Tutorials": tutorials.md
-  # - "Theory": theory.md
-  # - "Benchmark": benchmark.md
-  - "API Reference": api_reference.md
+  - Home: index.md
+  - Getting Started:
+      - Installation: installation.md
+      - Quick Start: getting_started.md
+  - Theory:
+      - Overview: theory/index.md
+      - Photoluminescence Lineshape: theory/photoluminescence.md
+      - Phonon Calculations: theory/phonons.md
+      - Configuration Coordinate Diagram: theory/configuration_coordinate.md
+      - Electronic State Localization: theory/participation_ratio.md
+  - Tutorials:
+      - Overview: tutorials/index.md
+      - PL Spectrum — Displacement Mode: tutorials/displacement_mode.md
+      - PL Spectrum — Force Mode: tutorials/force_mode.md
+      - Participation Ratio: tutorials/participation_ratio.md
+      - 1D Analytical Lineshape: tutorials/1d_lineshape.md
+  - API Reference:
+      - Overview: api/index.md
+      - Photoluminescence: api/photoluminescence.md
+      - Phonon: api/phonon.md
+      - Utilities: api/utils.md
+      - Participation Ratio: api/participation_ratio.md
+      - KS Analysis: api/ks_analysis.md
+      - Plotting: api/plot.md
+      - VASP I/O: api/vasp.md
+      - Defect Utilities: api/defect_utils.md
+      - Constants: api/constants.md
+      - CLI Reference: command_line_interface.md
+  - Contributing:
+      - Developer Guide: contributing.md
+      - Changelog: changelog.md
 
-theme: readthedocs
+# ──────────────────────────────────────────────────────────────────────────────
+# Plugins
+# Install:  pip install mkdocstrings[python] mkdocs-gen-files
+# ──────────────────────────────────────────────────────────────────────────────
+plugins:
+  - search:
+      lang: en
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            members_order: source
+            separate_signature: true
+            unwrap_annotated: true
+            merge_init_into_class: true
+            docstring_section_style: table
+            show_if_no_docstring: false
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Markdown extensions
+# ──────────────────────────────────────────────────────────────────────────────
 markdown_extensions:
+  # Math rendering via MathJax
   - pymdownx.arithmatex:
       generic: true
 
+  # Code blocks
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+  # Content tabs (Python / CLI side-by-side)
+  - pymdownx.tabbed:
+      alternate_style: true
+
+  # Admonitions (note, warning, tip …)
+  - admonition
+  - pymdownx.details
+
+  # Smart symbols and emoji
+  - pymdownx.smartsymbols
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+  # Misc
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Extra JavaScript & CSS
+# ──────────────────────────────────────────────────────────────────────────────
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Social / extra metadata
+# ──────────────────────────────────────────────────────────────────────────────
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Shibu778/defectpl
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/defectpl/
+  version:
+    provider: mike           # optional: versioned docs with `mike`

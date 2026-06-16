@@ -37,7 +37,39 @@ else:
 
 
 class Plotter:
-    """Handles static publication-quality matplotlib figures."""
+    """
+    Publication-quality static figure generator for DefectPL outputs.
+
+    Each method produces a single matplotlib figure and either displays it
+    interactively (``plot=True``) or saves it at 600 dpi to *out_dir*
+    (``plot=False``, the default used by :meth:`~defectpl.defectpl.Photoluminescence.generate_plots`).
+
+    All energy inputs follow the internal convention of **eV**; axis labels
+    are converted to meV where appropriate for readability.
+
+    Methods
+    -------
+    plot_penergy_vs_pmode
+        Phonon energy vs mode index (dispersionless Γ-point spectrum).
+    plot_ipr_vs_penergy
+        Phonon IPR vs phonon energy.
+    plot_loc_rat_vs_penergy
+        Localization ratio β_k = N·IPR_k vs phonon energy.
+    plot_qk_vs_penergy
+        Mode-projected displacement q_k vs phonon energy.
+    plot_HR_factor_vs_penergy
+        Partial Huang–Rhys factors S_k vs phonon energy.
+    plot_S_omega_vs_penergy
+        Continuous spectral density S(ω) vs phonon energy.
+    plot_S_omega_Sks_vs_penergy
+        S(ω) and S_k overlaid on dual y-axes.
+    plot_S_omega_Sks_Loc_rat_vs_penergy
+        S(ω) + S_k scatter coloured by localization ratio.
+    plot_S_omega_Sks_ipr_vs_penergy
+        S(ω) + S_k scatter coloured by IPR.
+    plot_intensity_vs_penergy
+        Normalised PL intensity spectrum vs photon energy.
+    """
 
     def __init__(self):
         pass
@@ -50,7 +82,7 @@ class Plotter:
         fig_format: str,
         plot: bool,
     ):
-        """Internal helper to streamline image exportation or execution visualization."""
+        """Save figure to *out_dir*/<file_name>.<fmt> at 600 dpi, or show interactively."""
         if plot:
             plt.show()
             plt.close(fig)
@@ -74,7 +106,24 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots phonon energy vs phonon mode index."""
+        """
+        Plot phonon energy (meV) vs mode index.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        plot : bool, optional
+            Show interactively instead of saving.  Default False.
+        out_dir : str or Path, optional
+            Output directory.  Default ``"./"``
+        file_name : str, optional
+            Base file name (no extension).  Default ``"penergy_vs_pmode"``.
+        fig_format : str, optional
+            ``"pdf"``, ``"png"``, ``"svg"``, or ``"jpg"``.  Default ``"pdf"``.
+        figsize : tuple of float, optional
+            Figure size in inches.  Default ``(3.3, 2.5)``.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         freq_mev = np.array(frequencies) * 1000.0
         mode_idx = np.arange(1, len(freq_mev) + 1)
@@ -95,7 +144,20 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots Inverse Participation Ratio (IPR) vs phonon energy."""
+        """
+        Scatter plot of phonon IPR vs phonon energy (meV).
+
+        IPR = Σp²/(Σp)² ranges from 1/N (fully delocalized) to 1 (fully localized).
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        iprs : numpy.ndarray, shape (nmodes,)
+            Inverse participation ratios per mode.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         freq_mev = np.array(frequencies) * 1000.0
 
@@ -115,7 +177,20 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots Mode Localization Ratio vs phonon energy."""
+        """
+        Scatter plot of localization ratio β_k = N·IPR_k vs phonon energy (meV).
+
+        β = 1 means perfectly delocalized; β = N means fully localized on one atom.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        localization_ratio : numpy.ndarray, shape (nmodes,)
+            Localization ratio per mode.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         freq_mev = np.array(frequencies) * 1000.0
 
@@ -135,7 +210,18 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots configurational vibrational mode displacement (q_k) vs phonon energy."""
+        """
+        Scatter plot of mode-projected displacement q_k vs phonon energy (meV).
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        qks : numpy.ndarray, shape (nmodes,)
+            Mode configurational displacements in amu^(1/2)·Å.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         freq_mev = np.array(frequencies) * 1000.0
 
@@ -155,7 +241,18 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots partial mode Huang-Rhys factors (S_k) vs phonon energy."""
+        """
+        Scatter plot of partial Huang–Rhys factors S_k vs phonon energy (meV).
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        Sks : numpy.ndarray, shape (nmodes,)
+            Partial (mode-resolved) Huang–Rhys factors.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         freq_mev = np.array(frequencies) * 1000.0
 
@@ -177,7 +274,25 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots continuous Huang-Rhys spectral density S(omega) distribution."""
+        """
+        Line plot of the continuous Huang–Rhys spectral density S(ω) in 1/meV vs energy (meV).
+
+        S(ω) is the phonon sideband weight per unit energy; its integral equals
+        the total Huang–Rhys factor S.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV** (used to set x-axis upper limit).
+        S_omega : array-like, shape (n_grid,)
+            Spectral density in **eV^(-1)**.
+        omega_range : list [ω_min, ω_max, n_points]
+            Energy grid parameters in **eV** matching the S(ω) array.
+        max_freq : float, optional
+            Upper frequency cut-off for the plot in **eV**.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
 
@@ -207,7 +322,20 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.5, 2.5),
     ):
-        """Plots continuous S(omega) and partial mode S_k factors overlaid using dual axes."""
+        """
+        Dual-axis plot of S(ω) (left axis) and partial S_k scatter (right axis).
+
+        Parameters
+        ----------
+        frequencies, S_omega, omega_range
+            See :meth:`plot_S_omega_vs_penergy`.
+        Sks : numpy.ndarray, shape (nmodes,)
+            Partial Huang–Rhys factors.
+        max_freq : float, optional
+            Upper frequency cut-off in **eV**.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax1 = plt.subplots(figsize=figsize)
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
 
@@ -250,7 +378,27 @@ class Plotter:
         figsize: Tuple[float, float] = (4.2, 2.5),
         cmap: str = "viridis",
     ):
-        """Plots S(omega) curve and scattered partial S_k points color-mapped by Localization Ratio."""
+        """
+        S(ω) line + S_k scatter coloured by localization ratio β_k.
+
+        Identifies phonon modes that simultaneously carry large HR weight *and*
+        are localized near the defect.
+
+        Parameters
+        ----------
+        frequencies, S_omega, omega_range
+            See :meth:`plot_S_omega_vs_penergy`.
+        Sks : numpy.ndarray, shape (nmodes,)
+            Partial Huang–Rhys factors (right y-axis).
+        localization_ratio : numpy.ndarray, shape (nmodes,)
+            Colour-code values β_k = N·IPR_k.
+        pylim : list of [float or None, float or None], optional
+            ``[ymin, ymax]`` for the right (S_k) axis.
+        cmap : str, optional
+            Matplotlib colormap name.  Default ``"viridis"``.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         # FIX: Explicitly set layout="constrained" to cleanly handle twinx + colorbar spacing
         fig, ax1 = plt.subplots(figsize=figsize, layout="constrained")
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
@@ -303,7 +451,22 @@ class Plotter:
         figsize: Tuple[float, float] = (4.2, 2.5),
         cmap: str = "viridis",
     ):
-        """Plots S(omega) curve and scattered partial S_k points color-mapped by IPR values."""
+        """
+        S(ω) line + S_k scatter coloured by phonon IPR.
+
+        Parameters
+        ----------
+        frequencies, S_omega, omega_range
+            See :meth:`plot_S_omega_vs_penergy`.
+        Sks : numpy.ndarray, shape (nmodes,)
+            Partial Huang–Rhys factors (right y-axis).
+        iprs : numpy.ndarray, shape (nmodes,)
+            Phonon inverse participation ratios used as colour code.
+        cmap : str, optional
+            Matplotlib colormap name.  Default ``"viridis"``.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         # FIX: Explicitly set layout="constrained" to cleanly handle twinx + colorbar spacing
         fig, ax1 = plt.subplots(figsize=figsize, layout="constrained")
         omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
@@ -351,7 +514,25 @@ class Plotter:
         fig_format: str = "pdf",
         figsize: Tuple[float, float] = (3.3, 2.5),
     ):
-        """Plots normalized photoluminescence intensity against emission energy."""
+        """
+        Line plot of the normalised PL intensity spectrum vs photon energy (eV).
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray
+            Phonon frequencies in eV (unused directly; kept for API consistency).
+        I : numpy.ndarray
+            Complex or real intensity array from :func:`~defectpl.utils.calc_Spectrum_Intensity`.
+            Absolute value is taken and the result is normalised to its maximum.
+        resolution : int
+            Number of grid points per eV; sets the energy-axis scale.
+        xlim : tuple of float
+            ``(x_min, x_max)`` for the photon energy axis in eV.
+        iylim : tuple of float, optional
+            ``(y_min, y_max)`` for the intensity axis.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
         fig, ax = plt.subplots(figsize=figsize)
 
         x_energy_ev = np.arange(len(I)) / float(resolution)
@@ -376,7 +557,19 @@ class Plotter:
 
 
 def plot_interactive_intensity(filename: Union[str, Path]):
-    """Loads a Photoluminescence file and generates an interactive HTML Plotly line plot."""
+    """
+    Open an interactive Plotly PL intensity spectrum from a serialised Photoluminescence JSON.
+
+    Parameters
+    ----------
+    filename : str or Path
+        Path to a JSON file written by :meth:`~defectpl.defectpl.Photoluminescence.as_dict`.
+
+    Raises
+    ------
+    TypeError
+        If the file does not contain a :class:`~defectpl.defectpl.Photoluminescence` object.
+    """
     from defectpl.defectpl import (
         Photoluminescence,
     )  # Runtime lazy-import safeguards execution
@@ -410,7 +603,23 @@ def plot_interactive_intensity(filename: Union[str, Path]):
 
 
 def plot_interactive_S_omega_Sks_Loc_rat_vs_penergy(filename: Union[str, Path]):
-    """Loads a Photoluminescence file and generates a multi-axis interactive visual framework."""
+    """
+    Open an interactive Plotly figure showing S(ω), S_k, and localization ratio.
+
+    Loads a serialised :class:`~defectpl.defectpl.Photoluminescence` object and
+    renders a dual-y-axis Plotly figure with S(ω) as a line and S_k
+    as a scatter coloured by the localization ratio.
+
+    Parameters
+    ----------
+    filename : str or Path
+        Path to the serialised Photoluminescence JSON.
+
+    Raises
+    ------
+    TypeError
+        If the file does not contain a valid Photoluminescence object.
+    """
     from defectpl.defectpl import Photoluminescence
 
     pl = loadfn(str(filename))
@@ -479,7 +688,31 @@ def comparepl(
     fig_format: str = "pdf",
     figsize: Tuple[float, float] = (3.3, 2.5),
 ):
-    """Loads multiple Photoluminescence data frames to plot comparative isotope pathways."""
+    """
+    Overlay normalised PL spectra from multiple Photoluminescence JSON files.
+
+    Useful for comparing spectra computed with different isotope masses,
+    temperatures, or structural parameters.
+
+    Parameters
+    ----------
+    properties_files : list of str or Path
+        Paths to serialised Photoluminescence JSON files.
+    xlim : tuple of float, optional
+        ``(x_min, x_max)`` for the photon energy axis in eV.
+    ylim : tuple of float, optional
+        ``(y_min, y_max)`` for the intensity axis.
+    legends : list of str, optional
+        Legend labels for each spectrum.  Defaults to ``"Composition 1"``, etc.
+    out_dir : str or Path, optional
+        If given, save the figure there instead of showing interactively.
+    colors : list of str, optional
+        Matplotlib color strings for each spectrum.
+    fig_format : str, optional
+        Output format.  Default ``"pdf"``.
+    figsize : tuple of float, optional
+        Figure size in inches.  Default ``(3.3, 2.5)``.
+    """
     from defectpl.defectpl import Photoluminescence
 
     pl_runs = [loadfn(str(f)) for f in properties_files]

@@ -9,41 +9,61 @@ from pathlib import Path
 from typing import List, Tuple, Union
 import numpy as np
 
-from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J, HBAR_JS
+from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J
 
 
 def calc_delR(dR: np.ndarray) -> float:
     """
-    Calculate the global norm of coordinate differences.
+    Compute the unweighted Cartesian displacement norm ΔR.
 
     Parameters
     ----------
     dR : np.ndarray
-        Array containing displacement vectors.
+        Atomic displacement matrix, shape ``(natoms, 3)``, in Å.
 
     Returns
     -------
     float
-        The root-sum-squared global structural displacement.
+        :math:`\\Delta R = \\sqrt{\\sum_{a,i} \\Delta R_{a,i}^2}` in Å.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> calc_delR(np.array([[1.0, 2.0, -2.0], [0.0, 0.0, 0.0]]))
+    3.0
     """
     return float(np.sqrt(np.sum(dR**2)))
 
 
 def calc_delQ(masses: np.ndarray, dR: np.ndarray) -> float:
     """
-    Calculate the mass-weighted generalized configuration coordinate displacement delta Q.
+    Compute the mass-weighted configuration coordinate difference ΔQ.
 
     Parameters
     ----------
     masses : np.ndarray
-        Array of atomic masses.
+        Atomic masses in AMU, shape ``(natoms,)``.
     dR : np.ndarray
-        Array containing displacement vectors for each site.
+        Atomic displacement matrix in Å, shape ``(natoms, 3)``.
 
     Returns
     -------
     float
-        The mass-weighted configuration coordinate displacement.
+        :math:`\\Delta Q = \\sqrt{\\sum_a m_a |\\Delta\\mathbf{R}_a|^2}` in
+        :math:`\\sqrt{\\text{amu}} \\cdot \\text{Å}`.
+
+    Notes
+    -----
+    The closure relation :math:`\\Delta Q^2 = \\sum_k q_k^2` holds when the
+    phonon eigenvectors span the full displacement space.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> masses = np.array([12.011, 15.999])
+    >>> dR = np.array([[0.1, 0.0, 0.0], [0.0, 0.2, 0.0]])
+    >>> calc_delQ(masses, dR)  # sqrt(12.011*0.01 + 15.999*0.04)
+    0.8289...
     """
     return float(np.sqrt(np.sum(masses * np.sum(dR**2, axis=1))))
 
@@ -269,19 +289,33 @@ def calc_qks_force_vectorized(
 
 def calc_Sks(qks: np.ndarray, frequencies: np.ndarray) -> np.ndarray:
     """
-    Calculate partial Huang-Rhys (HR) factors for each phonon normal mode k.
+    Compute partial Huang–Rhys factors for each Gamma-point phonon mode.
 
     Parameters
     ----------
     qks : np.ndarray
-        Normal mode projection coordinates array.
+        Mode-projected configuration coordinates in SI units (kg^(1/2)·m),
+        shape ``(nmodes,)``.  Obtained from :func:`calc_qks` or
+        :func:`calc_qks_force_mode`.
     frequencies : np.ndarray
-        Phonon frequencies array.
+        Phonon mode energies in eV, shape ``(nmodes,)``.
 
     Returns
     -------
     np.ndarray
-        The calculated partial Huang-Rhys factors per mode.
+        Partial Huang–Rhys factors :math:`S_k`, dimensionless, shape ``(nmodes,)``.
+
+    Notes
+    -----
+    The partial HR factor is [Alkauskas 2014a, Eq. 4]:
+
+    .. math::
+
+        S_k = \\frac{\\omega_k q_k^2}{2\\hbar}
+
+    where :math:`q_k` is in SI units (kg^(1/2)·m) and :math:`\\omega_k`
+    is converted from eV via :math:`\\omega_k = E_k / \\hbar`.
+    The total HR factor is :math:`S = \\sum_k S_k`.
     """
     return frequencies * qks**2 / (2 * HBAR_JS * HBAR_EVS)
 
@@ -290,21 +324,24 @@ def gaussian_broadening(
     omega: Union[float, np.ndarray], omega_k: Union[float, np.ndarray], sigma: float
 ) -> Union[float, np.ndarray]:
     """
-    Evaluate a standard normalized Gaussian profile for spectral broadening.
+    Evaluate a normalized Gaussian centred at *omega_k* with width *sigma*.
+
+    Used by :func:`calc_S_omega` to replace each discrete delta-function
+    mode contribution with a Gaussian of unit area.
 
     Parameters
     ----------
     omega : float or np.ndarray
-        Energy sampling points axis grid.
+        Evaluation energy in eV (can be a grid).
     omega_k : float or np.ndarray
-        Central resonance energy peaks grid positions.
+        Centre energy in eV (phonon mode frequency or broadcast array).
     sigma : float
-        Standard deviation width parameter managing Gaussian attenuation.
+        Standard deviation (broadening width) in eV.
 
     Returns
     -------
     float or np.ndarray
-        The evaluated intensity of the Gaussian curve profile.
+        Gaussian value(s) at *omega* in eV^{-1}.
     """
     return (1.0 / (sigma * np.sqrt(2.0 * np.pi))) * np.exp(
         -0.5 * ((omega - omega_k) / sigma) ** 2
@@ -318,23 +355,36 @@ def calc_S_omega(
     sigma: float = 6e-3,
 ) -> np.ndarray:
     """
-    Compute the continuous Huang-Rhys spectral density function S(omega) using broadening.
+    Compute the continuous electron–phonon spectral density function S(ω).
+
+    Each discrete mode contribution :math:`S_k \\delta(\\omega - \\omega_k)` is
+    replaced by a normalized Gaussian of width *sigma*, giving:
+
+    .. math::
+
+        S(\\omega) = \\sum_k S_k \\, g(\\omega - \\omega_k, \\sigma)
 
     Parameters
     ----------
     frequencies : np.ndarray
-        Phonon normal mode frequencies array.
+        Phonon mode energies in eV, shape ``(nmodes,)``.
     Sks : np.ndarray
-        Partial Huang-Rhys factors array.
+        Partial Huang–Rhys factors, shape ``(nmodes,)``.
     omega_range : list of float
-        Grid array generation specification boundary parameters: [start, stop, num_points].
+        Energy grid specification ``[start, stop, npoints]`` in eV.
     sigma : float, default 6e-3
-        Gaussian broadening standard deviation mapping width.
+        Gaussian broadening width in eV.  The default 6 meV is suitable for
+        defect calculations; increase for broad sidebands.
 
     Returns
     -------
     np.ndarray
-        The continuous spectral density array function evaluated over the energy grid.
+        Spectral density :math:`S(\\omega)` evaluated on the energy grid,
+        shape ``(npoints,)``.
+
+    See Also
+    --------
+    calc_St : Transforms S(ω) to the time domain via inverse FFT.
     """
     omega = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
     S_omega = np.zeros_like(omega)
@@ -345,35 +395,60 @@ def calc_S_omega(
 
 def calc_IPR(eigenvectors: np.ndarray) -> np.ndarray:
     """
-    Calculate the Inverse Participation Ratio (IPR) to evaluate localization of modes.
+    Calculate the site-projected Inverse Participation Ratio (IPR) for phonon modes.
+
+    For each normal mode i the per-atom weight is:
+
+        p_{i,a} = sum_{xyz} e_{i,a,xyz}^2
+
+    and the IPR is defined as:
+
+        IPR_i = sum_a p_{i,a}^2 / (sum_a p_{i,a})^2
+
+    Range: 1/N (fully delocalized over N atoms) to 1 (fully localized on one atom).
 
     Parameters
     ----------
     eigenvectors : np.ndarray
-        Phonon normal mode eigenvectors matrix.
+        Phonon normal mode eigenvectors, shape (nmodes, natoms, 3).
+        Works for both normalized (phonopy) and un-normalized eigenvectors.
 
     Returns
     -------
     np.ndarray
-        The inverse participation ratio array for each normal mode.
+        IPR value for each normal mode, shape (nmodes,).
     """
     participations = np.sum(eigenvectors * eigenvectors, axis=2)
-    return 1.0 / np.sum(participations**2, axis=1)
+    return np.sum(participations**2, axis=1) / np.sum(participations, axis=1) ** 2
 
 
 def calc_St(S_omega: np.ndarray) -> np.ndarray:
     """
-    Transform the spectral density function S(omega) to the time domain S(t) via inverse FFT.
+    Transform the electron–phonon spectral density S(ω) to the time domain S(t).
 
     Parameters
     ----------
     S_omega : np.ndarray
-        Continuous frequency-domain spectral density array.
+        Spectral density on a uniform energy grid, shape ``(npoints,)``.
 
     Returns
     -------
     np.ndarray
-        The corresponding complex-valued time domain array function S(t).
+        Complex-valued time-domain array :math:`S(t)`, shape ``(npoints,)``.
+
+    Notes
+    -----
+    Implements [Alkauskas 2014a, Eq. 9]:
+
+    .. math::
+
+        S(t) = \\int_0^\\infty S(\\hbar\\omega)\\, e^{-i\\omega t}\\, d(\\hbar\\omega)
+
+    via an inverse FFT with phase centering.
+
+    See Also
+    --------
+    calc_Gts : Constructs G(t) from S(t).
     """
     Sts = np.fft.ifft(S_omega)
     return 2.0 * np.pi * np.fft.ifftshift(Sts)
@@ -383,23 +458,34 @@ def calc_Gts(
     Sts: np.ndarray, total_HR: float, gamma: float, resolution: float
 ) -> np.ndarray:
     """
-    Compute the generating function G(t) tracking time-dependent correlations.
+    Compute the generating function G(t) from the time-domain spectral function.
 
     Parameters
     ----------
     Sts : np.ndarray
-        Time domain transformed array function tracker S(t).
+        Time-domain spectral function S(t), shape ``(npoints,)``.
     total_HR : float
-        Summed total global Huang-Rhys factor scalar component.
+        Total Huang–Rhys factor :math:`S = \\sum_k S_k` (dimensionless).
     gamma : float
-        Damping factor managing phenomenological electronic decay lifetime scaling.
+        ZPL broadening parameter in meV; applied as a Lorentzian decay
+        :math:`e^{-\\gamma|t|}` to reproduce finite ZPL linewidth.
     resolution : float
-        Sampling frequency or grid interval inverse step scaling ratio.
+        Spectral grid density in points per eV (``resolution = npoints / max_energy``).
 
     Returns
     -------
     np.ndarray
-        The resulting multi-mode generating function time array trajectory G(t).
+        Complex generating function :math:`G(t)`, shape ``(npoints,)``.
+
+    Notes
+    -----
+    Implements [Alkauskas 2014a, Eq. 8]:
+
+    .. math::
+
+        G(t) = e^{S(t) - S}\\, e^{-\\gamma|t|}
+
+    The Fourier transform of G(t) gives the optical spectral function A(ℏω).
     """
     l = len(Sts)
     t = (1.0 / resolution) * (np.arange(l) - l / 2)
@@ -410,23 +496,37 @@ def calc_Spectrum_Intensity(
     Gts: np.ndarray, EZPL: float, resolution: float
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Transform the generating function back to frequency space to get final line intensities.
+    Compute the optical spectral function A(ℏω) and PL intensity L(ℏω) from G(t).
 
     Parameters
     ----------
     Gts : np.ndarray
-        The time domain generating function array tracker G(t).
+        Complex generating function G(t), shape ``(npoints,)``.
     EZPL : float
-        Zero-phonon line transition energy value boundary scalar (eV).
+        Zero-phonon line energy in eV.  Used to shift the spectral axis so that
+        the ZPL appears at the correct absolute photon energy.
     resolution : float
-        Grid array frequency sampling accuracy ratio configuration.
+        Spectral grid density in points per eV (``npoints / max_energy``).
 
     Returns
     -------
-    luminescence_spectral_function : np.ndarray
-        Raw line shape density of states function array matrix (A).
-    luminescence_intensity : np.ndarray
-        Luminescence intensity array spectrum scaled by omega^3 energy modulation.
+    A : np.ndarray
+        Optical spectral function :math:`A(\\hbar\\omega)`, shape ``(npoints,)``.
+        Obtained as the FFT of G(t) with the ZPL shifted to *EZPL*.
+    intensity : np.ndarray
+        Normalized PL intensity :math:`L(\\hbar\\omega) \\propto \\omega^3 A(\\hbar\\omega)`,
+        shape ``(npoints,)``.
+
+    Notes
+    -----
+    Implements [Alkauskas 2014a, Eq. 7]:
+
+    .. math::
+
+        A(E_{\\text{ZPL}} - \\hbar\\omega) =
+        \\frac{1}{2\\pi} \\int_{-\\infty}^{\\infty} G(t)\\, e^{i\\omega t}\\, dt
+
+    The :math:`\\omega^3` prefactor originates from the photon density of states.
     """
     A = np.fft.fft(Gts)
     A1 = A.copy()
@@ -557,14 +657,79 @@ def calc_delta_Q(struct1, struct2) -> float:
     return calc_delQ(masses, dR)
 
 
+def get_omega_from_pes(
+    q_values: np.ndarray,
+    energies: np.ndarray,
+    ax=None,
+    eval_grid: np.ndarray = None,
+) -> float:
+    """
+    Fit a harmonic parabola E(Q) = ½·M·ω²·Q² to PES data points.
+
+    A second-order polynomial is fit to *(Q, E)* data.  The effective angular
+    frequency ω is extracted from the curvature coefficient and returned in
+    **eV** (as an effective phonon energy ℏω).
+
+    Parameters
+    ----------
+    q_values : np.ndarray
+        Configuration coordinate values Q in amu^(1/2)·Å.
+    energies : np.ndarray
+        Total energies (or energy differences) in eV, zero-referenced to the minimum.
+    ax : matplotlib.axes.Axes, optional
+        If provided, the fitted parabola is plotted on this axes object.
+    eval_grid : np.ndarray, optional
+        Q grid for plotting the fit curve.  Required when *ax* is given.
+
+    Returns
+    -------
+    float
+        Effective phonon energy ℏω in **eV** derived from the parabola curvature.
+
+    Notes
+    -----
+    The fit uses :func:`numpy.polyfit` (degree 2).  The curvature coefficient
+    a₂ (eV/amu·Å²) is related to the angular frequency by:
+
+    .. math::
+
+        \\hbar\\omega = \\sqrt{2 a_2 / M_{\\text{ref}}}
+
+    where an effective reference mass of 1 amu is assumed (since Q is already
+    mass-weighted).  The units are handled via the AMU2KG, ANG2M, and EV2J
+    conversion factors.
+    """
+    coeffs = np.polyfit(q_values, energies, 2)
+    a2 = coeffs[0]  # coefficient of Q^2 in eV / (amu^1/2 * Å)^2
+
+    # Convert curvature to SI: [eV / (amu * Å^2)] → [J / (kg * m^2)] = [rad^2/s^2]
+    a2_SI = a2 * EV2J / (AMU2KG * ANG2M**2)
+    omega_SI = np.sqrt(max(2.0 * a2_SI, 0.0))  # rad/s
+    omega_eV = omega_SI * HBAR_JS / EV2J
+
+    if ax is not None and eval_grid is not None:
+        poly_fn = np.poly1d(coeffs)
+        ax.plot(eval_grid, poly_fn(eval_grid), "--", lw=1)
+
+    return float(omega_eV)
+
+
 def extract_important_properties(
     pl_engine, filename: str = "important_properties.txt"
 ) -> None:
-    """Extracts single-value physical properties from a Photoluminescence engine
-    instance and formats them into a structured text file.
+    """
+    Write a structured summary of scalar PL properties to a text file.
 
-    Dynamically tracks the operational calculation mode (Force vs. Displacement)
-    and drops coordinate-based displacement scalars if evaluating a force mode run.
+    Extracts S, DW factor, ΔQ, ΔR, and configuration metadata from a
+    :class:`~defectpl.defectpl.Photoluminescence` instance.  Force-mode
+    runs omit ΔQ/ΔR since they are not directly computed in that mode.
+
+    Parameters
+    ----------
+    pl_engine : Photoluminescence
+        A fully computed Photoluminescence instance.
+    filename : str, optional
+        Output file path.  Default ``"important_properties.txt"``.
     """
     import numpy as np
 

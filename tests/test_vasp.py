@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from pymatgen.core import Structure
-from pymatgen.io.vasp.outputs import Outcar, Eigenval
+from pymatgen.io.vasp.outputs import Eigenval
 
 # ==============================================================================
 # CONFIGURATION / INPUT VARIABLES
@@ -208,10 +208,8 @@ def test_get_first_and_last_standalone():
     np.testing.assert_allclose(force_last[0], [0.001, 0.002, 0.003])
 
 
-def test_outcar_parser_class(monkeypatch):
-    """Tests structural features of the newly streamlined OutcarParser class."""
-    monkeypatch.setattr(Outcar, "__init__", lambda self, filename: None)
-
+def test_outcar_parser_class():
+    """Tests structural features of the OutcarParser class."""
     parser = OutcarParser(MOCK_OUTCAR_PATH)
     assert parser.natoms == 2
 

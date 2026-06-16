@@ -104,10 +104,23 @@ def test_calc_S_omega():
 
 
 def test_calc_IPR():
-    # Fully localized single vector entry mode check
+    # Fully localized on atom 0: IPR = 1
     eigenvectors = np.array([[[1.0, 0.0, 0.0], [0.0, 0.0, 0.0]]])
     ipr = calc_IPR(eigenvectors)
     assert ipr[0] == pytest.approx(1.0)
+
+    # Fully delocalized over 2 atoms (equal weight): IPR = 1/N = 0.5
+    # Each atom gets weight 0.5 in a normalized eigenvector.
+    w = np.sqrt(0.5)
+    eigenvectors_deloc = np.array([[[w, 0.0, 0.0], [w, 0.0, 0.0]]])
+    ipr_deloc = calc_IPR(eigenvectors_deloc)
+    assert ipr_deloc[0] == pytest.approx(0.5)
+
+    # Un-normalized eigenvectors: formula must not depend on overall scale.
+    # Scale the localized eigenvector by 3 — IPR must still be 1.
+    eigenvectors_scaled = np.array([[[3.0, 0.0, 0.0], [0.0, 0.0, 0.0]]])
+    ipr_scaled = calc_IPR(eigenvectors_scaled)
+    assert ipr_scaled[0] == pytest.approx(1.0)
 
 
 def test_time_domain_transforms():

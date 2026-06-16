@@ -1,0 +1,54 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "defectpl/**"     # API docstrings live here
+      - "pyproject.toml"
+  workflow_dispatch:       # allow manual trigger from the GitHub UI
+
+# Only one docs-deploy can run at a time; cancel any in-progress run
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: write          # mkdocs gh-deploy needs to push to gh-pages branch
+
+jobs:
+  deploy:
+    name: Build & deploy MkDocs site
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history; required if you add git-revision-date plugin later
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: docs-${{ runner.os }}-${{ hashFiles('docs/requirements.txt', 'pyproject.toml') }}
+          restore-keys: docs-${{ runner.os }}-
+
+      - name: Install package (API docs need it importable)
+        run: pip install ".[all]"
+
+      - name: Install MkDocs and plugins
+        run: pip install -r docs/requirements.txt
+
+      - name: Configure git identity for gh-deploy
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Build and deploy docs
+        run: mkdocs gh-deploy --force --clean --verbose

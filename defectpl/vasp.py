@@ -3,15 +3,12 @@
 Useful functions for working with VASP output files, such as OUTCAR, EIGENVAL, and vasprun.xml.
 """
 
+from __future__ import annotations
+
 from collections import deque
 from pathlib import Path
 from typing import Dict, List, Tuple, Union, Optional, Any
 import numpy as np
-
-from pymatgen.core import Structure
-from pymatgen.io.vasp import Outcar, Poscar
-from pymatgen.io.vasp.outputs import Eigenval
-from pymatgen.electronic_structure.core import Spin
 
 
 # =====================================================================
@@ -41,27 +38,44 @@ def get_spin_multiplicity(homo_up_idx: int, homo_down_idx: int) -> float:
 
 def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, Any]:
     """
-    Parse a VASP EIGENVAL file to extract spin-polarized eigenvalues at a k-point.
+    Parse a VASP EIGENVAL file and return spin-resolved eigenvalues at one k-point.
+
+    The EIGENVAL file must come from a spin-polarised (``ISPIN = 2``) calculation;
+    a ``ValueError`` is raised otherwise.
 
     Parameters
     ----------
     filename : str or pathlib.Path
-        The destination track file path addressing the target EIGENVAL parameter.
-    k_idx : int, default 0
-        The absolute sequential list entry index picking the desired k-point grid item.
+        Path to the VASP EIGENVAL file.
+    k_idx : int, optional
+        Zero-based k-point index to extract.  Default 0 (the Γ point for
+        single-k calculations).
 
     Returns
     -------
     dict
-        A data block payload containing keys mapping spin channels, index boundaries,
-        gaps, and calculation metrics.
+        Keys and types:
+
+        - ``"up"`` / ``"down"`` : list of [energy (eV), occupancy] pairs for
+          the spin-up and spin-down channels at the selected k-point.
+        - ``"homo_up_idx"`` / ``"homo_down_idx"`` : int — 0-based HOMO indices.
+        - ``"lumo_up_idx"`` / ``"lumo_down_idx"`` : int — 0-based LUMO indices.
+        - ``"homo_up"`` / ``"homo_down"`` : float — HOMO energies (eV).
+        - ``"lumo_up"`` / ``"lumo_down"`` : float — LUMO energies (eV).
+        - ``"hl_gap_up"`` / ``"hl_gap_down"`` : float — HOMO–LUMO gaps (eV).
+        - ``"nelect"`` : float — number of electrons.
+        - ``"nbands"`` : int — number of bands.
+        - ``"nkpt"`` : int — total number of k-points in the file.
+        - ``"selected_kpoint"`` : [k_idx, [kx, ky, kz]] — the k-point used.
+        - ``"spin_multiplicity"`` : float — 2S + 1.
 
     Raises
     ------
     ValueError
-        If the input calculation structure data shows it is not spin-polarized.
+        If ``ISPIN ≠ 2``.
     """
-    # Inline import to avoid hard cyclical dependencies during runtime initialization
+    from pymatgen.io.vasp.outputs import Eigenval
+    from pymatgen.electronic_structure.core import Spin
     from defectpl.ks_analysis import get_homo_lumo_idx
 
     data = {}
@@ -304,10 +318,13 @@ def get_structures_and_forces(
         If position indices are requested prior to matrix processing, or if
         the data stream terminates prematurely.
     """
+    from pymatgen.core import Structure
+
     outcar_path = Path(outcar_path)
     natoms = get_nions(outcar_path)
 
     if poscar_path:
+        from pymatgen.io.vasp import Poscar
         poscar_path = Path(poscar_path)
         if not poscar_path.is_file():
             raise FileNotFoundError(f"POSCAR reference file not found at {poscar_path}")
@@ -375,20 +392,40 @@ def get_structures_and_forces(
     return structures, forces
 
 
-class OutcarParser(Outcar):
+class OutcarParser:
     """
-    A subclass of pymatgen's Outcar class providing clean extended query utilities.
+    Lightweight parser for VASP OUTCAR files.
+
+    Provides structure, force, and convergence queries without any
+    pymatgen dependency at import time (pymatgen is loaded lazily inside
+    :meth:`get_structures_and_forces` when needed).
+
+    This class is a thin wrapper around the module-level functions
+    :func:`get_nions`, :func:`get_structures_and_forces`, and
+    :func:`check_outcar_convergence`.
 
     Parameters
     ----------
     filename : str or pathlib.Path
-        The path filename pointing to the targeting VASP OUTCAR run.
+        Path to the VASP OUTCAR file.
+
+    Attributes
+    ----------
+    filename_path : pathlib.Path
+        Resolved absolute path to the OUTCAR.
+    natoms : int
+        Number of ions in the supercell, read from OUTCAR on construction.
+
+    Examples
+    --------
+    >>> parser = OutcarParser("OUTCAR")
+    >>> conv = parser.check_convergence()
+    >>> print(conv["structural_converged"], conv["electronic_converged"])
+    >>> final_struct, final_forces = parser.get_final_structure_and_forces()
     """
 
     def __init__(self, filename: Union[str, Path]):
-        filename_str = str(Path(filename).resolve())
-        super().__init__(filename_str)
-        self.filename_path = Path(filename_str)
+        self.filename_path = Path(filename).resolve()
         self.natoms = self.get_natoms()
 
     def get_natoms(self) -> int:
