@@ -2,9 +2,9 @@
 r"""
 Physical constants and unit conversion factors for the defectpl package.
 
-References and underlying constant values align precisely with the CODATA 
-internationally recommended values. Derived parameters are calculated using 
-exact conversion formulas to maintain absolute mathematical consistency across 
+References and underlying constant values align precisely with the CODATA
+internationally recommended values. Derived parameters are calculated using
+exact conversion formulas to maintain absolute mathematical consistency across
 energy and mass spaces.
 
 Attributes
@@ -18,17 +18,17 @@ HBAR_JS : float
 HBAR_EVS : float
     The reduced Planck constant ($\hbar$) in Electron-volt-seconds (eV·s).
 THZ2EV : float
-    Conversion factor transforming frequency in Terahertz (THz) directly into 
+    Conversion factor transforming frequency in Terahertz (THz) directly into
     energy equivalents in Electron-volts (eV). Derived as $h \times 10^{12} / e$.
 AMU2KG : float
-    Conversion factor mapping Unified Atomic Mass Units (amu or Da) into 
+    Conversion factor mapping Unified Atomic Mass Units (amu or Da) into
     Kilograms (kg).
 ANG2M : float
     Conversion factor scaling length from Angstroms (Å) to Meters (m).
 EV2MEV : float
     Conversion factor scaling Electron-volts (eV) to Millielectron-volts (meV).
 EV2J : float
-    Conversion factor mapping Electron-volts (eV) into Joules (J). Identical 
+    Conversion factor mapping Electron-volts (eV) into Joules (J). Identical
     to the numeric scale of the elementary charge.
 """
 

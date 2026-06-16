@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests tracking execution routes across the defectpl CLI application layer, 
+Unit tests tracking execution routes across the defectpl CLI application layer,
 focusing on Displacement Mode, Force Mode, and custom standalone Plotting subcommands.
 """
 
-import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 import pytest
@@ -26,20 +25,16 @@ def mock_dependencies():
     Mocks backend calculations, file parsers, and plotting pipelines to isolate
     the application interface layer from heavy file system IO or structural mathematics.
     """
-    with patch("defectpl.phonon.read_band_yaml") as mock_read, patch(
-        "pymatgen.core.Structure.from_file"
-    ) as mock_struct, patch("defectpl.vasp_wrapper.calc_dR") as mock_dr, patch(
-        "defectpl.vasp_wrapper.prepare_dF_files"
-    ) as mock_df, patch(
-        "defectpl.defectpl.Photoluminescence"
-    ) as mock_pl, patch(
-        "defectpl.plot.Plotter"
-    ) as mock_plotter, patch(
-        "monty.serialization.dumpfn"
-    ) as mock_dump, patch(
-        "monty.serialization.loadfn"
-    ) as mock_load:
-
+    with (
+        patch("defectpl.phonon.read_band_yaml") as mock_read,
+        patch("pymatgen.core.Structure.from_file") as mock_struct,
+        patch("defectpl.vasp_wrapper.calc_dR") as mock_dr,
+        patch("defectpl.vasp_wrapper.prepare_dF_files") as mock_df,
+        patch("defectpl.defectpl.Photoluminescence") as mock_pl,
+        patch("defectpl.plot.Plotter") as mock_plotter,
+        patch("monty.serialization.dumpfn") as mock_dump,
+        patch("monty.serialization.loadfn") as mock_load,
+    ):
         # Setup typical dummy outputs from mocked structures
         mock_read.return_value = (MagicMock(), MagicMock(), MagicMock())
         mock_dr.return_value = MagicMock()

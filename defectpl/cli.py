@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Command Line Interface (CLI) application layer managing execution workflows 
-for the defectpl suite, covering photoluminescence lineshapes, structural 
+Command Line Interface (CLI) application layer managing execution workflows
+for the defectpl suite, covering photoluminescence lineshapes, structural
 displacements, Configuration Coordinate Diagrams (CCD), and phonon properties.
 """
 
@@ -628,7 +628,7 @@ def analyze_ccd(gs, es, gs_runs, es_runs, de, save_plot):
             dE=de,
             save_plot=save_plot,
         )
-        click.echo(f"\nFitted Harmonic Well Parameters Found:")
+        click.echo("\nFitted Harmonic Well Parameters Found:")
         click.echo(f"Ground state effective phonon frequency energy: {w_g:.4f} eV")
         click.echo(f"Excited state effective phonon frequency energy: {w_e:.4f} eV")
     except Exception as exc:
@@ -679,7 +679,7 @@ def compare_json(files, xmin, xmax, legends, out_dir, fmt):
 
     try:
         target_files = [Path(f.strip()) for f in files.split(" ") if f.strip()]
-        labels = [l.strip() for l in legends.split(",")] if legends else None
+        labels = [lbl.strip() for lbl in legends.split(",")] if legends else None
         xlim = (xmin, xmax) if (xmin is not None and xmax is not None) else None
 
         comparepl(
@@ -689,7 +689,7 @@ def compare_json(files, xmin, xmax, legends, out_dir, fmt):
             out_dir=out_dir,
             fig_format=fmt,
         )
-        click.echo(f"Comparative property spectrum graph compiled successfully.")
+        click.echo("Comparative property spectrum graph compiled successfully.")
     except Exception as exc:
         raise click.ClickException(
             f"Comparison array aggregation processing failure encountered: {exc}"
@@ -832,7 +832,7 @@ def phonon_symm(poscar, fc, fs, dim, symprec):
         )
 
     try:
-        symm_results = calculate_phonon_symmetries(
+        calculate_phonon_symmetries(
             unitcell_path=poscar,
             force_constants_path=fc,
             force_sets_path=fs,
@@ -1025,9 +1025,11 @@ def pr_group():
 
 # ------- shared option factories ----------------------------------------
 
+
 def _opt_procar(f):
     return click.option(
-        "--procar", "-p",
+        "--procar",
+        "-p",
         default="PROCAR",
         show_default=True,
         type=click.Path(dir_okay=False),
@@ -1037,7 +1039,8 @@ def _opt_procar(f):
 
 def _opt_entry(f):
     return click.option(
-        "--entry", "-e",
+        "--entry",
+        "-e",
         default="defect_entry.json",
         show_default=True,
         type=click.Path(dir_okay=False),
@@ -1047,7 +1050,8 @@ def _opt_entry(f):
 
 def _opt_dsi(f):
     return click.option(
-        "--dsi", "-s",
+        "--dsi",
+        "-s",
         default=None,
         type=click.Path(dir_okay=False),
         help=(
@@ -1072,7 +1076,8 @@ def _opt_poscar_pr(f):
 
 def _opt_cutoff(f):
     return click.option(
-        "--cutoff", "-c",
+        "--cutoff",
+        "-c",
         default=3.5,
         show_default=True,
         type=float,
@@ -1082,7 +1087,8 @@ def _opt_cutoff(f):
 
 def _opt_out_dir(f):
     return click.option(
-        "--out", "-o",
+        "--out",
+        "-o",
         default=".",
         show_default=True,
         type=click.Path(file_okay=False),
@@ -1091,6 +1097,7 @@ def _opt_out_dir(f):
 
 
 # ------- pretty-print helper --------------------------------------------
+
 
 def _print_pr_summary(result: dict, top_n: int = 15) -> None:
     sep = "─" * 76
@@ -1115,11 +1122,17 @@ def _print_pr_summary(result: dict, top_n: int = 15) -> None:
             kpt_idx = int(kpt_label.split("_")[1])
             for band_label, vals in band_dict.items():
                 band_idx = int(band_label.split("_")[1])
-                rows.append((
-                    sp_label, kpt_idx, band_idx,
-                    vals.get("energy"), vals.get("occupation"),
-                    vals["p_ratio"], vals["ipr"],
-                ))
+                rows.append(
+                    (
+                        sp_label,
+                        kpt_idx,
+                        band_idx,
+                        vals.get("energy"),
+                        vals.get("occupation"),
+                        vals["p_ratio"],
+                        vals["ipr"],
+                    )
+                )
     rows.sort(key=lambda x: -x[5])
 
     click.echo(
@@ -1128,19 +1141,19 @@ def _print_pr_summary(result: dict, top_n: int = 15) -> None:
         f"{'P-ratio':>8}  {'IPR':>10}"
     )
     click.echo(
-        f"  {'─'*7} {'─'*4} {'─'*5}  {'─'*11}  {'─'*5}  {'─'*8}  {'─'*10}"
+        f"  {'─' * 7} {'─' * 4} {'─' * 5}  {'─' * 11}  {'─' * 5}  {'─' * 8}  {'─' * 10}"
     )
     for sp, ik, ib, en, occ, pr, ipr in rows[:top_n]:
-        en_str  = f"{en:11.4f}"  if en  is not None else f"{'N/A':>11}"
+        en_str = f"{en:11.4f}" if en is not None else f"{'N/A':>11}"
         occ_str = f"{occ:5.3f}" if occ is not None else f"{'N/A':>5}"
         click.echo(
-            f"  {sp:<7} {ik:>4} {ib:>5}  {en_str}  {occ_str}  "
-            f"{pr:8.4f}  {ipr:10.6f}"
+            f"  {sp:<7} {ik:>4} {ib:>5}  {en_str}  {occ_str}  {pr:8.4f}  {ipr:10.6f}"
         )
     click.echo(f"{sep}\n")
 
 
 # ------- defectpl pr calc -----------------------------------------------
+
 
 @pr_group.command("calc")
 @_opt_procar
@@ -1150,7 +1163,8 @@ def _print_pr_summary(result: dict, top_n: int = 15) -> None:
 @_opt_cutoff
 @_opt_out_dir
 @click.option(
-    "--top", "top_n",
+    "--top",
+    "top_n",
     default=15,
     show_default=True,
     type=int,
@@ -1187,12 +1201,12 @@ def pr_calc(procar, entry, dsi, poscar, cutoff, out, top_n, no_csv, native_proca
     _logging.basicConfig(level=_logging.INFO, format="%(levelname)s: %(message)s")
 
     calc = ParticipationRatioCalculator(
-        procar                = procar,
-        defect_entry          = entry,
-        defect_structure_info = dsi,
-        poscar                = poscar,
-        cutoff_radius         = cutoff,
-        use_pymatgen          = not native_procar,
+        procar=procar,
+        defect_entry=entry,
+        defect_structure_info=dsi,
+        poscar=poscar,
+        cutoff_radius=cutoff,
+        use_pymatgen=not native_procar,
     )
     try:
         result = calc.run()
@@ -1210,9 +1224,12 @@ def pr_calc(procar, entry, dsi, poscar, cutoff, out, top_n, no_csv, native_proca
 
 # ------- defectpl pr batch ----------------------------------------------
 
+
 @pr_group.command("batch")
 @click.option(
-    "--dir", "-d", "batch_dir",
+    "--dir",
+    "-d",
+    "batch_dir",
     default=".",
     show_default=True,
     type=click.Path(file_okay=False, exists=True),
@@ -1226,7 +1243,8 @@ def pr_calc(procar, entry, dsi, poscar, cutoff, out, top_n, no_csv, native_proca
     help="Skip writing per-directory CSV files.",
 )
 @click.option(
-    "--combined-csv", "combined_csv",
+    "--combined-csv",
+    "combined_csv",
     default="batch_participation_ratio.csv",
     show_default=True,
     help="Name of the combined batch CSV written in --dir.",
@@ -1260,24 +1278,24 @@ def pr_batch(batch_dir, cutoff, no_csv, combined_csv, native_procar):
 
     for d in dirs:
         procar_p = d / "PROCAR"
-        entry_p  = d / "defect_entry.json"
+        entry_p = d / "defect_entry.json"
         if not procar_p.exists() or not entry_p.exists():
             continue
 
         click.echo(f"\n>>> {d.name}")
-        dsi_p    = d / "defect_structure_info.json"
+        dsi_p = d / "defect_structure_info.json"
         poscar_p = next(
             (d / n for n in ("CONTCAR", "POSCAR") if (d / n).exists()), None
         )
 
         try:
             calc = ParticipationRatioCalculator(
-                procar                = procar_p,
-                defect_entry          = entry_p,
-                defect_structure_info = dsi_p if dsi_p.exists() else None,
-                poscar                = poscar_p,
-                cutoff_radius         = cutoff,
-                use_pymatgen          = not native_procar,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p if dsi_p.exists() else None,
+                poscar=poscar_p,
+                cutoff_radius=cutoff,
+                use_pymatgen=not native_procar,
             )
             result = calc.run()
             calc.to_json(d / "participation_ratio.json")
@@ -1290,25 +1308,34 @@ def pr_batch(batch_dir, cutoff, no_csv, combined_csv, native_procar):
                     kpt_idx = int(kpt_label.split("_")[1])
                     for band_label, vals in band_dict.items():
                         band_idx = int(band_label.split("_")[1])
-                        all_rows.append(dict(
-                            defect  = result["defect_name"],
-                            dir     = d.name,
-                            spin    = sp_label,
-                            kpt     = kpt_idx,
-                            band    = band_idx,
-                            energy  = vals.get("energy"),
-                            occ     = vals.get("occupation"),
-                            p_ratio = vals["p_ratio"],
-                            ipr     = vals["ipr"],
-                        ))
+                        all_rows.append(
+                            dict(
+                                defect=result["defect_name"],
+                                dir=d.name,
+                                spin=sp_label,
+                                kpt=kpt_idx,
+                                band=band_idx,
+                                energy=vals.get("energy"),
+                                occ=vals.get("occupation"),
+                                p_ratio=vals["p_ratio"],
+                                ipr=vals["ipr"],
+                            )
+                        )
         except Exception as exc:
             click.secho(f"  SKIPPED ({d.name}): {exc}", fg="yellow")
 
     if all_rows:
         csv_path = batch_path / combined_csv
         fieldnames = [
-            "defect", "dir", "spin", "kpt", "band",
-            "energy", "occ", "p_ratio", "ipr",
+            "defect",
+            "dir",
+            "spin",
+            "kpt",
+            "band",
+            "energy",
+            "occ",
+            "p_ratio",
+            "ipr",
         ]
         with open(csv_path, "w", newline="") as fh:
             writer = _csv.DictWriter(fh, fieldnames=fieldnames)
@@ -1318,17 +1345,23 @@ def pr_batch(batch_dir, cutoff, no_csv, combined_csv, native_procar):
 
     click.secho(
         f"\nBatch complete: {n_ok}/{len(dirs)} directories processed.",
-        fg="green", bold=True,
+        fg="green",
+        bold=True,
     )
 
 
 # ------- defectpl pr summary --------------------------------------------
 
+
 @pr_group.command("summary")
-@click.argument("json_file", default="participation_ratio.json",
-                type=click.Path(dir_okay=False, exists=True))
+@click.argument(
+    "json_file",
+    default="participation_ratio.json",
+    type=click.Path(dir_okay=False, exists=True),
+)
 @click.option(
-    "--top", "top_n",
+    "--top",
+    "top_n",
     default=15,
     show_default=True,
     type=int,
@@ -1347,15 +1380,29 @@ def pr_summary(json_file, top_n):
 
 # ------- defectpl pr top ------------------------------------------------
 
+
 @pr_group.command("top")
-@click.argument("json_file", default="participation_ratio.json",
-                type=click.Path(dir_okay=False, exists=True))
-@click.option("--n", "top_n", default=10, show_default=True, type=int,
-              help="Number of states to list.")
-@click.option("--metric", "-m",
-              type=click.Choice(["p_ratio", "ipr"]),
-              default="p_ratio", show_default=True,
-              help="Metric used for ranking.")
+@click.argument(
+    "json_file",
+    default="participation_ratio.json",
+    type=click.Path(dir_okay=False, exists=True),
+)
+@click.option(
+    "--n",
+    "top_n",
+    default=10,
+    show_default=True,
+    type=int,
+    help="Number of states to list.",
+)
+@click.option(
+    "--metric",
+    "-m",
+    type=click.Choice(["p_ratio", "ipr"]),
+    default="p_ratio",
+    show_default=True,
+    help="Metric used for ranking.",
+)
 def pr_top(json_file, top_n, metric):
     """
     List the N most-localised states sorted by P-ratio or IPR.
@@ -1378,9 +1425,11 @@ def pr_top(json_file, top_n, metric):
         f"  {'Spin':<7} {'Kpt':>4} {'Band':>5}  "
         f"{'Energy(eV)':>11}  {'P-ratio':>8}  {'IPR':>10}"
     )
-    click.echo(f"  {'─'*7} {'─'*4} {'─'*5}  {'─'*11}  {'─'*8}  {'─'*10}")
+    click.echo(f"  {'─' * 7} {'─' * 4} {'─' * 5}  {'─' * 11}  {'─' * 8}  {'─' * 10}")
     for row in top:
-        en_str = f"{row['energy']:11.4f}" if row["energy"] is not None else f"{'N/A':>11}"
+        en_str = (
+            f"{row['energy']:11.4f}" if row["energy"] is not None else f"{'N/A':>11}"
+        )
         click.echo(
             f"  {row['spin']:<7} {row['kpt']:>4} {row['band']:>5}  "
             f"{en_str}  {row['p_ratio']:8.4f}  {row['ipr']:10.6f}"
@@ -1390,14 +1439,17 @@ def pr_top(json_file, top_n, metric):
 
 # ------- defectpl pr make-entry -----------------------------------------
 
+
 @pr_group.command("make-entry")
 @click.option(
-    "--name", "-n",
+    "--name",
+    "-n",
     required=True,
     help="Defect label, e.g. 'Va_O1_2' for oxygen vacancy charge +2.",
 )
 @click.option(
-    "--center", "-c",
+    "--center",
+    "-c",
     default=None,
     help=(
         "Fractional coordinates of the defect centre as 'x,y,z' or 'x y z'.  "
@@ -1405,13 +1457,15 @@ def pr_top(json_file, top_n, metric):
     ),
 )
 @click.option(
-    "--perfect", "-P",
+    "--perfect",
+    "-P",
     default=None,
     type=click.Path(dir_okay=False),
     help="POSCAR/CONTCAR of the perfect (undoped) supercell for auto-detection.",
 )
 @click.option(
-    "--defect", "-D",
+    "--defect",
+    "-D",
     default=None,
     type=click.Path(dir_okay=False),
     help="POSCAR/CONTCAR of the defect supercell for auto-detection.",
@@ -1424,7 +1478,8 @@ def pr_top(json_file, top_n, metric):
     help="Cartesian distance tolerance (Å) for site matching in auto-detection.",
 )
 @click.option(
-    "--out", "-o",
+    "--out",
+    "-o",
     default="defect_entry.json",
     show_default=True,
     type=click.Path(dir_okay=False),
@@ -1449,12 +1504,12 @@ def pr_make_entry(name, center, perfect, defect, site_tol, out):
     try:
         center_coords = parse_frac_coords(center) if center else None
         payload = make_defect_entry(
-            name           = name,
-            center         = center_coords,
-            perfect_poscar = perfect,
-            defect_poscar  = defect,
-            out_path       = out,
-            site_tol       = site_tol,
+            name=name,
+            center=center_coords,
+            perfect_poscar=perfect,
+            defect_poscar=defect,
+            out_path=out,
+            site_tol=site_tol,
         )
     except Exception as exc:
         raise click.ClickException(str(exc))
@@ -1468,27 +1523,32 @@ def pr_make_entry(name, center, perfect, defect, site_tol, out):
 
 # ------- defectpl pr make-dsi -------------------------------------------
 
+
 @pr_group.command("make-dsi")
 @click.option(
-    "--poscar", "-p",
+    "--poscar",
+    "-p",
     required=True,
     type=click.Path(dir_okay=False, exists=True),
     help="POSCAR/CONTCAR of the defect supercell.",
 )
 @click.option(
-    "--center", "-c",
+    "--center",
+    "-c",
     required=True,
     help="Fractional coordinates of the defect centre as 'x,y,z' or 'x y z'.",
 )
 @click.option(
-    "--cutoff", "-r",
+    "--cutoff",
+    "-r",
     default=3.5,
     show_default=True,
     type=float,
     help="Neighbour search radius in Å.",
 )
 @click.option(
-    "--out", "-o",
+    "--out",
+    "-o",
     default="defect_structure_info.json",
     show_default=True,
     type=click.Path(dir_okay=False),
@@ -1511,10 +1571,10 @@ def pr_make_dsi(poscar, center, cutoff, out):
     try:
         center_coords = parse_frac_coords(center)
         payload = make_defect_structure_info(
-            poscar             = poscar,
-            defect_center_frac = center_coords,
-            cutoff_radius      = cutoff,
-            out_path           = out,
+            poscar=poscar,
+            defect_center_frac=center_coords,
+            cutoff_radius=cutoff,
+            out_path=out,
         )
     except Exception as exc:
         raise click.ClickException(str(exc))
@@ -1525,33 +1585,67 @@ def pr_make_dsi(poscar, center, cutoff, out):
 
 
 @pr_group.command("plot")
-@click.argument("json_file", default="participation_ratio.json",
-                metavar="JSON_FILE",
-                type=click.Path(exists=True, dir_okay=False))
-@click.option("--xaxis", "-x",
-              type=click.Choice(["energy", "band"], case_sensitive=False),
-              default="energy", show_default=True,
-              help="X-axis quantity: energy (eV) or band index.")
-@click.option("--metric", "-m", default="p_ratio",
-              type=click.Choice(["p_ratio", "ipr"], case_sensitive=False),
-              show_default=True, help="Y-axis metric.")
-@click.option("--threshold", "-t", default=0.2, show_default=True,
-              help="Horizontal threshold line value.")
-@click.option("--vbm", default=None, type=float,
-              help="VBM energy (eV) — drawn as vertical line on energy plot.")
-@click.option("--cbm", default=None, type=float,
-              help="CBM energy (eV) — drawn as vertical line on energy plot.")
-@click.option("--emin", default=None, type=float,
-              help="Lower energy filter (eV).")
-@click.option("--emax", default=None, type=float,
-              help="Upper energy filter (eV).")
-@click.option("--kpt", "kpt_idx", default=0, show_default=True, type=int,
-              help="0-based k-point index to plot.")
-@click.option("--out", "-o", default=None,
-              help="Output image file (default: pr_energy.png or pr_band.png).")
+@click.argument(
+    "json_file",
+    default="participation_ratio.json",
+    metavar="JSON_FILE",
+    type=click.Path(exists=True, dir_okay=False),
+)
+@click.option(
+    "--xaxis",
+    "-x",
+    type=click.Choice(["energy", "band"], case_sensitive=False),
+    default="energy",
+    show_default=True,
+    help="X-axis quantity: energy (eV) or band index.",
+)
+@click.option(
+    "--metric",
+    "-m",
+    default="p_ratio",
+    type=click.Choice(["p_ratio", "ipr"], case_sensitive=False),
+    show_default=True,
+    help="Y-axis metric.",
+)
+@click.option(
+    "--threshold",
+    "-t",
+    default=0.2,
+    show_default=True,
+    help="Horizontal threshold line value.",
+)
+@click.option(
+    "--vbm",
+    default=None,
+    type=float,
+    help="VBM energy (eV) — drawn as vertical line on energy plot.",
+)
+@click.option(
+    "--cbm",
+    default=None,
+    type=float,
+    help="CBM energy (eV) — drawn as vertical line on energy plot.",
+)
+@click.option("--emin", default=None, type=float, help="Lower energy filter (eV).")
+@click.option("--emax", default=None, type=float, help="Upper energy filter (eV).")
+@click.option(
+    "--kpt",
+    "kpt_idx",
+    default=0,
+    show_default=True,
+    type=int,
+    help="0-based k-point index to plot.",
+)
+@click.option(
+    "--out",
+    "-o",
+    default=None,
+    help="Output image file (default: pr_energy.png or pr_band.png).",
+)
 @click.option("--title", default=None, help="Plot title (defaults to defect name).")
-def pr_plot(json_file, xaxis, metric, threshold, vbm, cbm, emin, emax,
-            kpt_idx, out, title):
+def pr_plot(
+    json_file, xaxis, metric, threshold, vbm, cbm, emin, emax, kpt_idx, out, title
+):
     """Scatter plot of P-ratio or IPR versus energy or band index.
 
     \b
@@ -1570,6 +1664,7 @@ def pr_plot(json_file, xaxis, metric, threshold, vbm, cbm, emin, emax,
     """
     try:
         import matplotlib
+
         matplotlib.use("Agg")
     except ImportError:
         raise click.ClickException(
@@ -1586,15 +1681,27 @@ def pr_plot(json_file, xaxis, metric, threshold, vbm, cbm, emin, emax,
     try:
         if xaxis == "energy":
             plot_pr_vs_energy(
-                result, metric=metric, threshold=threshold,
-                vbm=vbm, cbm=cbm, emin=emin, emax=emax,
-                kpt_idx=kpt_idx, title=title, out=out_path,
+                result,
+                metric=metric,
+                threshold=threshold,
+                vbm=vbm,
+                cbm=cbm,
+                emin=emin,
+                emax=emax,
+                kpt_idx=kpt_idx,
+                title=title,
+                out=out_path,
             )
         else:
             plot_pr_vs_band_index(
-                result, metric=metric, threshold=threshold,
-                emin=emin, emax=emax,
-                kpt_idx=kpt_idx, title=title, out=out_path,
+                result,
+                metric=metric,
+                threshold=threshold,
+                emin=emin,
+                emax=emax,
+                kpt_idx=kpt_idx,
+                title=title,
+                out=out_path,
             )
     except Exception as exc:
         raise click.ClickException(str(exc))
@@ -1603,35 +1710,71 @@ def pr_plot(json_file, xaxis, metric, threshold, vbm, cbm, emin, emax,
 
 
 @pr_group.command("ksplot")
-@click.option("--eigenval", "-e", default="EIGENVAL",
-              type=click.Path(exists=True, dir_okay=False),
-              show_default=True, help="Path to VASP EIGENVAL file.")
-@click.option("--pr-json", "pr_json", default="participation_ratio.json",
-              type=click.Path(exists=True, dir_okay=False),
-              show_default=True,
-              help="participation_ratio.json from 'defectpl pr calc'.")
-@click.option("--vbm", required=True, type=float,
-              help="Valence Band Maximum energy in eV.")
-@click.option("--cbm", required=True, type=float,
-              help="Conduction Band Minimum energy in eV.")
-@click.option("--espan", default=1.0, show_default=True, type=float,
-              help="Energy padding above/below VBM/CBM in eV.")
-@click.option("--metric", "-m", default="p_ratio",
-              type=click.Choice(["p_ratio", "ipr"], case_sensitive=False),
-              show_default=True, help="Localization metric for colour coding.")
-@click.option("--cmap", default="RdYlGn_r", show_default=True,
-              help="Matplotlib colormap name.")
-@click.option("--vmin", default=0.0, show_default=True, type=float,
-              help="Colormap lower bound.")
-@click.option("--vmax", default=1.0, show_default=True, type=float,
-              help="Colormap upper bound.")
-@click.option("--kidx", "kpt_idx", default=0, show_default=True, type=int,
-              help="0-based k-point index (for multi-k EIGENVAL).")
-@click.option("--out", "-o", default="ks_pr_plot.png", show_default=True,
-              help="Output image file (png/pdf/svg).")
+@click.option(
+    "--eigenval",
+    "-e",
+    default="EIGENVAL",
+    type=click.Path(exists=True, dir_okay=False),
+    show_default=True,
+    help="Path to VASP EIGENVAL file.",
+)
+@click.option(
+    "--pr-json",
+    "pr_json",
+    default="participation_ratio.json",
+    type=click.Path(exists=True, dir_okay=False),
+    show_default=True,
+    help="participation_ratio.json from 'defectpl pr calc'.",
+)
+@click.option(
+    "--vbm", required=True, type=float, help="Valence Band Maximum energy in eV."
+)
+@click.option(
+    "--cbm", required=True, type=float, help="Conduction Band Minimum energy in eV."
+)
+@click.option(
+    "--espan",
+    default=1.0,
+    show_default=True,
+    type=float,
+    help="Energy padding above/below VBM/CBM in eV.",
+)
+@click.option(
+    "--metric",
+    "-m",
+    default="p_ratio",
+    type=click.Choice(["p_ratio", "ipr"], case_sensitive=False),
+    show_default=True,
+    help="Localization metric for colour coding.",
+)
+@click.option(
+    "--cmap", default="RdYlGn_r", show_default=True, help="Matplotlib colormap name."
+)
+@click.option(
+    "--vmin", default=0.0, show_default=True, type=float, help="Colormap lower bound."
+)
+@click.option(
+    "--vmax", default=1.0, show_default=True, type=float, help="Colormap upper bound."
+)
+@click.option(
+    "--kidx",
+    "kpt_idx",
+    default=0,
+    show_default=True,
+    type=int,
+    help="0-based k-point index (for multi-k EIGENVAL).",
+)
+@click.option(
+    "--out",
+    "-o",
+    default="ks_pr_plot.png",
+    show_default=True,
+    help="Output image file (png/pdf/svg).",
+)
 @click.option("--title", default=None, help="Plot title.")
-def pr_ksplot(eigenval, pr_json, vbm, cbm, espan, metric, cmap, vmin, vmax,
-              kpt_idx, out, title):
+def pr_ksplot(
+    eigenval, pr_json, vbm, cbm, espan, metric, cmap, vmin, vmax, kpt_idx, out, title
+):
     """KS level diagram with levels colour-coded by P-ratio or IPR.
 
     Reads a VASP EIGENVAL and a participation_ratio.json, then renders the
@@ -1644,6 +1787,7 @@ def pr_ksplot(eigenval, pr_json, vbm, cbm, espan, metric, cmap, vmin, vmax,
     """
     try:
         import matplotlib
+
         matplotlib.use("Agg")
     except ImportError:
         raise click.ClickException(
@@ -1664,9 +1808,14 @@ def pr_ksplot(eigenval, pr_json, vbm, cbm, espan, metric, cmap, vmin, vmax,
 
     try:
         plot_ks_with_pr(
-            ks_data, pr_result,
-            metric=metric, cmap=cmap, vmin=vmin, vmax=vmax,
-            kpt_idx=kpt_idx, title=title,
+            ks_data,
+            pr_result,
+            metric=metric,
+            cmap=cmap,
+            vmin=vmin,
+            vmax=vmax,
+            kpt_idx=kpt_idx,
+            title=title,
             output_filename=out,
         )
     except Exception as exc:

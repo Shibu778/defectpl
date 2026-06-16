@@ -49,5 +49,12 @@ pdoc3 = "^0.11.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.ruff]
+exclude = ["defectpl/old_defectpl"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E402"]
+"defectpl/plot.py" = ["E741"]   # I is the standard physics symbol for intensity
+
 [tool.poetry.scripts]
 defectpl = 'defectpl.cli:main'

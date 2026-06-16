@@ -4,7 +4,6 @@ Unit tests for the ks_analysis module.
 All custom configurations, band edge alignments, and file paths are specified at the top.
 """
 
-import os
 import unittest
 from pathlib import Path
 from typing import Optional
@@ -29,17 +28,15 @@ CBM_REAL: float = 13.9744
 from defectpl.ks_analysis import (
     KohnShamPlotData,
     get_homo_lumo_idx,
-    get_spin_multiplicity,
-    read_eigenval_file,
     truncate_eigenval,
     find_degenerate_eigenvalues,
     split_energy_occupation,
     xpos_evaluation,
-    get_x_values,
     get_occupied_unoccupied_split,
     extract_ksplot_data,
     plot_spin_resolved_levels,
 )
+from defectpl.vasp import get_spin_multiplicity, read_eigenval_file
 
 
 class TestKohnShamAnalysis(unittest.TestCase):

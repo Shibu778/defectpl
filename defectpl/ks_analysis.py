@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 from monty.json import MSONable
 
 # Cross-module package imports supporting decoupled VASP I/O pipelines
-from defectpl.vasp import get_spin_multiplicity, read_eigenval_file
 
 
 class KohnShamPlotData(MSONable):
@@ -667,7 +666,7 @@ def _lookup_pr_values(
 
     Returns NaN for any band that is not found in the result.
     """
-    kpt_label  = f"kpt_{kpt_idx + 1}"
+    kpt_label = f"kpt_{kpt_idx + 1}"
     spin_block = pr_result.get("data", {}).get(spin_label, {})
     band_block = spin_block.get(kpt_label, {})
     out = []
@@ -745,8 +744,9 @@ def plot_ks_with_pr(
     import matplotlib.cm as cm
     import matplotlib.colors as mcolors
 
-    norm       = mcolors.Normalize(vmin=vmin, vmax=vmax)
+    norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
     import matplotlib as _mpl
+
     try:
         colormap = _mpl.colormaps[cmap]
     except AttributeError:
@@ -764,10 +764,18 @@ def plot_ks_with_pr(
     target_ax.axvline(0, color="black", linestyle="--", alpha=0.5)
 
     vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.35}
-    target_ax.axhspan(ks_data.emin, ks_data.vbm,
-                      color=vbm_cbm_color["vbm"], alpha=vbm_cbm_color["alpha"])
-    target_ax.axhspan(ks_data.cbm, ks_data.emax,
-                      color=vbm_cbm_color["cbm"], alpha=vbm_cbm_color["alpha"])
+    target_ax.axhspan(
+        ks_data.emin,
+        ks_data.vbm,
+        color=vbm_cbm_color["vbm"],
+        alpha=vbm_cbm_color["alpha"],
+    )
+    target_ax.axhspan(
+        ks_data.cbm,
+        ks_data.emax,
+        color=vbm_cbm_color["cbm"],
+        alpha=vbm_cbm_color["alpha"],
+    )
 
     s = ks_data.w * 200 * (figsize[0] / 6.0)
 
@@ -776,12 +784,17 @@ def plot_ks_with_pr(
         pr_result, ks_data.up_idx, "spin_1", metric, kpt_idx=kpt_idx
     )
     up_colors = [
-        scalar_map.to_rgba(v) if not (v != v) else "lightgray"   # NaN → gray
+        scalar_map.to_rgba(v) if not (v != v) else "lightgray"  # NaN → gray
         for v in up_pr
     ]
     target_ax.scatter(
-        ks_data.xvalues_up, ks_data.up_energies,
-        c=up_colors, marker="_", s=s, zorder=3, linewidths=2,
+        ks_data.xvalues_up,
+        ks_data.up_energies,
+        c=up_colors,
+        marker="_",
+        s=s,
+        zorder=3,
+        linewidths=2,
     )
 
     # ── spin-down (right, spin_2) ─────────────────────────────────────────────
@@ -790,22 +803,28 @@ def plot_ks_with_pr(
         pr_result, ks_data.down_idx, spin2_label, metric, kpt_idx=kpt_idx
     )
     down_colors = [
-        scalar_map.to_rgba(v) if not (v != v) else "lightgray"
-        for v in down_pr
+        scalar_map.to_rgba(v) if not (v != v) else "lightgray" for v in down_pr
     ]
     target_ax.scatter(
-        ks_data.xvalues_down, ks_data.down_energies,
-        c=down_colors, marker="_", s=s, zorder=3, linewidths=2,
+        ks_data.xvalues_down,
+        ks_data.down_energies,
+        c=down_colors,
+        marker="_",
+        s=s,
+        zorder=3,
+        linewidths=2,
     )
 
     # ── occupation markers ────────────────────────────────────────────────────
     em = s / 25.0
-    for xv, en, occ in zip(ks_data.xvalues_up, ks_data.up_energies,
-                            ks_data.up_occupations):
+    for xv, en, occ in zip(
+        ks_data.xvalues_up, ks_data.up_energies, ks_data.up_occupations
+    ):
         mk = "o" if occ > 0.6 else "x"
         target_ax.scatter([xv], [en], color="k", marker=mk, s=em, zorder=4)
-    for xv, en, occ in zip(ks_data.xvalues_down, ks_data.down_energies,
-                            ks_data.down_occupations):
+    for xv, en, occ in zip(
+        ks_data.xvalues_down, ks_data.down_energies, ks_data.down_occupations
+    ):
         mk = "o" if occ > 0.6 else "x"
         target_ax.scatter([xv], [en], color="k", marker=mk, s=em, zorder=4)
 
@@ -819,10 +838,24 @@ def plot_ks_with_pr(
     target_ax.set_xticklabels([])
 
     # Spin-channel labels below x-axis
-    target_ax.text(-ks_data.lim / 2, ks_data.emin, "spin ↑",
-                   ha="center", va="bottom", fontsize=8, color="gray")
-    target_ax.text( ks_data.lim / 2, ks_data.emin, "spin ↓",
-                   ha="center", va="bottom", fontsize=8, color="gray")
+    target_ax.text(
+        -ks_data.lim / 2,
+        ks_data.emin,
+        "spin ↑",
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color="gray",
+    )
+    target_ax.text(
+        ks_data.lim / 2,
+        ks_data.emin,
+        "spin ↓",
+        ha="center",
+        va="bottom",
+        fontsize=8,
+        color="gray",
+    )
 
     target_ax.set_title(title or defect_name)
 

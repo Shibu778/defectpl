@@ -4,7 +4,6 @@ Stores publication-grade plotting functions for the defectpl package.
 Author : Shibu Meher
 """
 
-import os
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 import numpy as np
@@ -15,7 +14,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from monty.serialization import loadfn
 
-from defectpl.constants import EV2MEV
 
 # Load custom publication style with a robust procedural fallback layout
 style_file = Path(__file__).parent / "defectpl.mplstyle"
@@ -717,7 +715,7 @@ def comparepl(
 
     pl_runs = [loadfn(str(f)) for f in properties_files]
     if legends is None:
-        legends = [f"Composition {i+1}" for i in range(len(properties_files))]
+        legends = [f"Composition {i + 1}" for i in range(len(properties_files))]
 
     fig, ax = plt.subplots(figsize=figsize)
     line_colors = colors or plt.rcParams["axes.prop_cycle"].by_key()["color"]

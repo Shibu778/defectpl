@@ -74,22 +74,22 @@ class Photoluminescence(MSONable):
         Root-mean-square atomic displacement ΔR in **Å**.
     delQ : float
         Mass-weighted configuration coordinate displacement ΔQ in
-        amu\ :sup:`1/2`·Å.
+        amu\\ :sup:`1/2`·Å.
     qks : numpy.ndarray, shape (nmodes,)
-        Mode-projected configurational displacement q\ :sub:`k` in
-        amu\ :sup:`1/2`·Å.
+        Mode-projected configurational displacement q\\ :sub:`k` in
+        amu\\ :sup:`1/2`·Å.
     Sks : numpy.ndarray, shape (nmodes,)
-        Partial (mode-resolved) Huang–Rhys factors S\ :sub:`k`.
+        Partial (mode-resolved) Huang–Rhys factors S\\ :sub:`k`.
     HR_factor : float
-        Total Huang–Rhys factor S = Σ S\ :sub:`k`.
+        Total Huang–Rhys factor S = Σ S\\ :sub:`k`.
     DW_factor : float
         Debye–Waller factor exp(−S).
     iprs : numpy.ndarray, shape (nmodes,)
         Phonon inverse participation ratio (IPR) per mode; range [1/N, 1].
     localization_ratio : numpy.ndarray, shape (nmodes,)
-        Localization ratio β\ :sub:`k` = N · IPR\ :sub:`k`; range [1, N].
+        Localization ratio β\\ :sub:`k` = N · IPR\\ :sub:`k`; range [1, N].
     S_omega : numpy.ndarray
-        Continuous Huang–Rhys spectral density S(ω) (eV\ :sup:`-1`).
+        Continuous Huang–Rhys spectral density S(ω) (eV\\ :sup:`-1`).
     Sts : numpy.ndarray
         Fourier transform of S(ω) used in the generating function.
     Gts : numpy.ndarray
@@ -366,7 +366,7 @@ class Photoluminescence(MSONable):
         iylim=None,
         fig_format="pdf",
     ):
-        """
+        r"""
         Generate all standard diagnostic plots and save them to *out_dir*.
 
         Produces ten figures: phonon energy vs mode index, IPR vs energy,
@@ -483,7 +483,7 @@ class Photoluminescence(MSONable):
 
 @dataclass
 class VibrationalSpectra1D(MSONable):
-    """
+    r"""
     1D harmonic-oscillator model for the vibrational lineshape of a luminescence band.
 
     Computes Franck–Condon overlaps between vibrational levels of two
@@ -807,7 +807,7 @@ class ConfigurationCoordinateDiagram(MSONable):
     ----------
     dQ : float
         Mass-weighted configuration coordinate displacement ΔQ in
-        amu\ :sup:`1/2`·Å, computed automatically from the two structures.
+        amu\\ :sup:`1/2`·Å, computed automatically from the two structures.
 
     Notes
     -----
@@ -940,7 +940,7 @@ class ConfigurationCoordinateDiagram(MSONable):
     def extract_pes_profile(
         self, vasprun_paths: List[Union[str, Path]], tol: float = 0.001
     ) -> Tuple[np.ndarray, np.ndarray]:
-        """
+        r"""
         Extract (Q, E) data points from a list of completed Vasprun files.
 
         Parameters
@@ -984,7 +984,7 @@ class ConfigurationCoordinateDiagram(MSONable):
         ylim: Tuple[float, float] = (-0.5, 4.0),
         save_plot: Optional[str] = None,
     ) -> Tuple[float, float]:
-        """
+        r"""
         Fit harmonic wells to the ground- and excited-state PES data.
 
         Parameters

@@ -4,7 +4,6 @@ Unit test suite for the Defect Optical Properties Engine (DefectPL) core module.
 """
 
 import unittest
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -19,7 +18,6 @@ from defectpl.defectpl import (
 
 
 class TestPhotoluminescence(unittest.TestCase):
-
     def setUp(self):
         """Set up dummy array data configurations for Photoluminescence testing."""
         self.frequencies = np.array([0.02, 0.04, 0.06])  # eV
@@ -73,7 +71,7 @@ class TestPhotoluminescence(unittest.TestCase):
 
         active_dF = np.array([[0.5, 0.0, 0.0], [0.0, 0.5, 0.0]])
 
-        pl = Photoluminescence(
+        Photoluminescence(
             frequencies=self.frequencies,
             eigenvectors=self.eigenvectors,
             masses=self.masses,
@@ -141,7 +139,6 @@ class TestPhotoluminescence(unittest.TestCase):
 
 
 class TestVibrationalSpectra1D(unittest.TestCase):
-
     def setUp(self):
         """Initialize configurations for 1D Harmonic Oscillator limits."""
         self.spectra = VibrationalSpectra1D(
@@ -177,7 +174,6 @@ class TestVibrationalSpectra1D(unittest.TestCase):
 
 
 class TestConfigurationCoordinateDiagram(unittest.TestCase):
-
     def setUp(self):
         """Construct mock crystal lattices to avoid disk-bound structural parsing hooks."""
         lattice = Lattice.cubic(3.5)

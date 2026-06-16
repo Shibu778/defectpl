@@ -5,7 +5,6 @@ Author: Shibu Meher, Manoj Dey
 """
 
 import math
-from pathlib import Path
 from typing import List, Tuple, Union
 import numpy as np
 
@@ -487,8 +486,8 @@ def calc_Gts(
 
     The Fourier transform of G(t) gives the optical spectral function A(ℏω).
     """
-    l = len(Sts)
-    t = (1.0 / resolution) * (np.arange(l) - l / 2)
+    n = len(Sts)
+    t = (1.0 / resolution) * (np.arange(n) - n / 2)
     return np.exp(Sts - total_HR) * np.exp(-gamma * np.abs(t))
 
 
@@ -530,11 +529,11 @@ def calc_Spectrum_Intensity(
     """
     A = np.fft.fft(Gts)
     A1 = A.copy()
-    l = len(A)
+    n = len(A)
     shift_idx = int(EZPL * resolution)
-    for i in range(l):
-        A[(shift_idx - i) % l] = A1[i]
-    omega_3 = (np.arange(l) / resolution) ** 3
+    for i in range(n):
+        A[(shift_idx - i) % n] = A1[i]
+    omega_3 = (np.arange(n) / resolution) ** 3
     return A, A * omega_3
 
 
@@ -598,22 +597,22 @@ def calculate_overlap_element(
 
     for kx in range(k1 + 1):
         for lx in range(l1 + 1):
-            k, l = 2 * kx + k2, 2 * lx + l2
+            k, lq = 2 * kx + k2, 2 * lx + l2
             try:
                 pr2 = (
                     np.sqrt(float(math.factorial(n) * math.factorial(m)))
                     / (
                         math.factorial(k)
-                        * math.factorial(l)
+                        * math.factorial(lq)
                         * math.factorial(k1 - kx)
                         * math.factorial(l1 - lx)
                     )
-                    * 2.0 ** ((k + l - m - n) // 2)
+                    * 2.0 ** ((k + lq - m - n) // 2)
                 )
             except ValueError:
                 pr2 = 0
-            pr3 = (sinfi**k) * (cosfi**l)
-            f = calculate_hermite(k + l, rho)
+            pr3 = (sinfi**k) * (cosfi**lq)
+            f = calculate_hermite(k + lq, rho)
             ix += pr1 * pr2 * pr3 * f
 
     return ix
@@ -650,7 +649,9 @@ def calc_delta_Q(struct1, struct2) -> float:
     n = len(struct1)
     dR = np.vstack(
         [
-            pbc_shortest_vectors(lattice, struct1.frac_coords[i], struct2.frac_coords[i])
+            pbc_shortest_vectors(
+                lattice, struct1.frac_coords[i], struct2.frac_coords[i]
+            )
             for i in range(n)
         ]
     ).reshape(n, 3)

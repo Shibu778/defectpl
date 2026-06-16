@@ -78,6 +78,7 @@ PRatioData = Dict[str, Dict[str, Dict[str, dict]]]
 # Native PROCAR parser (no pymatgen required)
 # ---------------------------------------------------------------------------
 
+
 def _parse_procar_native(procar_path: Path) -> dict:
     """
     Parse a VASP PROCAR file using pure Python (no pymatgen).
@@ -120,8 +121,8 @@ def _parse_procar_native(procar_path: Path) -> dict:
         m = dim_pat.search(line)
         if m:
             n_kpoints = int(m.group(1))
-            n_bands   = int(m.group(2))
-            n_ions    = int(m.group(3))
+            n_bands = int(m.group(2))
+            n_ions = int(m.group(3))
             first_dim_line = idx
             break
 
@@ -129,28 +130,32 @@ def _parse_procar_native(procar_path: Path) -> dict:
         raise ValueError(f"Could not parse dimensions from {procar_path}")
 
     # ── regex patterns ───────────────────────────────────────────────────────
-    kpt_pat  = re.compile(r"k-point\s+\d+\s*:\s*([\d.\-+Ee]+)\s+([\d.\-+Ee]+)\s+([\d.\-+Ee]+)")
-    wgt_pat  = re.compile(r"weight\s*=\s*([\d.\-+Ee]+)")
-    band_pat = re.compile(r"band\s+\d+\s*#\s*energy\s+([\d.\-+Ee]+)\s*#\s*occ\.\s*([\d.\-+Ee]+)")
-    ion_pat  = re.compile(r"^\s+\d+\s+")    # line starts with an ion index
+    kpt_pat = re.compile(
+        r"k-point\s+\d+\s*:\s*([\d.\-+Ee]+)\s+([\d.\-+Ee]+)\s+([\d.\-+Ee]+)"
+    )
+    wgt_pat = re.compile(r"weight\s*=\s*([\d.\-+Ee]+)")
+    band_pat = re.compile(
+        r"band\s+\d+\s*#\s*energy\s+([\d.\-+Ee]+)\s*#\s*occ\.\s*([\d.\-+Ee]+)"
+    )
+    ion_pat = re.compile(r"^\s+\d+\s+")  # line starts with an ion index
 
     # ── storage ─────────────────────────────────────────────────────────────
     n_spins = 2 if is_spin2 else 1
 
     # shape: (n_spins, n_kpoints, n_bands, n_ions)
-    site_proj   = np.zeros((n_spins, n_kpoints, n_bands, n_ions), dtype=np.float64)
+    site_proj = np.zeros((n_spins, n_kpoints, n_bands, n_ions), dtype=np.float64)
     eigenvalues = np.zeros((n_spins, n_kpoints, n_bands), dtype=np.float64)
     occupancies = np.zeros((n_spins, n_kpoints, n_bands), dtype=np.float64)
     kpoints_arr = np.zeros((n_kpoints, 3), dtype=np.float64)
     weights_arr = np.zeros(n_kpoints, dtype=np.float64)
 
     spin_idx = 0
-    k_idx    = -1
-    b_idx    = -1
-    i_idx    = -1
-    header_seen = False   # ion-column header line
+    k_idx = -1
+    b_idx = -1
+    i_idx = -1
+    header_seen = False  # ion-column header line
 
-    for line in lines[first_dim_line + 1:]:
+    for line in lines[first_dim_line + 1 :]:
         stripped = line.strip()
         if not stripped:
             continue
@@ -167,7 +172,11 @@ def _parse_procar_native(procar_path: Path) -> dict:
         if m:
             k_idx += 1
             if spin_idx == 0:
-                kpoints_arr[k_idx] = [float(m.group(1)), float(m.group(2)), float(m.group(3))]
+                kpoints_arr[k_idx] = [
+                    float(m.group(1)),
+                    float(m.group(2)),
+                    float(m.group(3)),
+                ]
                 mw = wgt_pat.search(line)
                 if mw:
                     weights_arr[k_idx] = float(mw.group(1))
@@ -216,36 +225,37 @@ def _parse_procar_native(procar_path: Path) -> dict:
         def __repr__(self):
             return "Spin.up" if self == 1 else "Spin.down"
 
-    _up   = _Spin(1)
+    _up = _Spin(1)
     _down = _Spin(-1)
 
     spins = [_up] if n_spins == 1 else [_up, _down]
 
     sp_proj = {_up: site_proj[0]}
     sp_eigs = {_up: eigenvalues[0]}
-    sp_occ  = {_up: occupancies[0]}
+    sp_occ = {_up: occupancies[0]}
     if n_spins == 2:
         sp_proj[_down] = site_proj[1]
         sp_eigs[_down] = eigenvalues[1]
-        sp_occ[_down]  = occupancies[1]
+        sp_occ[_down] = occupancies[1]
 
     return {
-        "n_kpoints":   n_kpoints,
-        "n_bands":     n_bands,
-        "n_ions":      n_ions,
-        "n_spins":     n_spins,
-        "spins":       spins,
-        "site_proj":   sp_proj,
+        "n_kpoints": n_kpoints,
+        "n_bands": n_bands,
+        "n_ions": n_ions,
+        "n_spins": n_spins,
+        "spins": spins,
+        "site_proj": sp_proj,
         "eigenvalues": sp_eigs,
         "occupancies": sp_occ,
-        "kpoints":     kpoints_arr,
-        "weights":     weights_arr,
+        "kpoints": kpoints_arr,
+        "weights": weights_arr,
     }
 
 
 # ---------------------------------------------------------------------------
 # PROCAR reader (pymatgen primary, native fallback)
 # ---------------------------------------------------------------------------
+
 
 def read_procar(procar_path: str | Path, use_pymatgen: bool = True) -> dict:
     """
@@ -290,26 +300,31 @@ def read_procar(procar_path: str | Path, use_pymatgen: bool = True) -> dict:
     if use_pymatgen:
         try:
             from pymatgen.io.vasp.outputs import Procar
+
             logger.info("Parsing PROCAR with pymatgen: %s", procar_path)
             p = Procar(str(procar_path))
 
-            spins     = list(p.data.keys())
-            data_arr  = p.data[spins[0]]   # (nk, nb, ni, n_orb)
+            spins = list(p.data.keys())
+            data_arr = p.data[spins[0]]  # (nk, nb, ni, n_orb)
             n_kpoints, n_bands, n_ions, _ = data_arr.shape
 
             site_proj = {spin: arr.sum(axis=-1) for spin, arr in p.data.items()}
 
             return {
-                "n_kpoints":   n_kpoints,
-                "n_bands":     n_bands,
-                "n_ions":      n_ions,
-                "n_spins":     len(spins),
-                "spins":       spins,
-                "site_proj":   site_proj,
+                "n_kpoints": n_kpoints,
+                "n_bands": n_bands,
+                "n_ions": n_ions,
+                "n_spins": len(spins),
+                "spins": spins,
+                "site_proj": site_proj,
                 "eigenvalues": getattr(p, "eigenvalues", None),
                 "occupancies": getattr(p, "occupancies", None),
-                "kpoints":     np.array(p.kpoints) if getattr(p, "kpoints", None) is not None else None,
-                "weights":     np.array(p.weights) if getattr(p, "weights", None) is not None else None,
+                "kpoints": np.array(p.kpoints)
+                if getattr(p, "kpoints", None) is not None
+                else None,
+                "weights": np.array(p.weights)
+                if getattr(p, "weights", None) is not None
+                else None,
             }
         except Exception as exc:
             logger.warning(
@@ -323,6 +338,7 @@ def read_procar(procar_path: str | Path, use_pymatgen: bool = True) -> dict:
 # ---------------------------------------------------------------------------
 # Neighbour detection helpers
 # ---------------------------------------------------------------------------
+
 
 def neighbors_from_defect_structure_info(dsi_path: str | Path) -> Optional[List[int]]:
     """
@@ -402,7 +418,9 @@ def neighbors_from_structure(
         if d < cutoff_radius:
             neighbors.append(i)
     logger.debug(
-        "Found %d neighbours within %.2f Å of defect centre", len(neighbors), cutoff_radius
+        "Found %d neighbours within %.2f Å of defect centre",
+        len(neighbors),
+        cutoff_radius,
     )
     return neighbors
 
@@ -439,20 +457,24 @@ def resolve_neighbors(
 
     if poscar_path is not None and Path(poscar_path).exists():
         try:
-            indices = neighbors_from_structure(poscar_path, defect_center_frac, cutoff_radius)
-            return indices, f"distance search r<{cutoff_radius:.1f}Å ({len(indices)} atoms)"
+            indices = neighbors_from_structure(
+                poscar_path, defect_center_frac, cutoff_radius
+            )
+            return (
+                indices,
+                f"distance search r<{cutoff_radius:.1f}Å ({len(indices)} atoms)",
+            )
         except Exception as exc:
             logger.warning("Distance-based neighbour search failed: %s", exc)
 
-    logger.warning(
-        "No neighbour information found; P-ratio will be 0 for all states."
-    )
+    logger.warning("No neighbour information found; P-ratio will be 0 for all states.")
     return [], "none (P-ratio will be 0)"
 
 
 # ---------------------------------------------------------------------------
 # Core calculation
 # ---------------------------------------------------------------------------
+
 
 def compute_participation_ratios(
     procar_data: dict,
@@ -479,11 +501,11 @@ def compute_participation_ratios(
     dict
         Serialisable result dictionary (spin → k-point → band → metrics).
     """
-    n_kpoints   = procar_data["n_kpoints"]
-    n_bands     = procar_data["n_bands"]
-    n_ions      = procar_data["n_ions"]
-    spins       = procar_data["spins"]
-    site_proj   = procar_data["site_proj"]   # {spin: (nk, nb, ni)}
+    n_kpoints = procar_data["n_kpoints"]
+    n_bands = procar_data["n_bands"]
+    n_ions = procar_data["n_ions"]
+    spins = procar_data["spins"]
+    site_proj = procar_data["site_proj"]  # {spin: (nk, nb, ni)}
     eigenvalues = procar_data.get("eigenvalues")
     occupancies = procar_data.get("occupancies")
 
@@ -494,6 +516,7 @@ def compute_participation_ratios(
         # Works with pymatgen Spin objects and our _Spin sentinels
         try:
             from pymatgen.electronic_structure.core import Spin
+
             if spin == Spin.up:
                 return "spin_1"
             if spin == Spin.down:
@@ -507,7 +530,7 @@ def compute_participation_ratios(
 
     for spin_idx, spin in enumerate(spins):
         sp_label = _spin_label(spin, spin_idx)
-        proj     = site_proj[spin]   # (nk, nb, ni)
+        proj = site_proj[spin]  # (nk, nb, ni)
         data_out[sp_label] = {}
 
         for ik in range(n_kpoints):
@@ -517,17 +540,19 @@ def compute_participation_ratios(
             for ib in range(n_bands):
                 band_label = f"band_{ib + 1}"
 
-                p_i     = proj[ik, ib, :]   # (n_ions,)
+                p_i = proj[ik, ib, :]  # (n_ions,)
                 p_total = float(p_i.sum())
 
                 if p_total > 1e-12:
-                    p_neighbors = float(p_i[neighbor_arr].sum()) if neighbor_arr.size else 0.0
-                    p_ratio     = p_neighbors / p_total
-                    ipr         = float((p_i ** 2).sum()) / (p_total ** 2)
+                    p_neighbors = (
+                        float(p_i[neighbor_arr].sum()) if neighbor_arr.size else 0.0
+                    )
+                    p_ratio = p_neighbors / p_total
+                    ipr = float((p_i**2).sum()) / (p_total**2)
                 else:
                     p_neighbors = 0.0
-                    p_ratio     = 0.0
-                    ipr         = 0.0
+                    p_ratio = 0.0
+                    ipr = 0.0
 
                 energy = occ = None
                 if eigenvalues is not None and spin in eigenvalues:
@@ -536,29 +561,30 @@ def compute_participation_ratios(
                     occ = float(occupancies[spin][ik, ib])
 
                 data_out[sp_label][kpt_label][band_label] = {
-                    "energy":      energy,
-                    "occupation":  occ,
-                    "p_ratio":     round(p_ratio, 8),
-                    "ipr":         round(ipr, 8),
+                    "energy": energy,
+                    "occupation": occ,
+                    "p_ratio": round(p_ratio, 8),
+                    "ipr": round(ipr, 8),
                     "p_neighbors": round(p_neighbors, 8),
-                    "p_total":     round(p_total, 8),
+                    "p_total": round(p_total, 8),
                 }
 
     return {
-        "defect_name":           defect_name,
-        "defect_center":         list(defect_center),
+        "defect_name": defect_name,
+        "defect_center": list(defect_center),
         "neighbor_atom_indices": neighbor_arr.tolist(),
-        "n_atoms":               n_ions,
-        "n_spins":               len(spins),
-        "n_kpoints":             n_kpoints,
-        "n_bands":               n_bands,
-        "data":                  data_out,
+        "n_atoms": n_ions,
+        "n_spins": len(spins),
+        "n_kpoints": n_kpoints,
+        "n_bands": n_bands,
+        "data": data_out,
     }
 
 
 # ---------------------------------------------------------------------------
 # High-level pipeline
 # ---------------------------------------------------------------------------
+
 
 class ParticipationRatioCalculator:
     """
@@ -605,12 +631,12 @@ class ParticipationRatioCalculator:
         cutoff_radius: float = 3.5,
         use_pymatgen: bool = True,
     ) -> None:
-        self.procar_path         = Path(procar)
-        self.defect_entry_path   = Path(defect_entry)
-        self.dsi_path            = Path(defect_structure_info) if defect_structure_info else None
-        self.poscar_path         = Path(poscar) if poscar else None
-        self.cutoff_radius       = cutoff_radius
-        self.use_pymatgen        = use_pymatgen
+        self.procar_path = Path(procar)
+        self.defect_entry_path = Path(defect_entry)
+        self.dsi_path = Path(defect_structure_info) if defect_structure_info else None
+        self.poscar_path = Path(poscar) if poscar else None
+        self.cutoff_radius = cutoff_radius
+        self.use_pymatgen = use_pymatgen
         self._result: Optional[dict] = None
 
     # ------------------------------------------------------------------
@@ -625,9 +651,11 @@ class ParticipationRatioCalculator:
         with open(self.defect_entry_path) as fh:
             data = json.load(fh)
         from defectpl.defect_utils import DEFECT_ENTRY_SCHEMA_VERSION
+
         file_ver = data.get("schema_version")
         if file_ver is not None and file_ver != DEFECT_ENTRY_SCHEMA_VERSION:
             import warnings
+
             warnings.warn(
                 f"defect_entry.json has schema_version '{file_ver}' but "
                 f"defectpl expects '{DEFECT_ENTRY_SCHEMA_VERSION}'. "
@@ -663,17 +691,17 @@ class ParticipationRatioCalculator:
             The same object is also stored as ``self.result``.
         """
         # 1. Load defect metadata
-        entry         = self._load_defect_entry()
-        defect_name   = entry.get("name", entry.get("defect_name", "unknown"))
+        entry = self._load_defect_entry()
+        defect_name = entry.get("name", entry.get("defect_name", "unknown"))
         defect_center = entry.get("defect_center", [0.5, 0.5, 0.5])
 
         # 2. Resolve neighbour atom indices
         poscar_path = self._find_poscar()
         neighbor_indices, neighbor_source = resolve_neighbors(
-            dsi_path           = self.dsi_path,
-            poscar_path        = poscar_path,
-            defect_center_frac = defect_center,
-            cutoff_radius      = self.cutoff_radius,
+            dsi_path=self.dsi_path,
+            poscar_path=poscar_path,
+            defect_center_frac=defect_center,
+            cutoff_radius=self.cutoff_radius,
         )
         logger.info("Neighbours resolved from: %s", neighbor_source)
 
@@ -681,16 +709,18 @@ class ParticipationRatioCalculator:
         procar_data = read_procar(self.procar_path, use_pymatgen=self.use_pymatgen)
         logger.info(
             "PROCAR: %d spin(s), %d k-point(s), %d band(s), %d ions",
-            procar_data["n_spins"], procar_data["n_kpoints"],
-            procar_data["n_bands"], procar_data["n_ions"],
+            procar_data["n_spins"],
+            procar_data["n_kpoints"],
+            procar_data["n_bands"],
+            procar_data["n_ions"],
         )
 
         # 4. Compute metrics
         self._result = compute_participation_ratios(
-            procar_data      = procar_data,
-            neighbor_indices = neighbor_indices,
-            defect_name      = defect_name,
-            defect_center    = defect_center,
+            procar_data=procar_data,
+            neighbor_indices=neighbor_indices,
+            defect_name=defect_name,
+            defect_center=defect_center,
         )
         self._result["neighbor_source"] = neighbor_source
 
@@ -750,8 +780,15 @@ class ParticipationRatioCalculator:
         path.parent.mkdir(parents=True, exist_ok=True)
 
         fieldnames = [
-            "spin", "kpt", "band", "energy", "occ",
-            "p_ratio", "ipr", "p_neighbors", "p_total",
+            "spin",
+            "kpt",
+            "band",
+            "energy",
+            "occ",
+            "p_ratio",
+            "ipr",
+            "p_neighbors",
+            "p_total",
         ]
         rows = []
         for sp_label, kpt_dict in self._result["data"].items():
@@ -760,17 +797,19 @@ class ParticipationRatioCalculator:
                 kpt_idx = int(kpt_label.split("_")[1])
                 for band_label, vals in band_dict.items():
                     band_idx = int(band_label.split("_")[1])
-                    rows.append({
-                        "spin":        spin_idx,
-                        "kpt":         kpt_idx,
-                        "band":        band_idx,
-                        "energy":      vals.get("energy"),
-                        "occ":         vals.get("occupation"),
-                        "p_ratio":     vals["p_ratio"],
-                        "ipr":         vals["ipr"],
-                        "p_neighbors": vals["p_neighbors"],
-                        "p_total":     vals["p_total"],
-                    })
+                    rows.append(
+                        {
+                            "spin": spin_idx,
+                            "kpt": kpt_idx,
+                            "band": band_idx,
+                            "energy": vals.get("energy"),
+                            "occ": vals.get("occupation"),
+                            "p_ratio": vals["p_ratio"],
+                            "ipr": vals["ipr"],
+                            "p_neighbors": vals["p_neighbors"],
+                            "p_total": vals["p_total"],
+                        }
+                    )
 
         with open(path, "w", newline="") as fh:
             writer = csv.DictWriter(fh, fieldnames=fieldnames)
@@ -809,13 +848,13 @@ class ParticipationRatioCalculator:
                     band_idx = int(band_label.split("_")[1])
                     rows.append(
                         dict(
-                            spin    = sp_label,
-                            kpt     = kpt_idx,
-                            band    = band_idx,
-                            energy  = vals.get("energy"),
-                            occ     = vals.get("occupation"),
-                            p_ratio = vals["p_ratio"],
-                            ipr     = vals["ipr"],
+                            spin=sp_label,
+                            kpt=kpt_idx,
+                            band=band_idx,
+                            energy=vals.get("energy"),
+                            occ=vals.get("occupation"),
+                            p_ratio=vals["p_ratio"],
+                            ipr=vals["ipr"],
                         )
                     )
 
@@ -826,6 +865,7 @@ class ParticipationRatioCalculator:
 # ---------------------------------------------------------------------------
 # Result helpers
 # ---------------------------------------------------------------------------
+
 
 def flatten_pr_result(result: dict, kpt_idx: int = 0) -> List[dict]:
     """
@@ -853,16 +893,18 @@ def flatten_pr_result(result: dict, kpt_idx: int = 0) -> List[dict]:
             continue
         for band_label, vals in kpt_dict[kpt_label].items():
             band_idx = int(band_label.split("_")[1])
-            rows.append({
-                "spin":        sp_label,
-                "band":        band_idx,
-                "energy":      vals.get("energy"),
-                "occ":         vals.get("occupation", 0.0) or 0.0,
-                "p_ratio":     vals.get("p_ratio", 0.0) or 0.0,
-                "ipr":         vals.get("ipr", 0.0) or 0.0,
-                "p_neighbors": vals.get("p_neighbors", 0.0) or 0.0,
-                "p_total":     vals.get("p_total", 0.0) or 0.0,
-            })
+            rows.append(
+                {
+                    "spin": sp_label,
+                    "band": band_idx,
+                    "energy": vals.get("energy"),
+                    "occ": vals.get("occupation", 0.0) or 0.0,
+                    "p_ratio": vals.get("p_ratio", 0.0) or 0.0,
+                    "ipr": vals.get("ipr", 0.0) or 0.0,
+                    "p_neighbors": vals.get("p_neighbors", 0.0) or 0.0,
+                    "p_total": vals.get("p_total", 0.0) or 0.0,
+                }
+            )
     return rows
 
 
@@ -870,8 +912,8 @@ def flatten_pr_result(result: dict, kpt_idx: int = 0) -> List[dict]:
 # Plotting
 # ---------------------------------------------------------------------------
 
-_SPIN_COLORS  = {"spin_1": "#1f77b4", "spin_2": "#d62728"}
-_SPIN_SYMBOLS = {"spin_1": "spin ↑",  "spin_2": "spin ↓"}
+_SPIN_COLORS = {"spin_1": "#1f77b4", "spin_2": "#d62728"}
+_SPIN_SYMBOLS = {"spin_1": "spin ↑", "spin_2": "spin ↓"}
 _METRIC_LABEL = {"p_ratio": "P-ratio", "ipr": "IPR"}
 
 
@@ -880,6 +922,7 @@ def _require_matplotlib() -> tuple:
     try:
         import matplotlib as mpl
         import matplotlib.pyplot as plt
+
         return mpl, plt
     except ImportError:
         raise ImportError(
@@ -890,15 +933,14 @@ def _require_matplotlib() -> tuple:
 
 def _scatter_spin_rows(ax, rows: List[dict], metric: str, x_key: str) -> None:
     """Draw filled/open scatter markers per spin for a list of row dicts."""
-    from itertools import groupby
 
     by_spin = {}
     for row in rows:
         by_spin.setdefault(row["spin"], []).append(row)
 
     for sp_label, sp_rows in sorted(by_spin.items()):
-        color  = _SPIN_COLORS.get(sp_label, "gray")
-        sym    = _SPIN_SYMBOLS.get(sp_label, sp_label)
+        color = _SPIN_COLORS.get(sp_label, "gray")
+        sym = _SPIN_SYMBOLS.get(sp_label, sp_label)
         xs_occ, ys_occ = [], []
         xs_emp, ys_emp = [], []
         for row in sp_rows:
@@ -917,8 +959,14 @@ def _scatter_spin_rows(ax, rows: List[dict], metric: str, x_key: str) -> None:
         if xs_occ:
             ax.scatter(xs_occ, ys_occ, c=color, label=f"{sym} (occ)", **kw)
         if xs_emp:
-            ax.scatter(xs_emp, ys_emp, facecolors="none", edgecolors=color,
-                       label=f"{sym} (empty)", **kw)
+            ax.scatter(
+                xs_emp,
+                ys_emp,
+                facecolors="none",
+                edgecolors=color,
+                label=f"{sym} (empty)",
+                **kw,
+            )
 
 
 def plot_pr_vs_energy(
@@ -987,13 +1035,30 @@ def plot_pr_vs_energy(
 
     _scatter_spin_rows(ax, rows, metric=metric, x_key="energy")
 
-    ax.axhline(threshold, color="gray", linestyle="--", linewidth=1,
-               label=f"threshold = {threshold}")
+    ax.axhline(
+        threshold,
+        color="gray",
+        linestyle="--",
+        linewidth=1,
+        label=f"threshold = {threshold}",
+    )
 
     if vbm is not None:
-        ax.axvline(vbm, color="orange", linestyle=":", linewidth=1.2, label=f"VBM = {vbm:.3f} eV")
+        ax.axvline(
+            vbm,
+            color="orange",
+            linestyle=":",
+            linewidth=1.2,
+            label=f"VBM = {vbm:.3f} eV",
+        )
     if cbm is not None:
-        ax.axvline(cbm, color="green",  linestyle=":", linewidth=1.2, label=f"CBM = {cbm:.3f} eV")
+        ax.axvline(
+            cbm,
+            color="green",
+            linestyle=":",
+            linewidth=1.2,
+            label=f"CBM = {cbm:.3f} eV",
+        )
 
     ax.set_xlabel("Energy (eV)")
     ax.set_ylabel(_METRIC_LABEL.get(metric, metric))
@@ -1072,8 +1137,13 @@ def plot_pr_vs_band_index(
 
     _scatter_spin_rows(ax, rows, metric=metric, x_key="band")
 
-    ax.axhline(threshold, color="gray", linestyle="--", linewidth=1,
-               label=f"threshold = {threshold}")
+    ax.axhline(
+        threshold,
+        color="gray",
+        linestyle="--",
+        linewidth=1,
+        label=f"threshold = {threshold}",
+    )
 
     ax.set_xlabel("Band index")
     ax.set_ylabel(_METRIC_LABEL.get(metric, metric))

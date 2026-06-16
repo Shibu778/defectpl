@@ -38,6 +38,7 @@ DEFECT_ENTRY_SCHEMA_VERSION = "1.0"
 # Defect centre auto-detection
 # ---------------------------------------------------------------------------
 
+
 def detect_defect_center(
     perfect_poscar: str | Path,
     defect_poscar: str | Path,
@@ -75,8 +76,8 @@ def detect_defect_center(
     """
     from pymatgen.core import Structure
 
-    perfect  = Structure.from_file(str(perfect_poscar))
-    defect   = Structure.from_file(str(defect_poscar))
+    perfect = Structure.from_file(str(perfect_poscar))
+    defect = Structure.from_file(str(defect_poscar))
 
     p_cart = np.array([s.coords for s in perfect])
     d_cart = np.array([s.coords for s in defect])
@@ -96,7 +97,7 @@ def detect_defect_center(
             extra_in_defect.append(id_)
 
     n_missing = len(missing_in_defect)
-    n_extra   = len(extra_in_defect)
+    n_extra = len(extra_in_defect)
 
     if n_missing == 1 and n_extra == 0:
         # Vacancy: centre is the removed atom's position in the perfect cell
@@ -133,6 +134,7 @@ def detect_defect_center(
 # ---------------------------------------------------------------------------
 # make_defect_entry
 # ---------------------------------------------------------------------------
+
 
 def make_defect_entry(
     name: str,
@@ -176,7 +178,7 @@ def make_defect_entry(
     """
     if center is not None:
         defect_center = list(float(x) for x in center)
-        defect_type   = "manual"
+        defect_type = "manual"
     elif perfect_poscar is not None and defect_poscar is not None:
         defect_center, defect_type = detect_defect_center(
             perfect_poscar, defect_poscar, site_tol=site_tol
@@ -191,9 +193,9 @@ def make_defect_entry(
 
     payload = {
         "schema_version": DEFECT_ENTRY_SCHEMA_VERSION,
-        "name":           name,
-        "defect_center":  defect_center,
-        "defect_type":    defect_type,
+        "name": name,
+        "defect_center": defect_center,
+        "defect_type": defect_type,
     }
 
     out_path = Path(out_path)
@@ -208,6 +210,7 @@ def make_defect_entry(
 # ---------------------------------------------------------------------------
 # make_defect_structure_info
 # ---------------------------------------------------------------------------
+
 
 def make_defect_structure_info(
     poscar: str | Path,
@@ -245,8 +248,8 @@ def make_defect_structure_info(
     from pymatgen.core import Structure
 
     poscar = Path(poscar)
-    struct  = Structure.from_file(str(poscar))
-    center  = np.array(defect_center_frac, dtype=float)
+    struct = Structure.from_file(str(poscar))
+    center = np.array(defect_center_frac, dtype=float)
 
     neighbors: List[dict] = []
     for i, site in enumerate(struct):
@@ -254,17 +257,19 @@ def make_defect_structure_info(
         diff -= np.round(diff)  # minimum image
         d = float(np.linalg.norm(struct.lattice.get_cartesian_coords(diff)))
         if d < cutoff_radius:
-            neighbors.append({"index": i, "element": str(site.specie), "distance": round(d, 5)})
+            neighbors.append(
+                {"index": i, "element": str(site.specie), "distance": round(d, 5)}
+            )
 
     indices = [n["index"] for n in neighbors]
 
     payload = {
-        "poscar":                str(poscar),
-        "defect_center_frac":   list(float(x) for x in defect_center_frac),
-        "cutoff_radius":        cutoff_radius,
-        "n_neighbors":          len(indices),
+        "poscar": str(poscar),
+        "defect_center_frac": list(float(x) for x in defect_center_frac),
+        "cutoff_radius": cutoff_radius,
+        "n_neighbors": len(indices),
         "neighbor_atom_indices": indices,
-        "neighbors":            neighbors,
+        "neighbors": neighbors,
     }
 
     out_path = Path(out_path)
@@ -273,7 +278,9 @@ def make_defect_structure_info(
         json.dump(payload, fh, indent=2)
 
     logger.info(
-        "defect_structure_info.json written: %s  (%d neighbours)", out_path, len(indices)
+        "defect_structure_info.json written: %s  (%d neighbours)",
+        out_path,
+        len(indices),
     )
     return payload
 
@@ -281,6 +288,7 @@ def make_defect_structure_info(
 # ---------------------------------------------------------------------------
 # Utility: parse fractional coordinate string  "x,y,z"  or  "x y z"
 # ---------------------------------------------------------------------------
+
 
 def parse_frac_coords(text: str) -> List[float]:
     """
@@ -303,11 +311,14 @@ def parse_frac_coords(text: str) -> List[float]:
         If exactly 3 values cannot be parsed.
     """
     import re
+
     parts = re.split(r"[,\s]+", text.strip())
     try:
         coords = [float(p) for p in parts if p]
     except ValueError as exc:
-        raise ValueError(f"Cannot parse fractional coordinates from '{text}': {exc}") from exc
+        raise ValueError(
+            f"Cannot parse fractional coordinates from '{text}': {exc}"
+        ) from exc
     if len(coords) != 3:
         raise ValueError(
             f"Expected 3 fractional coordinates, got {len(coords)} from '{text}'"

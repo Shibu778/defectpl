@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Module for parsing, calculating, and managing Gamma-point phonon properties 
+Module for parsing, calculating, and managing Gamma-point phonon properties
 using Phonopy and VASP outputs. All calculations convert frequency data to eV.
 
 Author: Shibu Meher
@@ -15,6 +15,7 @@ from monty.json import MSONable
 
 # Import energy rescaling metric conversion factors from constants
 from defectpl.constants import THZ2EV
+
 
 # phonopy is a declared dependency but may not be present in all environments.
 # All phonopy symbols are imported lazily inside the functions that need them so
@@ -116,6 +117,7 @@ def create_force_constants_from_vasprun(
     """
     _require_phonopy("create_force_constants_from_vasprun")
     from phonopy.interface.vasp import create_FORCE_CONSTANTS
+
     return create_FORCE_CONSTANTS(str(vasprun_filename), is_hdf5, log_level)
 
 

@@ -7,8 +7,11 @@ from __future__ import annotations
 
 from collections import deque
 from pathlib import Path
-from typing import Dict, List, Tuple, Union, Optional, Any
+from typing import TYPE_CHECKING, Dict, List, Tuple, Union, Optional, Any
 import numpy as np
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
 
 
 # =====================================================================
@@ -325,6 +328,7 @@ def get_structures_and_forces(
 
     if poscar_path:
         from pymatgen.io.vasp import Poscar
+
         poscar_path = Path(poscar_path)
         if not poscar_path.is_file():
             raise FileNotFoundError(f"POSCAR reference file not found at {poscar_path}")

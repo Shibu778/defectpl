@@ -13,10 +13,9 @@ from __future__ import annotations
 import csv
 import json
 import math
-import tempfile
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -38,15 +37,15 @@ from defectpl.defect_utils import (
 # Shared fixtures / helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-N_IONS     = 8
-N_KPOINTS  = 2
-N_BANDS    = 4
+N_IONS = 8
+N_KPOINTS = 2
+N_BANDS = 4
 
 NEIGHBOR_INDICES = [1, 3]
 
 
 def _make_site_proj(seed: int = 42) -> np.ndarray:
-    rng  = np.random.default_rng(seed)
+    rng = np.random.default_rng(seed)
     proj = rng.uniform(0.0, 1.0, (N_KPOINTS, N_BANDS, N_IONS))
     proj /= proj.sum(axis=2, keepdims=True)
     return proj
@@ -54,8 +53,10 @@ def _make_site_proj(seed: int = 42) -> np.ndarray:
 
 def _spin_sentinel(value: int = 1):
     """Return a hashable spin sentinel compatible with the native parser."""
+
     class _Spin(int):
         pass
+
     return _Spin(value)
 
 
@@ -63,25 +64,26 @@ def _make_procar_data(seed: int = 42) -> dict:
     """Build a synthetic procar_data dict matching read_procar's output schema."""
     try:
         from pymatgen.electronic_structure.core import Spin
+
         spin_up = Spin.up
     except ImportError:
         spin_up = _spin_sentinel(1)
 
-    proj   = _make_site_proj(seed)
+    proj = _make_site_proj(seed)
     eigval = np.linspace(-5.0, 5.0, N_KPOINTS * N_BANDS).reshape(N_KPOINTS, N_BANDS)
-    occ    = (eigval < 0.0).astype(float)
+    occ = (eigval < 0.0).astype(float)
 
     return {
-        "n_kpoints":   N_KPOINTS,
-        "n_bands":     N_BANDS,
-        "n_ions":      N_IONS,
-        "n_spins":     1,
-        "spins":       [spin_up],
-        "site_proj":   {spin_up: proj},
+        "n_kpoints": N_KPOINTS,
+        "n_bands": N_BANDS,
+        "n_ions": N_IONS,
+        "n_spins": 1,
+        "spins": [spin_up],
+        "site_proj": {spin_up: proj},
         "eigenvalues": {spin_up: eigval},
         "occupancies": {spin_up: occ},
-        "kpoints":     None,
-        "weights":     None,
+        "kpoints": None,
+        "weights": None,
     }
 
 
@@ -89,25 +91,33 @@ def _make_procar_data(seed: int = 42) -> dict:
 # 1.  compute_participation_ratios
 # ──────────────────────────────────────────────────────────────────────────────
 
-class TestComputeParticipationRatios:
 
+class TestComputeParticipationRatios:
     def setup_method(self):
         self.procar_data = _make_procar_data()
 
     def test_return_schema(self):
         result = compute_participation_ratios(
-            self.procar_data, NEIGHBOR_INDICES,
+            self.procar_data,
+            NEIGHBOR_INDICES,
             defect_name="Va_O1_2",
             defect_center=[0.5, 0.5, 0.5],
         )
-        for key in ("defect_name", "defect_center",
-                    "neighbor_atom_indices", "n_atoms",
-                    "n_spins", "n_kpoints", "n_bands", "data"):
+        for key in (
+            "defect_name",
+            "defect_center",
+            "neighbor_atom_indices",
+            "n_atoms",
+            "n_spins",
+            "n_kpoints",
+            "n_bands",
+            "data",
+        ):
             assert key in result, f"Missing key: {key}"
 
     def test_dimensions(self):
-        result  = compute_participation_ratios(self.procar_data, NEIGHBOR_INDICES)
-        data    = result["data"]
+        result = compute_participation_ratios(self.procar_data, NEIGHBOR_INDICES)
+        data = result["data"]
         assert len(data) == 1
         sp_data = next(iter(data.values()))
         assert len(sp_data) == N_KPOINTS
@@ -140,7 +150,7 @@ class TestComputeParticipationRatios:
 
     def test_all_neighbors_gives_unit_p_ratio(self):
         all_idx = list(range(N_IONS))
-        result  = compute_participation_ratios(self.procar_data, all_idx)
+        result = compute_participation_ratios(self.procar_data, all_idx)
         for sp_data in result["data"].values():
             for kpt_data in sp_data.values():
                 for band_vals in kpt_data.values():
@@ -148,8 +158,8 @@ class TestComputeParticipationRatios:
 
     def test_fully_localized_ipr(self):
         procar = _make_procar_data()
-        spin   = procar["spins"][0]
-        proj   = procar["site_proj"][spin]
+        spin = procar["spins"][0]
+        proj = procar["site_proj"][spin]
         proj[:] = 0.0
         proj[:, :, 0] = 1.0
         result = compute_participation_ratios(procar, [0])
@@ -160,7 +170,7 @@ class TestComputeParticipationRatios:
 
     def test_uniform_projection_ipr(self):
         procar = _make_procar_data()
-        spin   = procar["spins"][0]
+        spin = procar["spins"][0]
         procar["site_proj"][spin][:] = 1.0 / N_IONS
         result = compute_participation_ratios(procar, [])
         for sp_data in result["data"].values():
@@ -218,7 +228,6 @@ tot  0.610  0.250  0.000  0.000  0.860
 
 
 class TestNativeProcarParser:
-
     def _write_procar(self, tmp_path: Path, content: str) -> Path:
         p = tmp_path / "PROCAR"
         p.write_text(content, encoding="utf-8")
@@ -228,15 +237,15 @@ class TestNativeProcarParser:
         p = self._write_procar(tmp_path, _PROCAR_MINIMAL)
         data = _parse_procar_native(p)
         assert data["n_kpoints"] == 1
-        assert data["n_bands"]   == 2
-        assert data["n_ions"]    == 3
-        assert data["n_spins"]   == 1
+        assert data["n_bands"] == 2
+        assert data["n_ions"] == 3
+        assert data["n_spins"] == 1
 
     def test_site_proj_values(self, tmp_path: Path):
-        p    = self._write_procar(tmp_path, _PROCAR_MINIMAL)
+        p = self._write_procar(tmp_path, _PROCAR_MINIMAL)
         data = _parse_procar_native(p)
         spin = data["spins"][0]
-        proj = data["site_proj"][spin]   # (nk=1, nb=2, ni=3)
+        proj = data["site_proj"][spin]  # (nk=1, nb=2, ni=3)
         # band 1, ion 0 → tot = 0.150
         assert math.isclose(proj[0, 0, 0], 0.150, abs_tol=1e-5)
         # band 1, ion 1 → tot = 0.300
@@ -245,12 +254,12 @@ class TestNativeProcarParser:
         assert math.isclose(proj[0, 1, 1], 0.700, abs_tol=1e-5)
 
     def test_eigenvalues(self, tmp_path: Path):
-        p    = self._write_procar(tmp_path, _PROCAR_MINIMAL)
+        p = self._write_procar(tmp_path, _PROCAR_MINIMAL)
         data = _parse_procar_native(p)
         spin = data["spins"][0]
         eigs = data["eigenvalues"][spin]
         assert math.isclose(eigs[0, 0], -2.0, abs_tol=1e-6)
-        assert math.isclose(eigs[0, 1],  1.0, abs_tol=1e-6)
+        assert math.isclose(eigs[0, 1], 1.0, abs_tol=1e-6)
 
     def test_raises_on_missing_file(self, tmp_path: Path):
         with pytest.raises(FileNotFoundError):
@@ -261,8 +270,8 @@ class TestNativeProcarParser:
 # 3.  Neighbour detection helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-class TestNeighborsFromDefectStructureInfo:
 
+class TestNeighborsFromDefectStructureInfo:
     def _write_dsi(self, path: Path, data: dict) -> None:
         with open(path, "w") as fh:
             json.dump(data, fh)
@@ -297,12 +306,13 @@ class TestNeighborsFromDefectStructureInfo:
 
     def test_reads_neighbors_list_of_dicts(self, tmp_path: Path):
         p = tmp_path / "dsi.json"
-        self._write_dsi(p, {"neighbors": [{"index": 2, "dist": 1.5}, {"index": 5, "dist": 2.1}]})
+        self._write_dsi(
+            p, {"neighbors": [{"index": 2, "dist": 1.5}, {"index": 5, "dist": 2.1}]}
+        )
         assert neighbors_from_defect_structure_info(p) == [2, 5]
 
 
 class TestResolveNeighbors:
-
     def test_prefers_dsi_over_distance(self, tmp_path: Path):
         dsi_path = tmp_path / "dsi.json"
         with open(dsi_path, "w") as fh:
@@ -330,8 +340,8 @@ class TestResolveNeighbors:
 # 4.  ParticipationRatioCalculator
 # ──────────────────────────────────────────────────────────────────────────────
 
-class TestParticipationRatioCalculator:
 
+class TestParticipationRatioCalculator:
     def _make_entry(self, tmp_path: Path) -> Path:
         entry = {"name": "Va_O1_2", "defect_center": [0.25, 0.25, 0.25]}
         p = tmp_path / "defect_entry.json"
@@ -358,13 +368,15 @@ class TestParticipationRatioCalculator:
         )
 
     def test_run_returns_dict(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
-            calc   = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+            calc = ParticipationRatioCalculator(
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             result = calc.run()
 
@@ -372,32 +384,36 @@ class TestParticipationRatioCalculator:
         assert "data" in result
 
     def test_result_property_is_none_before_run(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
+        entry_p = self._make_entry(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
-        calc     = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
+        calc = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
         assert calc.result is None
 
     def test_result_property_set_after_run(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
         assert calc.result is not None
 
     def test_to_json_creates_file(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
@@ -409,20 +425,22 @@ class TestParticipationRatioCalculator:
         assert loaded["defect_name"] == "Va_O1_2"
 
     def test_to_json_raises_before_run(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
+        entry_p = self._make_entry(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
-        calc     = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
+        calc = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
         with pytest.raises(RuntimeError, match="run()"):
             calc.to_json(tmp_path / "x.json")
 
     def test_to_csv_creates_file(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
@@ -431,13 +449,15 @@ class TestParticipationRatioCalculator:
         assert csv_path.exists()
 
     def test_to_csv_row_count(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
@@ -448,20 +468,22 @@ class TestParticipationRatioCalculator:
         assert len(rows) == N_KPOINTS * N_BANDS
 
     def test_to_csv_raises_before_run(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
+        entry_p = self._make_entry(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
-        calc     = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
+        calc = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
         with pytest.raises(RuntimeError, match="run()"):
             calc.to_csv(tmp_path / "x.csv")
 
     def test_top_localized_by_p_ratio(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
@@ -471,43 +493,48 @@ class TestParticipationRatioCalculator:
         assert vals == sorted(vals, reverse=True)
 
     def test_top_localized_by_ipr(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             calc.run()
 
-        top  = calc.top_localized(n=5, metric="ipr")
+        top = calc.top_localized(n=5, metric="ipr")
         vals = [r["ipr"] for r in top]
         assert vals == sorted(vals, reverse=True)
 
     def test_top_localized_raises_before_run(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
+        entry_p = self._make_entry(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
-        calc     = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
+        calc = ParticipationRatioCalculator(procar=procar_p, defect_entry=entry_p)
         with pytest.raises(RuntimeError):
             calc.top_localized()
 
     def test_missing_defect_entry_raises(self, tmp_path: Path):
         procar_p = self._make_dummy_procar(tmp_path)
-        calc     = ParticipationRatioCalculator(
-            procar=procar_p, defect_entry=tmp_path / "nonexistent.json",
+        calc = ParticipationRatioCalculator(
+            procar=procar_p,
+            defect_entry=tmp_path / "nonexistent.json",
         )
         with pytest.raises(FileNotFoundError, match="defect_entry"):
             calc.run()
 
     def test_neighbor_source_stored_in_result(self, tmp_path: Path):
-        entry_p  = self._make_entry(tmp_path)
-        dsi_p    = self._make_dsi(tmp_path)
+        entry_p = self._make_entry(tmp_path)
+        dsi_p = self._make_dsi(tmp_path)
         procar_p = self._make_dummy_procar(tmp_path)
 
         with self._patch_read_procar():
             calc = ParticipationRatioCalculator(
-                procar=procar_p, defect_entry=entry_p, defect_structure_info=dsi_p,
+                procar=procar_p,
+                defect_entry=entry_p,
+                defect_structure_info=dsi_p,
             )
             result = calc.run()
 
@@ -518,8 +545,8 @@ class TestParticipationRatioCalculator:
 # 5.  defect_utils — make_defect_entry
 # ──────────────────────────────────────────────────────────────────────────────
 
-class TestMakeDefectEntry:
 
+class TestMakeDefectEntry:
     def test_manual_center(self, tmp_path: Path):
         out = tmp_path / "defect_entry.json"
         payload = make_defect_entry(
@@ -553,6 +580,7 @@ class TestMakeDefectEntry:
 # 6.  defect_utils — make_defect_structure_info
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def _write_simple_poscar(path: Path) -> None:
     """Write a tiny cubic POSCAR with 4 atoms for neighbour tests."""
     poscar = """\
@@ -573,7 +601,6 @@ Direct
 
 
 class TestMakeDefectStructureInfo:
-
     def test_creates_file(self, tmp_path: Path):
         poscar = tmp_path / "POSCAR"
         _write_simple_poscar(poscar)
@@ -617,8 +644,8 @@ class TestMakeDefectStructureInfo:
 # 7.  defect_utils — parse_frac_coords
 # ──────────────────────────────────────────────────────────────────────────────
 
-class TestParseFracCoords:
 
+class TestParseFracCoords:
     def test_comma_separated(self):
         coords = parse_frac_coords("0.5,0.5,0.5")
         assert coords == [0.5, 0.5, 0.5]
@@ -644,9 +671,11 @@ class TestParseFracCoords:
 # 8.  CLI tests
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture()
 def cli_runner():
     from click.testing import CliRunner
+
     return CliRunner()
 
 
@@ -662,7 +691,6 @@ def _setup_calc_dir(tmp_path: Path) -> tuple:
 
 @patch("defectpl.participation_ratio.read_procar", return_value=_make_procar_data())
 class TestCLI:
-
     def test_pr_calc_creates_outputs(self, _mock_rp, cli_runner, tmp_path):
         from defectpl.cli import pr_group
 
@@ -671,10 +699,14 @@ class TestCLI:
             pr_group,
             [
                 "calc",
-                "--procar", str(tmp_path / "PROCAR"),
-                "--entry",  str(tmp_path / "defect_entry.json"),
-                "--dsi",    str(tmp_path / "defect_structure_info.json"),
-                "--out",    str(tmp_path),
+                "--procar",
+                str(tmp_path / "PROCAR"),
+                "--entry",
+                str(tmp_path / "defect_entry.json"),
+                "--dsi",
+                str(tmp_path / "defect_structure_info.json"),
+                "--out",
+                str(tmp_path),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -689,9 +721,12 @@ class TestCLI:
             pr_group,
             [
                 "calc",
-                "--procar", str(tmp_path / "PROCAR"),
-                "--entry",  str(tmp_path / "defect_entry.json"),
-                "--out",    str(tmp_path),
+                "--procar",
+                str(tmp_path / "PROCAR"),
+                "--entry",
+                str(tmp_path / "defect_entry.json"),
+                "--out",
+                str(tmp_path),
                 "--no-csv",
             ],
         )
@@ -706,10 +741,14 @@ class TestCLI:
             pr_group,
             [
                 "calc",
-                "--procar", str(tmp_path / "PROCAR"),
-                "--entry",  str(tmp_path / "defect_entry.json"),
-                "--dsi",    str(tmp_path / "defect_structure_info.json"),
-                "--out",    str(tmp_path),
+                "--procar",
+                str(tmp_path / "PROCAR"),
+                "--entry",
+                str(tmp_path / "defect_entry.json"),
+                "--dsi",
+                str(tmp_path / "defect_structure_info.json"),
+                "--out",
+                str(tmp_path),
             ],
         )
         json_path = tmp_path / "participation_ratio.json"
@@ -725,10 +764,14 @@ class TestCLI:
             pr_group,
             [
                 "calc",
-                "--procar", str(tmp_path / "PROCAR"),
-                "--entry",  str(tmp_path / "defect_entry.json"),
-                "--dsi",    str(tmp_path / "defect_structure_info.json"),
-                "--out",    str(tmp_path),
+                "--procar",
+                str(tmp_path / "PROCAR"),
+                "--entry",
+                str(tmp_path / "defect_entry.json"),
+                "--dsi",
+                str(tmp_path / "defect_structure_info.json"),
+                "--out",
+                str(tmp_path),
             ],
         )
         json_path = tmp_path / "participation_ratio.json"
@@ -769,14 +812,21 @@ class TestCLI:
 
 
 class TestCLIMakeEntry:
-
     def test_make_entry_manual(self, cli_runner, tmp_path):
         from defectpl.cli import pr_group
 
         out = str(tmp_path / "defect_entry.json")
         result = cli_runner.invoke(
             pr_group,
-            ["make-entry", "--name", "Va_O1_2", "--center", "0.5,0.5,0.5", "--out", out],
+            [
+                "make-entry",
+                "--name",
+                "Va_O1_2",
+                "--center",
+                "0.5,0.5,0.5",
+                "--out",
+                out,
+            ],
         )
         assert result.exit_code == 0, result.output
         assert Path(out).exists()
@@ -795,7 +845,6 @@ class TestCLIMakeEntry:
 
 
 class TestCLIMakeDsi:
-
     def test_make_dsi_creates_file(self, cli_runner, tmp_path):
         from defectpl.cli import pr_group
 
@@ -807,10 +856,14 @@ class TestCLIMakeDsi:
             pr_group,
             [
                 "make-dsi",
-                "--poscar", str(poscar_path),
-                "--center", "0.0,0.0,0.0",
-                "--cutoff", "0.01",
-                "--out", out,
+                "--poscar",
+                str(poscar_path),
+                "--center",
+                "0.0,0.0,0.0",
+                "--cutoff",
+                "0.01",
+                "--out",
+                out,
             ],
         )
         assert result.exit_code == 0, result.output

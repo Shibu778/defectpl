@@ -6,10 +6,9 @@ Unit tests for the plot.py module within the defectpl package layout.
 from pathlib import Path
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
 
 # Import targets securely after path normalization
-from defectpl.plot import Plotter, comparepl
+from defectpl.plot import Plotter
 
 # ==============================================================================
 # CONFIGURATION / INPUT VARIABLES

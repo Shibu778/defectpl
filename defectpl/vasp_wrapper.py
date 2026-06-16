@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Wrapper functions to interface with VASP output files and extract necessary data for defect photoluminescence calculations, 
-including structure parsing, force extraction, and configuration coordinate analysis. This module serves as a bridge between 
+Wrapper functions to interface with VASP output files and extract necessary data for defect photoluminescence calculations,
+including structure parsing, force extraction, and configuration coordinate analysis. This module serves as a bridge between
 raw VASP outputs and the higher-level photoluminescence modeling workflows defined in defectpl.defectpl.
 """
 
 from pathlib import Path
 from typing import List, Tuple, Union
 
-import click
 import numpy as np
 
 from pymatgen.core import Structure
@@ -18,7 +17,6 @@ from pymatgen.util.coord import pbc_shortest_vectors
 from defectpl.phonon import read_band_yaml
 from defectpl.vasp import (
     get_final_structure_and_forces_from_outcar,
-    get_first_structure_and_forces_from_outcar,
 )
 from defectpl.utils import calc_delQ
 
