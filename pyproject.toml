@@ -32,10 +32,10 @@ numpy = "^2.1.2"
 click = "^8.1.7"
 matplotlib = "^3.8.0"
 plotly = ">=5.18.0"
-monty = "^2026.5.18"
-pymatgen-core = { version = "^2026.5.18", optional = true }
-pymatgen = { version = "^2026.5.4", optional = true }
-phonopy = { version = "^2.35.0", optional = true }
+monty = ">=2024.7.30"
+pymatgen-core = { version = ">=2024.7.30", optional = true }
+pymatgen = { version = ">=2024.7.30", optional = true }
+phonopy = { version = ">=2.23.0", optional = true }
 
 [tool.poetry.extras]
 vasp = ["pymatgen", "pymatgen-core"]
