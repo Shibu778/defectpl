@@ -7,6 +7,7 @@ defect states and electronic transitions near the semiconductor bandgap.
 """
 
 import os
+import shutil
 import warnings
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Union, Optional
@@ -581,6 +582,8 @@ def plot_spin_resolved_levels(
     """
     if style_file and os.path.exists(style_file):
         plt.style.use(style_file)
+        if plt.rcParams.get("text.usetex") and shutil.which("latex") is None:
+            plt.rcParams["text.usetex"] = False
 
     figsize = (6, 6)
     vbm_cbm_color = {"vbm": "orange", "cbm": "green", "alpha": 0.5}
@@ -740,6 +743,8 @@ def plot_ks_with_pr(
     """
     if style_file and os.path.exists(style_file):
         plt.style.use(style_file)
+        if plt.rcParams.get("text.usetex") and shutil.which("latex") is None:
+            plt.rcParams["text.usetex"] = False
 
     import matplotlib.cm as cm
     import matplotlib.colors as mcolors

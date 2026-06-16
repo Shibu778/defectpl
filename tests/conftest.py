@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Pytest configuration: set a non-interactive matplotlib backend and disable
-LaTeX rendering so plot tests pass on CI runners that have no LaTeX install.
+Pytest configuration: non-interactive matplotlib backend for CI.
+
+LaTeX fallback is handled in the source (plot.py and ks_analysis.py) by
+checking shutil.which("latex") after every style.use() call.  This fixture
+is a safety net that disables text.usetex before and after each test.
 """
 
 import matplotlib
-
-matplotlib.use("Agg")  # must come before any pyplot import
-
 import pytest
-import matplotlib.pyplot as plt
+
+matplotlib.use("Agg")
 
 
 @pytest.fixture(autouse=True)
 def _no_latex():
-    """Force text.usetex=False for every test regardless of the loaded style."""
-    with plt.rc_context({"text.usetex": False}):
-        yield
+    """Guarantee text.usetex=False throughout every test."""
+    matplotlib.rcParams["text.usetex"] = False
+    yield
+    matplotlib.rcParams["text.usetex"] = False

@@ -19,6 +19,10 @@ from monty.serialization import loadfn
 style_file = Path(__file__).parent / "defectpl.mplstyle"
 if style_file.exists():
     style.use(str(style_file))
+    import shutil as _shutil
+
+    if plt.rcParams.get("text.usetex") and _shutil.which("latex") is None:
+        plt.rcParams["text.usetex"] = False
 else:
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["font.sans-serif"] = [
