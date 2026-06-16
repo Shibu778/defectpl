@@ -183,5 +183,3 @@ extra:
       link: https://github.com/Shibu778/defectpl
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/defectpl/
-  version:
-    provider: mike           # optional: versioned docs with `mike`
