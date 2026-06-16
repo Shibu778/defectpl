@@ -8,7 +8,7 @@ callers) and do not add any runtime overhead.
 
 from __future__ import annotations
 
-from typing import List, TypedDict
+from typing import TypedDict
 
 import numpy as np
 
