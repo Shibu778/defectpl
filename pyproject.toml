@@ -8,7 +8,7 @@ license = "MIT"
 homepage = "https://github.com/Shibu778/defectpl"
 repository = "https://github.com/Shibu778/defectpl"
 documentation = "https://Shibu778.github.io/defectpl/"
-keywords = ["defects", "optical properties", "point defects", "DFT", "VASP", "pymatgen"]
+keywords = ["defects", "optical properties", "point defects", "DFT", "VASP", "QE", "ABINIT", "CP2K", "multi-code"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",

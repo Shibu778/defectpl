@@ -4,22 +4,26 @@ Defect Optical Properties Engine (DefectPL) core module.
 Authors: Shibu Meher, Manoj Dey
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
 from shutil import copyfile
-from typing import Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import numpy as np
 from monty.json import MSONable
-from pymatgen.core import Structure
+
+if TYPE_CHECKING:
+    from pymatgen.core import Structure
 
 from defectpl.constants import AMU2KG, ANG2M, EV2J, HBAR_EVS
 from defectpl.plot import Plotter
 import defectpl.utils as utils
-from defectpl.vasp_wrapper import calc_delta_Q, get_q_from_structure
+from defectpl.io.vasp import calc_delta_Q, get_q_from_structure
 
 
 @dataclass
