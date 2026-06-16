@@ -1,12 +1,14 @@
 name: Publish to PyPI
 
 # Triggered by pushing a version tag: git tag v0.3.0 && git push origin v0.3.0
+# Can also be triggered manually from GitHub Actions UI (Actions → Publish to PyPI → Run workflow)
 on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"        # matches v0.2.1, v1.0.0, etc.
       - "v[0-9]+.[0-9]+.[0-9]+.post[0-9]+"  # post-releases
       - "v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"     # release candidates
+  workflow_dispatch:
 
 jobs:
   # ──────────────────────────────────────────────────────────────────────────
