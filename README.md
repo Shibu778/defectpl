@@ -160,16 +160,12 @@ If you use DefectPL in published work please cite:
 > *Phys. Rev. B* **112**, 184112 (2025).
 > [doi:10.1103/PhysRevB.112.184112](https://doi.org/10.1103/PhysRevB.112.184112)
 
-The generating-function formalism is from:
-
-> Alkauskas, Buckley, Awschalom & Van de Walle,
-> *New J. Phys.* **16**, 073026 (2014).
-
 ---
 
 ## Acknowledgements
 
 DefectPL is inspired by `pyphotonics`, integrating specialized functionalities from `pypl`, `pydefect`, and `nonrad` with the refined plotting aesthetics of `sumo`.
+
 ---
 
 ## Contributing

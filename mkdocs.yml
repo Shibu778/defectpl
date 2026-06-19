@@ -170,8 +170,7 @@ exclude_docs: |
   overrides/**
 
 extra_javascript:
-  - path: javascripts/mathjax.js
-    defer: true
+  - javascripts/mathjax.js
   - path: https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
     defer: true
 

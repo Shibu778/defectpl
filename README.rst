@@ -196,6 +196,7 @@ Acknowledgements
 
 **DefectPL** is inspired by ``pyphotonics``, integrating specialized functionalities from ``pypl``, ``pydefect``, and ``nonrad`` with the refined plotting aesthetics of ``sumo``.
 
+
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/defectpl.svg?color=blue
    :target: https://pypi.org/pypi/defectpl
 .. |Conda Recipe| image:: https://img.shields.io/badge/recipe-defectpl-green.svg
