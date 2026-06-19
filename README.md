@@ -1,160 +1,176 @@
-# DefectPL
+<div align="center">
 
-A high-performance computational toolkit for calculating and visualizing the photoluminescence (PL) spectra, electron-phonon coupling characteristics, and optical lineshapes of quantum defect centers in insulators and semiconductors.
+<picture>
+  <source media="(prefers-color-scheme: dark)"
+          srcset="docs/assets/defectpl-logo-horizontal-reverse.svg">
+  <source media="(prefers-color-scheme: light)"
+          srcset="docs/assets/defectpl-logo-horizontal.svg">
+  <img alt="DefectPL"
+       src="docs/assets/defectpl-logo-horizontal.svg"
+       width="480">
+</picture>
 
-[![PyPI Version](https://img.shields.io/pypi/v/defectpl.svg?color=blue)](https://pypi.org/pypi/defectpl)
-[![Conda Recipe](https://img.shields.io/badge/recipe-defectpl-green.svg)](https://github.com/conda-forge/defectpl-feedstock)
-[![Anaconda Version](https://anaconda.org/conda-forge/defectpl/badges/version.svg)](https://anaconda.org/conda-forge/defectpl)
+**First-principles photoluminescence lineshapes, electron–phonon coupling, and
+electronic-state localization for point defects in semiconductors and insulators.**
+
+[![PyPI](https://img.shields.io/pypi/v/defectpl.svg)](https://pypi.org/project/defectpl)
+[![Conda](https://anaconda.org/conda-forge/defectpl/badges/version.svg)](https://anaconda.org/conda-forge/defectpl)
 [![Downloads](https://static.pepy.tech/badge/defectpl)](https://pepy.tech/project/defectpl)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://python.org)
+[![CI](https://github.com/Shibu778/defectpl/actions/workflows/ci.yml/badge.svg)](https://github.com/Shibu778/defectpl/actions/workflows/ci.yml)
 
-> ⚠️ **Development Status:** This package is under active development. Features, APIs, and documentation are subject to rapid updates.
-
----
-
-## 📌 Overview & Key Features
-
-**DefectPL** implements photoluminescence calculation framework based on standard generating function methodologies (*New J. Phys.* **16** 073026 (2014)) to evaluate electronic-vibrational coupling profiles of point defects in solids from first-principles data. It bridges ab initio electronic structure outputs with experimentally observable optical lineshapes, specifically supporting high Huang-Rhys (HR) factor regimes.
-
-The core engine provides automated pipelines to compute, serialize, and visualize:
-* **Macroscopic Optical Lineshapes:** Full photoluminescence (PL) spectra sidebands accounting for multi-phonon convolutions.
-* **Coupling Parameters:** Quantified total and mode-resolved partial Huang-Rhys factors ($S_k$), alongside temperature-dependent Debye-Waller factors ($I_{\text{ZPL}}/I_{\text{tot}}$).
-* **Phonon Localization Metrics:** Spatial confinement analytics via Inverse Participation Ratios (IPR) and structural localization index mappings.
-* **Spectral Density Mapping:** Multi-mode Electron-Phonon Spectral Density functions, $S(\omega)$.
-* **Isotope Engineering:** Analytical evaluation of localized isotope substitution impacts on vibrational mode coupling pathways.
+</div>
 
 ---
 
-## 📚 Documentation & Reference
+DefectPL implements the generating-function formalism of Alkauskas *et al.* (2014) to compute
+multi-phonon photoluminescence lineshapes from first-principles VASP + phonopy data.
+It is designed for high-throughput workflows: calculations serialize to JSON, plots are
+publication-ready out of the box, and the full pipeline is accessible via a `defectpl` CLI.
 
-For comprehensive API references, mathematical formulations, and step-by-step tutorials, visit the official documentation portal:
-👉 [**https://Shibu778.github.io/defectpl/**](https://Shibu778.github.io/defectpl/)
-
-### Citation
-
-If you utilize DefectPL in your peer-reviewed scientific workflows, please cite the following original research works:
-
-> 📄 **Carbon with Stone-Wales Defect as Quantum Emitter in h-BN**, *Phys. Rev. B* **111**, 104109 (2025). [DOI: 10.1103/PhysRevB.111.104109](https://doi.org/10.1103/PhysRevB.111.104109)
-
-> 📄 **High-throughput Computational Search for Group-IV-related Quantum Defects as Spin-photon Interfaces in 4H-SiC**, *Phys. Rev. B* **112**, 184112 (2025). [DOI: 10.1103/PhysRevB.112.184112](https://doi.org/10.1103/PhysRevB.112.184112)
+**[Documentation](https://Shibu778.github.io/defectpl/)** &nbsp;·&nbsp;
+**[API Reference](https://Shibu778.github.io/defectpl/api/)** &nbsp;·&nbsp;
+**[Tutorials](https://Shibu778.github.io/defectpl/tutorials/)** &nbsp;·&nbsp;
+**[CLI Reference](https://Shibu778.github.io/defectpl/command_line_interface/)**
 
 ---
 
-## 🚀 Installation
+## Features
 
-DefectPL can be seamlessly integrated via your preferred package manager ecosystem.
+| Capability | Details |
+|---|---|
+| PL lineshapes | Multi-phonon generating-function spectra; displacement & force mode |
+| Temperature | Finite-T spectra via Bose-Einstein occupation and thermal spectral density |
+| Absorption | Absorption spectrum from the conjugate generating function |
+| HR factors | Total and mode-resolved partial Huang–Rhys factors S_k |
+| Spectral density | Continuous S(ω) and C(ω,T) from phonopy band.yaml |
+| Phonon localization | IPR, Alkauskas IPR, localization ratio per phonon mode |
+| Electronic localization | P-ratio and IPR from VASP PROCAR; KS level diagrams |
+| Configuration coordinate | ΔQ, ΔR, parabolic PES fitting, Stokes shift |
+| Serialization | Full MSONable JSON round-trip for all engine objects |
+| CLI | `defectpl pl displacement`, `pl force`, `pl from-json`, `plot` |
+| Plots | 17 standard diagnostic plots; publication-quality PDF/PNG |
 
-### Standard Installation via PyPI
+---
+
+## Installation
+
 ```bash
+# Full install (VASP I/O + phonopy)
+pip install "defectpl[all]"
+
+# Core only (no pymatgen / phonopy)
 pip install defectpl
 
+# conda-forge
+conda install -c conda-forge defectpl
 ```
 
-### Stable Pre-compiled Binaries via Conda-Forge
+For a reproducible development environment see [`environment.yaml`](environment.yaml):
 
 ```bash
-conda install conda-forge::defectpl
-
-```
-
-### Editable Source Build (For Developers)
-
-```bash
-git clone [https://github.com/Shibu778/defectpl.git](https://github.com/Shibu778/defectpl.git)
-cd defectpl
-pip install -e .
-
+conda env create -f environment.yaml
+conda activate defectpl-dev
+pip install -e ".[all]"
 ```
 
 ---
 
-## 🧑‍💻 Architectural Tracks & Examples
+## Quick start
 
-DefectPL natively exposes **two core calculation modalities**: **Displacement Mode** (evaluating structural coordinate shift vectors) and **Force Mode** (evaluating vertical electronic excitation forces). All core engine classes inherit from Monty’s `MSONable`, ensuring atomic state serialization into lightweight JSON formats.
-
-### 1. Displacement Mode (Structure Coordinates Tracking)
-
-Ideal when relaxed atomic geometries for both the ground state (GS) and excited state (ES) are completely resolved alongside Phonopy supercell calculations.
+### Python API
 
 ```python
-from pathlib import Path
 from pymatgen.core import Structure
-from monty.serialization import dumpfn
-
 from defectpl.phonon import read_band_yaml
 from defectpl.io.vasp import calc_dR
 from defectpl.defectpl import Photoluminescence
 
-# 1. Parse ground/excited state geometry and Phonopy coordinates
-struct_gs = Structure.from_file("CONTCAR_GS")
-struct_es = Structure.from_file("CONTCAR_ES")
+gs = Structure.from_file("CONTCAR_gs")
+es = Structure.from_file("CONTCAR_es")
 frequencies, eigenvectors, masses = read_band_yaml("band.yaml")
 
-# 2. Extract periodic-boundary-condition safe displacement matrices
-dR = calc_dR(struct_gs, struct_es)
-
-# 3. Initialize core execution engine
-pl_engine = Photoluminescence(
+pl = Photoluminescence(
     frequencies=frequencies,
     eigenvectors=eigenvectors,
     masses=masses,
-    dR=dR,          # Pass dR matrix for Displacement mode
-    dF=None,
-    EZPL=1.95,
-    gamma=2.0
+    dR=calc_dR(gs, es),
+    EZPL=1.945,   # zero-phonon line in eV
+    gamma=2.0,    # ZPL broadening in meV
 )
 
-# 4. Generate publication-quality graphics & serialize configuration states
-pl_engine.generate_plots(out_dir="./plots", fig_format="png")
-dumpfn(pl_engine, "properties.json", indent=4)
+print(f"Huang-Rhys factor  S = {pl.HR_factor:.3f}")
+print(f"Debye-Waller factor  = {pl.DW_factor:.4f}")
 
+pl.generate_plots(out_dir="./plots/", fig_format="png")
 ```
 
-### 2. Force Mode (Force Difference Matrix Tracking)
+### CLI
 
-Ideal for high-throughput pipelines, utilizing the force landscape acting on the ground-state structure under a vertical electronic excitation constraint.
+```bash
+# Displacement mode — structures + phonopy band.yaml
+defectpl pl displacement \
+  --band_yaml band.yaml \
+  --contcar_gs CONTCAR_gs \
+  --contcar_es CONTCAR_es \
+  --ezpl 1.945 --gamma 2.0 \
+  --temperature 300 \
+  --plot_all --json_out pl.json
 
-```python
-from defectpl.io.vasp import prepare_dF_files
-from defectpl.defectpl import Photoluminescence
-from defectpl.phonon import read_band_yaml
+# Force mode — no excited-state relaxation needed
+defectpl pl force \
+  --band_yaml band.yaml \
+  --outcar_gs OUTCAR_gs \
+  --outcar_es OUTCAR_es \
+  --ezpl 1.945
 
-# 1. Parse standard Phonopy baseline calculations
-frequencies, eigenvectors, masses = read_band_yaml("band.yaml")
+# Regenerate all plots from a saved JSON
+defectpl pl from-json pl.json
 
-# 2. Extract force difference vectors (dF = F_excited - F_ground) from VASP output streams
-dF = prepare_dF_files("OUTCAR_GS", "OUTCAR_ES")
-
-# 3. Execute solver via Force Matrix track
-pl_engine = Photoluminescence(
-    frequencies=frequencies,
-    eigenvectors=eigenvectors,
-    masses=masses,
-    dR=None,
-    dF=dF,          # Pass dF matrix for Force mode
-    EZPL=1.95,
-    gamma=2.0
-)
-pl_engine.generate_plots(out_dir="./plots", fig_format="png")
-
+# Standalone plot with type filter
+defectpl plot pl.json --type absorption
 ```
 
 ---
 
-## 🤝 Contributing & Bug Reporting
+## Calculation modes
 
-We welcome community contributions, optimization proposals, and workflow suggestions! If you uncover numerical bugs or wish to request feature additions, please systematically log them through our official [GitHub Issues](https://www.google.com/search?q=https://github.com/Shibu778/defectpl/issues) portal or submit a structured Pull Request.
+**Displacement mode** requires fully relaxed ground-state (GS) and excited-state (ES)
+geometries plus a phonopy supercell calculation on the GS structure.
+
+**Force mode** only requires the GS relaxation.
+The force-difference vector dF = F_ES − F_GS is extracted directly from VASP OUTCARs,
+making it suitable for high-throughput screening where ES relaxation is expensive.
 
 ---
 
-## 👤 Maintainers & Acknowledgements
+## Cite
 
-**Project Lead Maintainers:** * **Shibu Meher** * **Manoj Dey**
+If you use DefectPL in published work please cite:
 
-### Special Acknowledgements
+> Shibu Meher *et al.*,
+> **Carbon with Stone-Wales Defect as Quantum Emitter in h-BN**,
+> *Phys. Rev. B* **111**, 104109 (2025).
+> [doi:10.1103/PhysRevB.111.104109](https://doi.org/10.1103/PhysRevB.111.104109)
 
-The development of this software was supported and inspired by several foundational open-source packages within the materials physics community:
-* **`PyPhotonics`**
-* **`nonrad`**
-* **`sumo`**
-* **`phonopy`**
+> Shibu Meher *et al.*,
+> **High-throughput Computational Search for Group-IV-related Quantum Defects as
+> Spin-photon Interfaces in 4H-SiC**,
+> *Phys. Rev. B* **112**, 184112 (2025).
+> [doi:10.1103/PhysRevB.112.184112](https://doi.org/10.1103/PhysRevB.112.184112)
+
+The generating-function formalism is from:
+
+> Alkauskas, Buckley, Awschalom & Van de Walle,
+> *New J. Phys.* **16**, 073026 (2014).
+
+---
+
+## Contributing
+
+Contributions, bug reports, and feature requests are welcome.
+See the [Developer Guide](https://Shibu778.github.io/defectpl/contributing/) for
+environment setup, pre-commit hooks, coding conventions, and the release workflow.
+
+**Maintainers:** Shibu Meher, Manoj Dey

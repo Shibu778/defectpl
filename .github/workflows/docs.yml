@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "docs/**"
+      - "overrides/**"    # MkDocs theme overrides (logo partial etc.)
       - "mkdocs.yml"
       - "defectpl/**"     # API docstrings live here
       - "pyproject.toml"

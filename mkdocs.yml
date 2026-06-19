@@ -17,8 +17,9 @@ copyright: Copyright &copy; 2024 Shibu Meher
 # ──────────────────────────────────────────────────────────────────────────────
 theme:
   name: material
+  custom_dir: overrides                      # logo.html partial for light/dark sidebar swap
   language: en
-  logo: assets/defectpl-mark-color.svg      # sidebar / header icon
+  logo: assets/defectpl-mark-color.svg      # light-mode sidebar / header icon
   favicon: assets/defectpl-appicon.svg      # browser tab
   palette:
     # Light mode

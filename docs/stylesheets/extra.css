@@ -56,13 +56,15 @@
    Logo variants per color scheme
    ───────────────────────────────────────────────────────── */
 
-/* In light mode: color mark in sidebar, hide white mark */
-.logo-white  { display: none; }
-.logo-color  { display: inline; }
+/* Sidebar / header logo: color mark in light, white mark in dark.
+   Controlled by overrides/partials/logo.html which renders both <img> tags.
+   Use .md-logo prefix (specificity 0,2,0) to beat Material's
+   .md-logo img rule (0,1,1) which would otherwise re-show the hidden image. */
+.md-logo .logo-dark-mode  { display: none;  }
+.md-logo .logo-light-mode { display: block; }
 
-/* In dark mode: white mark in sidebar, hide color mark */
-[data-md-color-scheme="slate"] .logo-color { display: none; }
-[data-md-color-scheme="slate"] .logo-white { display: inline; }
+[data-md-color-scheme="slate"] .md-logo .logo-light-mode { display: none;  }
+[data-md-color-scheme="slate"] .md-logo .logo-dark-mode  { display: block; }
 
 /* Landing page hero logo */
 .hero-logo {
@@ -72,7 +74,7 @@
   width: 80%;
 }
 
-/* In dark mode swap to the reverse (white) horizontal logo */
+/* Hero: horizontal-color in light mode, horizontal-reverse in dark mode */
 .hero-logo-light { display: block; }
 .hero-logo-dark  { display: none;  }
 
