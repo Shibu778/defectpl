@@ -5,10 +5,9 @@ import re
 from pathlib import Path
 import pandas as pd
 
-# Define paths
-BASE_OUT_DIR = Path(
-    "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond"
-)
+# Automatically resolve the base directory relative to the script's location
+# This resolves to: ...\defectpl\examples\NV_diamond
+BASE_OUT_DIR = Path(__file__).resolve().parent
 
 # The 4 case folders we want to aggregate
 TARGET_CASES = ["pbe_out", "frac_pbe_out", "hse06_out", "frac_hse06_out"]

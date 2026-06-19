@@ -1,13 +1,13 @@
 Functional_Setup,Pipeline_Mode,Calculation Run Mode,Zero-Phonon Line (ZPL) Energy,Total Huang-Rhys (HR) Factor,Debye-Waller (DW) Factor,Total Number of Atoms (natoms),ZPL Broadening Factor (gamma),Gaussian Broadening (sigma),Energy Mesh Resolution,Mass-Weighted Delta Q (delQ),Structural Delta R (delR)
 pbe_out,abs_gs_force_mode,Force Mode,1.75,3.872026,0.020816,215.0,2.0,0.006,1000.0,,
-pbe_out,gs_zpl_disp_mode,Displacement Mode,1.75,2.927105,0.053552,215.0,2.0,0.006,1000.0,0.642559,0.183851 Å
+pbe_out,gs_zpl_disp_mode,Displacement Mode,1.75,2.927105,0.053552,215.0,2.0,0.006,1000.0,0.642559,0.183851 Ã…
 pbe_out,zpl_ems_force_mode,Force Mode,1.75,2.731487,0.065122,215.0,2.0,0.006,1000.0,,
 frac_pbe_out,abs_gs_force_mode,Force Mode,1.729,3.186198,0.041329,215.0,2.0,0.006,1000.0,,
-frac_pbe_out,gs_zpl_disp_mode,Displacement Mode,1.729,2.574647,0.076181,215.0,2.0,0.006,1000.0,0.603373,0.172432 Å
+frac_pbe_out,gs_zpl_disp_mode,Displacement Mode,1.729,2.574647,0.076181,215.0,2.0,0.006,1000.0,0.603373,0.172432 Ã…
 frac_pbe_out,zpl_ems_force_mode,Force Mode,1.729,2.417947,0.089104,215.0,2.0,0.006,1000.0,,
 hse06_out,abs_gs_force_mode,Force Mode,1.991,5.029075,0.006545,215.0,2.0,0.006,1000.0,,
-hse06_out,gs_zpl_disp_mode,Displacement Mode,1.991,3.231119,0.039513,215.0,2.0,0.006,1000.0,0.667635,0.190834 Å
+hse06_out,gs_zpl_disp_mode,Displacement Mode,1.991,3.231119,0.039513,215.0,2.0,0.006,1000.0,0.667635,0.190834 Ã…
 hse06_out,zpl_ems_force_mode,Force Mode,1.991,3.439309,0.032087,215.0,2.0,0.006,1000.0,,
 frac_hse06_out,abs_gs_force_mode,Force Mode,2.19,4.485894,0.011267,215.0,2.0,0.006,1000.0,,
-frac_hse06_out,gs_zpl_disp_mode,Displacement Mode,2.19,3.20348,0.040621,215.0,2.0,0.006,1000.0,0.667367,0.190678 Å
+frac_hse06_out,gs_zpl_disp_mode,Displacement Mode,2.19,3.20348,0.040621,215.0,2.0,0.006,1000.0,0.667367,0.190678 Ã…
 frac_hse06_out,zpl_ems_force_mode,Force Mode,2.19,3.229683,0.03957,215.0,2.0,0.006,1000.0,,

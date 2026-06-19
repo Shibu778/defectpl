@@ -14,7 +14,6 @@ from pymatgen.core import Structure
 
 def clean_existing_output_directories(base_out_path: Path):
     """Safely wipes and resets the root evaluation directories before execution
-
     to prevent artifacts or old diagnostic runs from polluting new calculations.
     """
     if base_out_path.exists():
@@ -30,7 +29,6 @@ def prepare_and_unzip_data(
     source_gz_path: Path, base_out_path: Path, suffix: str = ""
 ) -> Path:
     """Creates a 'data' directory inside base_out_path, copies the source .gz file
-
     into it, unzips it with an optional suffix to avoid naming conflicts,
     and returns the Path to the unzipped file.
     """
@@ -76,7 +74,6 @@ def execute_pipeline(
     fig_format: str = "svg",
 ):
     """Executes a single Photoluminescence pipeline, exports diagnostic plots,
-
     summaries, and gz-compressed JSON configurations.
     """
     print(f"\n--- Running PL calculations for {pipeline_name} pipeline ---")
@@ -137,7 +134,6 @@ def run_pl_analysis(
     fig_format: str = "svg",
 ):
     """Orchestrates data unzipping and pipeline executions with configurable
-
     internal system subdirectories. Handles automatic cleanup.
     """
     extracted_files = []
@@ -259,18 +255,21 @@ def run_pl_analysis(
 # --- Execution Entry Point ---
 if __name__ == "__main__":
 
-    DATA_DIR = Path(
-        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/data"
-    )
+    # SCRIPT_DIR resolves to: ...\defectpl\examples\NV_diamond
+    SCRIPT_DIR = Path(__file__).resolve().parent
+
+    # DATA_DIR steps up twice and goes into data: ...\defectpl\data
+    DATA_DIR = SCRIPT_DIR.parents[1] / "data"
+    
+    # EXAMPLES_BASE keeps outputs localized to the current directory
+    EXAMPLES_BASE = SCRIPT_DIR
 
     # --------------------------------------------------------------------------
     # PBE Functional Examples
     # --------------------------------------------------------------------------
 
     # Example 1: Calculation with PBE functional and complete electron excitation
-    EX1_OUT = Path(
-        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/pbe_out"
-    )
+    EX1_OUT = EXAMPLES_BASE / "pbe_out"
     clean_existing_output_directories(EX1_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -285,9 +284,7 @@ if __name__ == "__main__":
     )
 
     # Example 2: Calculation with PBE functional and fractional electron excitation
-    EX2_OUT = Path(
-        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_pbe_out"
-    )
+    EX2_OUT = EXAMPLES_BASE / "frac_pbe_out"
     clean_existing_output_directories(EX2_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -306,9 +303,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # Example 3: Calculation with HSE06 functional and complete electron excitation
-    EX3_OUT = Path(
-        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/hse06_out"
-    )
+    EX3_OUT = EXAMPLES_BASE / "hse06_out"
     clean_existing_output_directories(EX3_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
@@ -323,9 +318,7 @@ if __name__ == "__main__":
     )
 
     # Example 4: Calculation with HSE06 functional and fractional electron excitation
-    EX4_OUT = Path(
-        "/home/user/Project/ht_SiN/benchmark/NV_diamond_PL/codes/defectpl/examples/NV_diamond/frac_hse06_out"
-    )
+    EX4_OUT = EXAMPLES_BASE / "frac_hse06_out"
     clean_existing_output_directories(EX4_OUT)
     run_pl_analysis(
         data_path=DATA_DIR,
