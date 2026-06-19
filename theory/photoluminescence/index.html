@@ -822,10 +822,132 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-software-pipeline-mapping" class="md-nav__link">
+  <a href="#5-phonon-mode-localization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Software Pipeline Mapping
+        5. Phonon Mode Localization
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Phonon Mode Localization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inverse-participation-ratio-ipr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inverse Participation Ratio (IPR)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localization-ratio-localization_ratio-attribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Localization ratio — localization_ratio attribute
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-finite-temperature-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Finite-Temperature Extension
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Finite-Temperature Extension">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-bose-einstein-phonon-occupation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Bose-Einstein Phonon Occupation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-thermal-spectral-density" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Thermal Spectral Density
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-temperature-dependent-generating-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Temperature-Dependent Generating Function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-absorption-spectrum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Absorption Spectrum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-frequency-dependent-gaussian-broadening" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Frequency-Dependent Gaussian Broadening
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#66-effective-phonon-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.6 Effective Phonon Frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-software-pipeline-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Software Pipeline Mapping
       
     </span>
   </a>
@@ -1691,10 +1813,10 @@
 <div class="arithmatex">\[S = \int_{0}^{\infty} S(\hbar\omega) d(\hbar\omega) = \sum_{k} S_{k}\]</div>
 <hr />
 <h2 id="3-the-generating-function-approach">3. The Generating Function Approach<a class="headerlink" href="#3-the-generating-function-approach" title="Permanent link">&para;</a></h2>
-<p>Rather than calculating explicitly convoluted multi-phonon combination states term by term, <code>defectpl</code> resolves <span class="arithmatex">\(A(\hbar\omega)\)</span> using the time-dependent generating function approach developed by Lax, Kubo, and Toyozawa [1]. </p>
+<p>Rather than calculating explicitly convoluted multi-phonon combination states term by term, <code>defectpl</code> resolves <span class="arithmatex">\(A(\hbar\omega)\)</span> using the time-dependent generating function approach developed by Lax, Kubo, and Toyozawa [1].</p>
 <p>The optical spectral function is calculated via the Fourier transform of a time-domain generating function <span class="arithmatex">\(G(t)\)</span> [1]:</p>
 <div class="arithmatex">\[A(E_{\text{ZPL}} - \hbar\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} G(t) e^{i\omega t - \gamma |t|} dt\]</div>
-<p>where <span class="arithmatex">\(\gamma\)</span> is a semi-empirical broadening parameter applied to reproduce the finite experimental width of the Zero-Phonon Line (arising from homogeneous thermal interactions or inhomogeneous sample strain) [1]. </p>
+<p>where <span class="arithmatex">\(\gamma\)</span> is a semi-empirical broadening parameter applied to reproduce the finite experimental width of the Zero-Phonon Line (arising from homogeneous thermal interactions or inhomogeneous sample strain) [1].</p>
 <p>The generating function <span class="arithmatex">\(G(t)\)</span> is computed directly from the electron-phonon coupling spectrum [1]:</p>
 <div class="arithmatex">\[G(t) = e^{S(t) - S(0)}\]</div>
 <p>where <span class="arithmatex">\(S(t)\)</span> is the Fourier transform of the spectral density [1]:</p>
@@ -1735,7 +1857,133 @@
 <div class="arithmatex">\[\text{DOS}(E) = \sum_{i,j} C_{i,j} \cdot \frac{1}{\sigma\sqrt{2\pi}} \exp\left( -\frac{(E_{i,j} - E)^{2}}{2\sigma^{2}} \right)\]</div>
 <div class="arithmatex">\[L(E) = \text{DOS}(E) \cdot E^{3}\]</div>
 <hr />
-<h2 id="5-software-pipeline-mapping">5. Software Pipeline Mapping<a class="headerlink" href="#5-software-pipeline-mapping" title="Permanent link">&para;</a></h2>
+<h2 id="5-phonon-mode-localization">5. Phonon Mode Localization<a class="headerlink" href="#5-phonon-mode-localization" title="Permanent link">&para;</a></h2>
+<h3 id="inverse-participation-ratio-ipr">Inverse Participation Ratio (IPR)<a class="headerlink" href="#inverse-participation-ratio-ipr" title="Permanent link">&para;</a></h3>
+<p>To identify which phonon modes are spatially localized near the defect, defectpl computes two
+complementary IPR metrics for each normal mode <span class="arithmatex">\(k\)</span>.</p>
+<p>The per-atom participation weight is (Alkauskas 2014, eq. 13):</p>
+<div class="arithmatex">\[p_{k;\alpha} = \sum_i \Delta r_{k;\alpha i}^2\]</div>
+<p>where <span class="arithmatex">\(\Delta r_{k;\alpha i}\)</span> is the normalized phonon eigenvector component for atom <span class="arithmatex">\(\alpha\)</span>,
+direction <span class="arithmatex">\(i\)</span>, in mode <span class="arithmatex">\(k\)</span>.</p>
+<h4 id="traditional-condensed-matter-ipr-iprs-attribute">Traditional (condensed-matter) IPR — <code>iprs</code> attribute<a class="headerlink" href="#traditional-condensed-matter-ipr-iprs-attribute" title="Permanent link">&para;</a></h4>
+<div class="arithmatex">\[\mathrm{IPR}_k^{\mathrm{trad}} = \frac{\displaystyle\sum_\alpha p_{k;\alpha}^2}{\left(\displaystyle\sum_\alpha p_{k;\alpha}\right)^2}\]</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(1\)</span></td>
+<td>Fully localized on one atom</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(1/N\)</span></td>
+<td>Fully delocalized over <span class="arithmatex">\(N\)</span> atoms</td>
+</tr>
+</tbody>
+</table>
+<p>Large = more localized.  Scale-invariant: gives identical results for normalized and un-normalized
+eigenvectors.</p>
+<h4 id="alkauskas-convention-ipr-iprs_alkauskas-attribute">Alkauskas-convention IPR — <code>iprs_alkauskas</code> attribute<a class="headerlink" href="#alkauskas-convention-ipr-iprs_alkauskas-attribute" title="Permanent link">&para;</a></h4>
+<p>Defined by Alkauskas <em>et al.</em> (2014), eq. 12:</p>
+<div class="arithmatex">\[\mathrm{IPR}_k = \frac{\left(\displaystyle\sum_\alpha p_{k;\alpha}\right)^2}{\displaystyle\sum_\alpha p_{k;\alpha}^2}\]</div>
+<p>For phonopy-normalized eigenvectors this simplifies to <span class="arithmatex">\(1/\sum_\alpha p_{k;\alpha}^2\)</span>.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(1\)</span></td>
+<td>Fully localized on one atom</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(N\)</span></td>
+<td>Fully delocalized over <span class="arithmatex">\(N\)</span> atoms</td>
+</tr>
+</tbody>
+</table>
+<p>Small = more localized.  This is the reciprocal of the traditional IPR.</p>
+<h4 id="relationship-between-the-two-conventions">Relationship between the two conventions<a class="headerlink" href="#relationship-between-the-two-conventions" title="Permanent link">&para;</a></h4>
+<div class="arithmatex">\[\mathrm{IPR}_k^{\mathrm{Alkauskas}} = \frac{1}{\mathrm{IPR}_k^{\mathrm{trad}}}\]</div>
+<h3 id="localization-ratio-localization_ratio-attribute">Localization ratio — <code>localization_ratio</code> attribute<a class="headerlink" href="#localization-ratio-localization_ratio-attribute" title="Permanent link">&para;</a></h3>
+<p>Alkauskas <em>et al.</em> (2014), eq. 14, define the <strong>localization ratio</strong> <span class="arithmatex">\(\beta_k\)</span> as:</p>
+<div class="arithmatex">\[\beta_k = \frac{M}{\mathrm{IPR}_k^{\mathrm{Alkauskas}}} = M \cdot \mathrm{IPR}_k^{\mathrm{trad}}\]</div>
+<p>where <span class="arithmatex">\(M\)</span> is the total number of atoms in the supercell.  In defectpl:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="bp">self</span><span class="o">.</span><span class="n">localization_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">natoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">iprs</span>   <span class="c1"># = natoms × IPR_trad = β_k</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th><span class="arithmatex">\(\beta_k\)</span></th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\approx 1\)</span></td>
+<td>Delocalized bulk phonon</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\approx M\)</span></td>
+<td>Fully localized on a single atom</td>
+</tr>
+</tbody>
+</table>
+<p>A large <span class="arithmatex">\(\beta_k\)</span> combined with a large <span class="arithmatex">\(S_k\)</span> identifies a phonon resonance that couples strongly
+to the optical transition <em>and</em> is spatially confined near the defect — the diagnostic signature
+of a localized vibrational mode.</p>
+<hr />
+<h2 id="6-finite-temperature-extension">6. Finite-Temperature Extension<a class="headerlink" href="#6-finite-temperature-extension" title="Permanent link">&para;</a></h2>
+<p>At temperatures above 0 K, phonons are thermally occupied and both emission and absorption of
+phonons contribute to the optical lineshape.  The formalism follows Jin <em>et al.</em> (2021) [3].</p>
+<h3 id="61-bose-einstein-phonon-occupation">6.1 Bose-Einstein Phonon Occupation<a class="headerlink" href="#61-bose-einstein-phonon-occupation" title="Permanent link">&para;</a></h3>
+<p>The mean phonon occupation of mode <span class="arithmatex">\(k\)</span> at temperature <span class="arithmatex">\(T\)</span> is:</p>
+<div class="arithmatex">\[\bar{n}_k(T) = \frac{1}{\exp\!\left(\dfrac{\hbar\omega_k}{k_B T}\right) - 1}\]</div>
+<p>At <span class="arithmatex">\(T = 0\)</span>, <span class="arithmatex">\(\bar{n}_k = 0\)</span> and the T=0 formalism is recovered exactly.</p>
+<h3 id="62-thermal-spectral-density">6.2 Thermal Spectral Density<a class="headerlink" href="#62-thermal-spectral-density" title="Permanent link">&para;</a></h3>
+<p>The thermal extension adds a new spectral density <span class="arithmatex">\(C(\hbar\omega, T)\)</span> defined as:</p>
+<div class="arithmatex">\[C(\hbar\omega, T) = \sum_k \bar{n}_k(T)\, S_k\, \delta(\hbar\omega - \hbar\omega_k)\]</div>
+<p>This quantity encodes the contribution of thermally occupied phonons to the lineshape.
+The time-domain counterpart is:</p>
+<div class="arithmatex">\[C(t, T) = \int_0^\infty C(\hbar\omega, T)\, e^{i\omega t}\, d(\hbar\omega)\]</div>
+<p>computed numerically as <span class="arithmatex">\(C(t) = \mathcal{F}^{-1}[C(\omega)]\)</span> via FFT (identical to how <span class="arithmatex">\(S(t)\)</span>
+is obtained from <span class="arithmatex">\(S(\omega)\)</span>).</p>
+<h3 id="63-temperature-dependent-generating-function">6.3 Temperature-Dependent Generating Function<a class="headerlink" href="#63-temperature-dependent-generating-function" title="Permanent link">&para;</a></h3>
+<p>The generating function generalises to [3, Eq. 7]:</p>
+<div class="arithmatex">\[G(t, T) = \exp\!\Big[S(t) - S(0) + 2C(t,T) - 2C(0,T)\Big]\, e^{-\gamma|t|}\]</div>
+<p>where:
+- <span class="arithmatex">\(S(0) = \sum_k S_k\)</span> is the total Huang-Rhys factor <span class="arithmatex">\(S_{\mathrm{HR}}\)</span>,
+- <span class="arithmatex">\(C(0, T) = \sum_k \bar{n}_k(T)\, S_k\)</span> is the thermal sum.</p>
+<p>At <span class="arithmatex">\(T = 0\)</span>, <span class="arithmatex">\(C(t,T) = C(0,T) = 0\)</span> and the original formula is recovered.</p>
+<h3 id="64-absorption-spectrum">6.4 Absorption Spectrum<a class="headerlink" href="#64-absorption-spectrum" title="Permanent link">&para;</a></h3>
+<p>The absorption spectral function is obtained from the complex conjugate of the PL generating
+function [3, Eq. 8]:</p>
+<div class="arithmatex">\[G_{\mathrm{abs}}(t, T) = G^*(t, T)\]</div>
+<p>because replacing <span class="arithmatex">\(S(t)\)</span> with its complex conjugate <span class="arithmatex">\(S^*(-t)\)</span> is equivalent to reversing
+the phonon-energy axis: phonon sidebands appear on the <strong>high-energy side</strong> of the ZPL
+(phonon absorption raises the photon energy), opposite to the PL emission sideband.</p>
+<p>The absorption intensity uses a linear <span class="arithmatex">\(\omega\)</span> prefactor (photon density of states in
+absorption) rather than the <span class="arithmatex">\(\omega^3\)</span> factor used for emission:</p>
+<div class="arithmatex">\[\alpha(\hbar\omega) \propto \omega\, A_{\mathrm{abs}}(\hbar\omega)\]</div>
+<h3 id="65-frequency-dependent-gaussian-broadening">6.5 Frequency-Dependent Gaussian Broadening<a class="headerlink" href="#65-frequency-dependent-gaussian-broadening" title="Permanent link">&para;</a></h3>
+<p>When <code>sigma</code> is supplied as a 2-tuple <code>(σ_low, σ_high)</code>, the broadening width varies linearly
+with phonon frequency:</p>
+<div class="arithmatex">\[\sigma(\omega_k) = \sigma_{\mathrm{low}} +
+\frac{(\sigma_{\mathrm{high}} - \sigma_{\mathrm{low}})(\omega_k - \omega_{\min})}
+{\omega_{\max} - \omega_{\min}}\]</div>
+<p>A scalar <code>sigma</code> value is equivalent to setting <span class="arithmatex">\(\sigma_{\mathrm{low}} = \sigma_{\mathrm{high}}\)</span>.</p>
+<h3 id="66-effective-phonon-frequency">6.6 Effective Phonon Frequency<a class="headerlink" href="#66-effective-phonon-frequency" title="Permanent link">&para;</a></h3>
+<p>A single characteristic phonon frequency that captures the mass-weighted average coupling is [3, Eq. 16]:</p>
+<div class="arithmatex">\[\Omega_{\mathrm{eff}} = \sqrt{\frac{\sum_k \omega_k^2\, \Delta Q_k^2}{\sum_k \Delta Q_k^2}}\]</div>
+<hr />
+<h2 id="7-software-pipeline-mapping">7. Software Pipeline Mapping<a class="headerlink" href="#7-software-pipeline-mapping" title="Permanent link">&para;</a></h2>
 <p>The math detailed in this tutorial maps directly to modules in the <code>defectpl</code> repository:
 * <strong><code>defectpl.defectpl.Photoluminescence</code></strong>: Rehydrates the cached JSON properties (frequencies <span class="arithmatex">\(\omega_{k}\)</span>, partial factors <span class="arithmatex">\(S_{k}\)</span>, force matrices, and energy grids), manages the evaluation of equations for <span class="arithmatex">\(S(\hbar\omega)\)</span>, and executes the numeric integration of <span class="arithmatex">\(G(t)\)</span> to transform it into the final luminescence vector <span class="arithmatex">\(L(\hbar\omega)\)</span>.
 * <strong><code>defectpl.defectpl.VibrationalSpectra1D</code></strong>: Handles standalone effective coordinate lineshape synthesis using parameterized 1D potentials.
@@ -1744,6 +1992,7 @@
 <h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
 <p>[1] Alkauskas, A., Buckley, B. B., Awschalom, D. D., &amp; Van de Walle, C. G. (2014). First-principles theory of the luminescence lineshape for the triplet transition in diamond NV centres. <em>New Journal of Physics</em>, 16(7), 073026. https://doi.org/10.1088/1367-2630/16/7/073026</p>
 <p>[2] Alkauskas, A., Yan, Q., &amp; Van de Walle, C. G. (2014). First-principles theory of nonradiative carrier capture via multiphonon emission. <em>Physical Review B</em>, 90(7), 075202. https://doi.org/10.1103/PhysRevB.90.075202</p>
+<p>[3] Jin, Y., Govoni, M., Wolfowicz, G., Rice, S. E., Heremans, F. J., Awschalom, D. D., &amp; Galli, G. (2021). Photoluminescence spectra of point defects in semiconductors: Validation of first-principles calculations. <em>Physical Review Materials</em>, 5(8), 084603. https://doi.org/10.1103/PhysRevMaterials.5.084603</p>
 
 
 

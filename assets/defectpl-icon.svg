@@ -1,24 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-  <defs>
-    <radialGradient id="glow_i" cx="50%" cy="46%" r="55%">
-      <stop offset="0%" stop-color="#FFEAF6"></stop>
-      <stop offset="20%" stop-color="#FF6FB5"></stop>
-      <stop offset="54%" stop-color="#9B45F0"></stop>
-      <stop offset="100%" stop-color="#5B5BF5"></stop>
-    </radialGradient>
-    <linearGradient id="ring_i" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#5B5BF5"></stop>
-      <stop offset="50%" stop-color="#9B45F0"></stop>
-      <stop offset="100%" stop-color="#E0479E"></stop>
-    </linearGradient>
-    <radialGradient id="halo_i" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#9B45F0" stop-opacity="0.20"></stop>
-      <stop offset="100%" stop-color="#9B45F0" stop-opacity="0"></stop>
-    </radialGradient></defs>
-  <polygon points="186,120 153,177.16 87,177.16 54,120 87,62.84 153,62.84" fill="none" stroke="#0E1116" stroke-width="8" stroke-linejoin="round"></polygon>
-  <g fill="#0E1116">
-    <circle cx="186" cy="120" r="13"></circle><circle cx="153" cy="177.16" r="13"></circle><circle cx="87" cy="177.16" r="13"></circle><circle cx="54" cy="120" r="13"></circle><circle cx="87" cy="62.84" r="13"></circle><circle cx="153" cy="62.84" r="13"></circle>
-  </g>
-  <circle cx="120" cy="120" r="40" fill="none" stroke="url(#ring_i)" stroke-width="3.5" opacity="0.55"></circle>
-  <circle cx="120" cy="120" r="19" fill="url(#glow_i)"></circle>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><defs>
+  <radialGradient id="glow_i" cx="50%" cy="44%" r="58%"><stop offset="0%" stop-color="#FFEAF6"></stop><stop offset="20%" stop-color="#FF6FB5"></stop><stop offset="52%" stop-color="#9B45F0"></stop><stop offset="100%" stop-color="#5B5BF5"></stop></radialGradient>
+  <linearGradient id="ring_i" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5B5BF5"></stop><stop offset="50%" stop-color="#9B45F0"></stop><stop offset="100%" stop-color="#E0479E"></stop></linearGradient>
+  <radialGradient id="halo_i" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9B45F0" stop-opacity="0.16"></stop><stop offset="100%" stop-color="#9B45F0" stop-opacity="0"></stop></radialGradient></defs>
+  <g transform="rotate(-30 120 120)">
+    <g><line x1="90" y1="120" x2="105" y2="120" stroke="#0E1116" stroke-width="9" stroke-linecap="round"></line><line x1="135" y1="94.02" x2="127.5" y2="107.00999999999999" stroke="#0E1116" stroke-width="9" stroke-linecap="round"></line><line x1="135" y1="145.98" x2="127.5" y2="132.99" stroke="#0E1116" stroke-width="9" stroke-linecap="round"></line>
+    <circle cx="90" cy="120" r="15" fill="#0E1116"></circle><circle cx="135" cy="94.02" r="15" fill="#0E1116"></circle><circle cx="135" cy="145.98" r="15" fill="#0E1116"></circle>
+    <g transform="rotate(30 120 120)"><circle cx="120" cy="120" r="22" fill="url(#glow_i)"></circle></g>
+  </g></g></svg>
