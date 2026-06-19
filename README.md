@@ -146,6 +146,7 @@ making it suitable for high-throughput screening where ES relaxation is expensiv
 
 ## Cite
 
+See the full [citation page](https://Shibu778.github.io/defectpl/cite/) for BibTeX entries and method references.
 If you use DefectPL in published work please cite:
 
 > Shibu Meher *et al.*,

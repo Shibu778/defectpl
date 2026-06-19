@@ -90,6 +90,7 @@ nav:
       - Defect Utilities: api/defect_utils.md
       - Constants: api/constants.md
       - CLI Reference: command_line_interface.md
+  - Citing: cite.md
   - Contributing:
       - Developer Guide: contributing.md
       - Changelog: changelog.md

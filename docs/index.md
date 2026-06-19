@@ -122,6 +122,7 @@ pl.generate_plots(out_dir="./plots/", fig_format="png")
 
 ## Cite
 
+See the full [Citing DefectPL](cite.md) page for BibTeX entries and method references.
 If you use DefectPL in published work, please cite:
 
 > Shibu Meher *et al.*, **Carbon with Stone-Wales Defect as Quantum Emitter in h-BN**,
