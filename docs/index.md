@@ -5,18 +5,17 @@ hide:
 ---
 
 <div style="text-align:center; padding: 2.5rem 0 0.5rem;">
-  <img src="assets/defectpl-logo-horizontal.svg"
+  <img src="assets/defectpl-logo-stacked.svg"
        alt="DefectPL"
        class="hero-logo hero-logo-light"
-       style="max-width:460px; width:80%;">
-  <img src="assets/defectpl-logo-horizontal-reverse.svg"
+       style="max-width:320px; width:60%;">
+  <img src="assets/defectpl-logo-stacked-reverse.svg"
        alt="DefectPL"
        class="hero-logo hero-logo-dark"
-       style="max-width:460px; width:80%;">
+       style="max-width:320px; width:60%;">
 
   <p style="font-size:1.1rem; opacity:0.8; max-width:620px; margin:0.8rem auto 1.4rem;">
-    First-principles photoluminescence lineshapes, electron–phonon coupling, and<br>
-    electronic-state localization for point defects in semiconductors and insulators.
+    A unified Python package for the optical properties of point defects in solids.
   </p>
 
   <div class="badge-row">
@@ -24,7 +23,7 @@ hide:
     <a href="https://anaconda.org/conda-forge/defectpl"><img src="https://anaconda.org/conda-forge/defectpl/badges/version.svg" alt="Conda"></a>
     <a href="https://pepy.tech/project/defectpl"><img src="https://static.pepy.tech/badge/defectpl" alt="Downloads"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT"></a>
-    <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
+    <a><img src="https://img.shields.io/badge/python-3.11%2B-blue" alt="Python 3.11+"></a>
   </div>
 
   <div style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:2.5rem;">
@@ -135,9 +134,4 @@ If you use DefectPL in published work, please cite:
 ---
 
 ## Acknowledgements
-
-DefectPL implements the generating-function formalism of
-Alkauskas, Buckley, Awschalom & Van de Walle (*New J. Phys.* **16**, 073026, 2014)
-and the Franck–Condon overlap approach of Alkauskas, Yan & Van de Walle
-(*Phys. Rev. B* **90**, 075202, 2014).
-Electronic P-ratio follows Kumagai *et al.* (*Phys. Rev. B* **103**, 104102, 2021).
+DefectPL is inspired by `pyphotonics`, integrating specialized functionalities from `pypl`, `pydefect`, and `nonrad` with the refined plotting aesthetics of `sumo`.

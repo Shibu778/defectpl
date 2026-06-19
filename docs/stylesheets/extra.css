@@ -31,11 +31,13 @@
   padding: 3rem 0 2rem;
   text-align: center;
 }
+
 .hero h1 {
   font-size: 2.6rem;
   font-weight: 700;
   margin-bottom: 0.4rem;
 }
+
 .hero p {
   font-size: 1.05rem;
   opacity: 0.85;
@@ -56,15 +58,41 @@
    Logo variants per color scheme
    ───────────────────────────────────────────────────────── */
 
-/* Sidebar / header logo: color mark in light, white mark in dark.
-   Controlled by overrides/partials/logo.html which renders both <img> tags.
-   Use .md-logo prefix (specificity 0,2,0) to beat Material's
-   .md-logo img rule (0,1,1) which would otherwise re-show the hidden image. */
-.md-logo .logo-dark-mode  { display: none;  }
-.md-logo .logo-light-mode { display: block; }
+/* Header logo: horizontal wordmark — light in light mode, reverse in dark mode.
+   overrides/partials/logo.html renders both <img> tags; CSS toggles visibility.
+   !important ensures these rules beat any Material internal display:block rule. */
+.md-logo .logo-dark-mode {
+  display: none !important;
+}
 
-[data-md-color-scheme="slate"] .md-logo .logo-light-mode { display: none;  }
-[data-md-color-scheme="slate"] .md-logo .logo-dark-mode  { display: block; }
+.md-logo .logo-light-mode {
+  display: block !important;
+}
+
+[data-md-color-scheme="slate"] .md-logo .logo-light-mode {
+  display: none !important;
+}
+
+[data-md-color-scheme="slate"] .md-logo .logo-dark-mode {
+  display: block !important;
+}
+
+/* The horizontal logo embeds the wordmark — suppress the duplicate site-name text */
+.md-header__title .md-header__topic:first-child {
+  display: none;
+}
+
+/* Expand the header to fit a larger wordmark logo */
+.md-header__inner {
+  height: 4rem;
+}
+
+/* Large horizontal wordmark — let the SVG scale to its natural aspect ratio */
+.md-logo img {
+  height: 3rem !important;
+  width: auto !important;
+  max-width: none !important;
+}
 
 /* Landing page hero logo */
 .hero-logo {
@@ -75,11 +103,21 @@
 }
 
 /* Hero: horizontal-color in light mode, horizontal-reverse in dark mode */
-.hero-logo-light { display: block; }
-.hero-logo-dark  { display: none;  }
+.hero-logo-light {
+  display: block;
+}
 
-[data-md-color-scheme="slate"] .hero-logo-light { display: none;  }
-[data-md-color-scheme="slate"] .hero-logo-dark  { display: block; }
+.hero-logo-dark {
+  display: none;
+}
+
+[data-md-color-scheme="slate"] .hero-logo-light {
+  display: none;
+}
+
+[data-md-color-scheme="slate"] .hero-logo-dark {
+  display: block;
+}
 
 /* Feature grid on landing page */
 .feature-grid {
@@ -88,15 +126,18 @@
   gap: 1.2rem;
   margin: 2rem 0;
 }
+
 .feature-card {
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 6px;
   padding: 1.1rem 1.2rem;
 }
+
 .feature-card h3 {
   margin-top: 0;
   font-size: 1rem;
 }
+
 .feature-card p {
   margin-bottom: 0;
   font-size: 0.82rem;

@@ -10,8 +10,7 @@
        width="480">
 </picture>
 
-**First-principles photoluminescence lineshapes, electron–phonon coupling, and
-electronic-state localization for point defects in semiconductors and insulators.**
+**A unified Python package for the optical properties of point defects in solids.**
 
 [![PyPI](https://img.shields.io/pypi/v/defectpl.svg)](https://pypi.org/project/defectpl)
 [![Conda](https://anaconda.org/conda-forge/defectpl/badges/version.svg)](https://anaconda.org/conda-forge/defectpl)
@@ -165,6 +164,11 @@ The generating-function formalism is from:
 > Alkauskas, Buckley, Awschalom & Van de Walle,
 > *New J. Phys.* **16**, 073026 (2014).
 
+---
+
+## Acknowledgements
+
+DefectPL is inspired by `pyphotonics`, integrating specialized functionalities from `pypl`, `pydefect`, and `nonrad` with the refined plotting aesthetics of `sumo`.
 ---
 
 ## Contributing

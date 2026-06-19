@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-defectpl — unified package for optical properties of point defects.
+defectpl — A unified Python package for the optical properties of point defects in solids.
 
 Public API
 ----------
 Core physics engines::
 
-    from defectpl import Photoluminescence, VibrationalSpectra1D
+    from defectpl import Photoluminescence, Photoabsorption, VibrationalSpectra1D
     from defectpl import ConfigurationCoordinateDiagram
+
+``Photoluminescence`` uses **ground-state phonons** and computes the PL emission
+spectrum.  ``Photoabsorption`` uses **excited-state phonons** (a phonopy run on
+the ES geometry) and computes only the absorption spectrum.
 
 Phonon helpers::
 
@@ -34,6 +38,7 @@ defectpl.physics.*    — physics computation engines
 
 from defectpl.defectpl import (
     ConfigurationCoordinateDiagram,
+    Photoabsorption,
     Photoluminescence,
     VibrationalSpectra1D,
 )
@@ -46,6 +51,7 @@ __version__ = "0.3.0"
 __all__ = [
     # Physics engines
     "ConfigurationCoordinateDiagram",
+    "Photoabsorption",
     "Photoluminescence",
     "VibrationalSpectra1D",
     # Phonon helpers

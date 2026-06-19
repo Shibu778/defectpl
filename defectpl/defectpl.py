@@ -115,10 +115,6 @@ class Photoluminescence(MSONable):
     C_total : float
         Zero-time thermal correction :math:`C(0,T) = \\sum_k \\bar{n}_k S_k`.
         Zero at T = 0.
-    A_abs : numpy.ndarray
-        Absorption spectral function.
-    absorption : numpy.ndarray
-        Normalised absorption intensity :math:`\\alpha(\\hbar\\omega) \\propto \\omega\\, A_{abs}`.
     effective_phonon_freq : float
         Effective phonon frequency Ω in **eV** (Jin *et al.* 2021, Eq. 16),
         computed as the displacement-weighted average :math:`\\Omega = \\sum_k \\omega_k^2
@@ -217,8 +213,6 @@ class Photoluminescence(MSONable):
     Gts: np.ndarray = field(init=False, default=None)
     A_line: np.ndarray = field(init=False, default=None)
     intensity: np.ndarray = field(init=False, default=None)
-    A_abs: np.ndarray = field(init=False, default=None)
-    absorption: np.ndarray = field(init=False, default=None)
 
     def __post_init__(self):
         self.frequencies = np.asarray(self.frequencies)
@@ -290,9 +284,6 @@ class Photoluminescence(MSONable):
         self.A_line, self.intensity = utils.calc_Spectrum_Intensity(
             self.Gts, self.EZPL, self.resolution
         )
-        self.A_abs, self.absorption = utils.calc_Absorption_Intensity(
-            self.Gts, self.EZPL, self.resolution
-        )
 
     def as_dict(self) -> dict:
         """
@@ -354,16 +345,12 @@ class Photoluminescence(MSONable):
             ),
             "omega_range": self.omega_range,
             "S_omega": self.S_omega.tolist() if self.S_omega is not None else None,
-            "absorption": (
-                self.absorption.tolist() if self.absorption is not None else None
-            ),
             # Drop complex/spectral arrays — cheaply recomputed by from_dict
             "Sts": None,
             "Gts": None,
             "A_line": None,
             "intensity": None,
             "Cts": None,
-            "A_abs": None,
         }
 
     @classmethod
@@ -419,9 +406,6 @@ class Photoluminescence(MSONable):
             "omega_range", [0.0, obj.max_energy, int(obj.max_energy * obj.resolution)]
         )
         obj.S_omega = np.array(d["S_omega"]) if d.get("S_omega") is not None else None
-        obj.absorption = (
-            np.array(d["absorption"]) if d.get("absorption") is not None else None
-        )
 
         # Placeholders for complex/derived arrays (recomputed below)
         obj.Sts = None
@@ -429,7 +413,6 @@ class Photoluminescence(MSONable):
         obj.A_line = None
         obj.intensity = None
         obj.Cts = None
-        obj.A_abs = None
 
         # Recompute complex-dependent pipeline from stored S_omega and C_omega
         if obj.intensity is None:
@@ -444,9 +427,6 @@ class Photoluminescence(MSONable):
                 C_total=obj.C_total,
             )
             obj.A_line, obj.intensity = utils.calc_Spectrum_Intensity(
-                obj.Gts, obj.EZPL, obj.resolution
-            )
-            obj.A_abs, obj.absorption = utils.calc_Absorption_Intensity(
                 obj.Gts, obj.EZPL, obj.resolution
             )
 
@@ -484,13 +464,13 @@ class Photoluminescence(MSONable):
         r"""
         Generate all standard diagnostic plots and save them to *out_dir*.
 
-        Produces sixteen figures: phonon energy vs mode index, traditional IPR vs energy,
+        Produces fourteen figures: phonon energy vs mode index, traditional IPR vs energy,
         Alkauskas IPR vs energy, localization ratio vs energy, phonon occupation vs energy,
         q\ :sub:`k` vs energy, S\ :sub:`k` vs energy, S(ω) alone, C(ω,T) alone,
         S(ω)+S\ :sub:`k`, S(ω)+S\ :sub:`k` coloured by localization ratio,
         S(ω)+S\ :sub:`k` coloured by traditional IPR, S(ω)+S\ :sub:`k` coloured by
-        Alkauskas IPR, the final PL intensity spectrum, the absorption spectrum, and
-        the PL+absorption overlay.
+        Alkauskas IPR, and the final PL intensity spectrum.  Absorption plots require
+        a :class:`Photoabsorption` object (which uses excited-state phonons).
 
         Parameters
         ----------
@@ -630,18 +610,565 @@ class Photoluminescence(MSONable):
             iylim=iylim,
             fig_format=fig_format,
         )
-        plotter.plot_absorption_vs_penergy(
+        print("All static visualization plots generated successfully.")
+
+
+@dataclass
+class Photoabsorption(MSONable):
+    """
+    Core engine for first-principles photoabsorption lineshape calculations.
+
+    Implements the generating-function formalism of Alkauskas *et al.*
+    (*New J. Phys.* **16**, 073026, 2014) to compute the full multi-phonon
+    photoabsorption spectrum of a point defect from DFT inputs.
+
+    This class uses **excited-state phonons** (a phonopy ``band.yaml`` run on
+    the excited-state geometry) to correctly describe the coupling of the
+    photon-absorption process to vibrational modes.  This is physically
+    distinct from :class:`Photoluminescence`, which uses ground-state phonons
+    for PL emission.
+
+    Two input modes are supported:
+
+    * **Displacement mode** — supply ``dR`` (atomic displacements between
+      ground and excited equilibrium geometries).
+    * **Force mode** — supply ``dF`` (forces on the excited-state atoms when
+      the system is in the ground-state charge state).
+
+    Parameters
+    ----------
+    frequencies : numpy.ndarray, shape (nmodes,)
+        Phonon mode frequencies at the Γ point in **eV** (from excited-state
+        phonopy calculation).
+    eigenvectors : numpy.ndarray, shape (nmodes, natoms, 3)
+        Mass-normalised phonon displacement eigenvectors (real part only).
+    masses : numpy.ndarray, shape (natoms,)
+        Atomic masses in atomic mass units (amu).
+    EZPL : float
+        Zero-phonon line (ZPL) energy in **eV**.
+    dR : numpy.ndarray, shape (natoms, 3), optional
+        Atomic displacement vector (excited − ground equilibrium) in **Å**.
+        Used in displacement mode.
+    dF : numpy.ndarray, shape (natoms, 3), optional
+        Atomic force difference (ground charge − excited charge) evaluated at
+        the ES geometry in **eV/Å**.  Used in force mode.  ``dR`` takes
+        priority if both are given.
+    resolution : int, optional
+        Number of energy grid points per eV; sets spectral resolution.
+        Default 1000.
+    max_energy : float, optional
+        Upper bound of the energy axis in **eV**.  Default 5.0.
+    sigma : float or (float, float), optional
+        Gaussian broadening width applied to the spectral function S(ω) in **eV**.
+        Default 6 meV.
+    gamma : float, optional
+        Lorentzian (homogeneous) broadening of the ZPL in **meV**.
+        Default 2.0 meV.
+    temperature : float, optional
+        Lattice temperature in **Kelvin**.  Pass 0 (default) for the T = 0 K limit.
+
+    Attributes
+    ----------
+    natoms : int
+        Number of atoms in the supercell.
+    delR : float
+        Root-mean-square atomic displacement ΔR in **Å**.
+    delQ : float
+        Mass-weighted configuration coordinate displacement ΔQ in
+        amu\\ :sup:`1/2`·Å.
+    qks : numpy.ndarray, shape (nmodes,)
+        Mode-projected configurational displacement q\\ :sub:`k`.
+    Sks : numpy.ndarray, shape (nmodes,)
+        Partial (mode-resolved) Huang–Rhys factors S\\ :sub:`k`.
+    HR_factor : float
+        Total Huang–Rhys factor S = Σ S\\ :sub:`k`.
+    DW_factor : float
+        Debye–Waller factor exp(−S).
+    iprs : numpy.ndarray, shape (nmodes,)
+        Phonon inverse participation ratio (traditional convention).
+    iprs_alkauskas : numpy.ndarray, shape (nmodes,)
+        Phonon IPR following Alkauskas *et al.* (2014) eq. 12.
+    localization_ratio : numpy.ndarray, shape (nmodes,)
+        Localization ratio β\\ :sub:`k` = N · IPR\\ :sub:`k`.
+    nks : numpy.ndarray, shape (nmodes,)
+        Bose-Einstein phonon occupation numbers :math:`\\bar{n}_k(T)`.
+    C_omega : numpy.ndarray
+        Thermal electron–phonon spectral density :math:`C(\\hbar\\omega, T)`.
+    Cts : numpy.ndarray
+        Real-valued time-domain thermal correction :math:`C(t, T)`.
+    C_total : float
+        Zero-time thermal correction :math:`C(0,T) = \\sum_k \\bar{n}_k S_k`.
+    effective_phonon_freq : float
+        Effective phonon frequency Ω in **eV**.
+    S_omega : numpy.ndarray
+        Continuous Huang–Rhys spectral density S(ω) (eV\\ :sup:`-1`).
+    Sts : numpy.ndarray
+        Fourier transform of S(ω) used in the generating function.
+    Gts : numpy.ndarray
+        Generating function G(t) = exp[S(t) − S] · exp(−γ|t|).
+    A_abs : numpy.ndarray
+        Absorption spectral function.
+    absorption : numpy.ndarray
+        Normalised absorption intensity :math:`\\alpha(\\hbar\\omega) \\propto \\omega\\, A_{abs}`.
+
+    Notes
+    -----
+    **Physics rationale**: In the Franck–Condon picture, the absorption
+    lineshape couples to the vibrational modes of the *excited* electronic
+    state, because the nuclear wavepacket created by photon absorption
+    evolves on the excited-state potential energy surface.  Conversely, PL
+    emission couples to *ground-state* phonons.  Using the correct phonon set
+    (ES for absorption, GS for emission) is essential for quantitatively
+    accurate lineshapes, particularly when the two geometries differ
+    significantly.
+
+    References
+    ----------
+    Alkauskas, Buckley, Awschalom & Van de Walle,
+    *New J. Phys.* **16**, 073026 (2014).
+
+    Examples
+    --------
+    >>> from defectpl.phonon import read_band_yaml
+    >>> import numpy as np
+    >>> freqs_es, evecs_es, masses = read_band_yaml("band_es.yaml")
+    >>> dR = np.load("dR.npy")
+    >>> abs_engine = Photoabsorption(
+    ...     frequencies=freqs_es,
+    ...     eigenvectors=evecs_es,
+    ...     masses=masses,
+    ...     EZPL=1.945,
+    ...     dR=dR,
+    ... )
+    >>> print(f"S = {abs_engine.HR_factor:.3f}")
+    """
+
+    # 1. Mandatory Core Inputs
+    frequencies: np.ndarray
+    eigenvectors: np.ndarray
+    masses: np.ndarray
+    EZPL: float
+
+    # 2. Runtime Optional Parameters
+    dR: Optional[np.ndarray] = None
+    dF: Optional[np.ndarray] = None
+    resolution: int = 1000
+    max_energy: float = 5.0
+    sigma: Union[float, Tuple[float, float]] = 6e-3
+    gamma: float = 2.0
+    temperature: float = 0.0
+
+    # Dependent calculated properties
+    natoms: int = field(init=False)
+    delR: float = field(init=False, default=None)
+    delQ: float = field(init=False, default=None)
+    qks: np.ndarray = field(init=False, default=None)
+    Sks: np.ndarray = field(init=False, default=None)
+    HR_factor: float = field(init=False, default=None)
+    DW_factor: float = field(init=False, default=None)
+    iprs: np.ndarray = field(init=False, default=None)
+    iprs_alkauskas: np.ndarray = field(init=False, default=None)
+    localization_ratio: np.ndarray = field(init=False, default=None)
+    nks: np.ndarray = field(init=False, default=None)
+    C_omega: np.ndarray = field(init=False, default=None)
+    Cts: np.ndarray = field(init=False, default=None)
+    C_total: float = field(init=False, default=0.0)
+    effective_phonon_freq: float = field(init=False, default=None)
+    omega_range: List[Union[float, int]] = field(init=False, default=None)
+    S_omega: np.ndarray = field(init=False, default=None)
+    Sts: np.ndarray = field(init=False, default=None)
+    Gts: np.ndarray = field(init=False, default=None)
+    A_abs: np.ndarray = field(init=False, default=None)
+    absorption: np.ndarray = field(init=False, default=None)
+
+    def __post_init__(self):
+        self.frequencies = np.asarray(self.frequencies)
+        self.eigenvectors = np.asarray(self.eigenvectors)
+        self.masses = np.asarray(self.masses)
+        if self.dR is not None:
+            self.dR = np.asarray(self.dR)
+        if self.dF is not None:
+            self.dF = np.asarray(self.dF)
+
+        self.natoms = len(self.masses)
+        self.omega_range = [
+            0.0,
+            self.max_energy,
+            int(self.max_energy * self.resolution),
+        ]
+        self.compute_properties()
+
+    def compute_properties(self):
+        """Run the full calculation pipeline and populate all derived attributes."""
+        self.delR = utils.calc_delR(self.dR) if self.dR is not None else 0.0
+        self.delQ = (
+            utils.calc_delQ(self.masses, self.dR) if self.dR is not None else 0.0
+        )
+
+        if self.dF is not None and np.any(self.dF):
+            self.qks = utils.calc_qks_force_vectorized(
+                self.masses, self.dF, self.eigenvectors, self.frequencies
+            )
+        elif self.dR is not None and np.any(self.dR):
+            self.qks = utils.calc_qks_vectorized(
+                self.masses, self.dR, self.eigenvectors
+            )
+        else:
+            raise ValueError(
+                "Either dR or dF must be provided and non-zero to compute qks."
+            )
+
+        self.Sks = utils.calc_Sks(self.qks, self.frequencies)
+        self.HR_factor = float(np.sum(self.Sks))
+        self.DW_factor = float(np.exp(-self.HR_factor))
+
+        self.iprs = utils.calc_IPR(self.eigenvectors)
+        self.iprs_alkauskas = utils.calc_IPR_alkauskas(self.eigenvectors)
+        self.localization_ratio = self.natoms * self.iprs
+
+        self.nks = utils.calc_phonon_occupation(self.frequencies, self.temperature)
+        self.C_omega = utils.calc_C_omega(
+            self.frequencies, self.Sks, self.nks, self.omega_range, self.sigma
+        )
+        self.Cts = utils.calc_Ct(self.C_omega)
+        self.C_total = utils.calc_C_total(self.nks, self.Sks)
+        self.effective_phonon_freq = utils.calc_effective_phonon_frequency(
+            self.frequencies, self.qks
+        )
+
+        self.S_omega = utils.calc_S_omega(
+            self.frequencies, self.Sks, self.omega_range, self.sigma
+        )
+        self.Sts = utils.calc_St(self.S_omega)
+        self.Gts = utils.calc_Gts(
+            self.Sts,
+            self.HR_factor,
+            self.gamma,
+            self.resolution,
+            Cts=self.Cts,
+            C_total=self.C_total,
+        )
+        self.A_abs, self.absorption = utils.calc_Absorption_Intensity(
+            self.Gts, self.EZPL, self.resolution
+        )
+
+    def as_dict(self) -> dict:
+        """
+        Serialize to a JSON-compatible dictionary.
+
+        Complex-valued arrays (``Sts``, ``Gts``) and derived spectral arrays
+        (``A_abs``, ``absorption``) are stored; Sts/Gts are cheaply recomputed
+        by :meth:`from_dict`.
+        """
+        return {
+            "@module": self.__class__.__module__,
+            "@class": self.__class__.__name__,
+            # Core Inputs
+            "frequencies": self.frequencies.tolist(),
+            "eigenvectors": self.eigenvectors.tolist(),
+            "masses": self.masses.tolist(),
+            "dR": self.dR.tolist() if self.dR is not None else None,
+            "dF": self.dF.tolist() if self.dF is not None else None,
+            "EZPL": self.EZPL,
+            "gamma": self.gamma,
+            "resolution": self.resolution,
+            "max_energy": self.max_energy,
+            "sigma": list(self.sigma) if hasattr(self.sigma, "__len__") else self.sigma,
+            "temperature": self.temperature,
+            # Safe Real-Valued Computed Properties
+            "natoms": self.natoms,
+            "delR": float(self.delR) if hasattr(self.delR, "__float__") else self.delR,
+            "delQ": float(self.delQ) if hasattr(self.delQ, "__float__") else self.delQ,
+            "qks": self.qks.tolist() if self.qks is not None else None,
+            "Sks": self.Sks.tolist() if self.Sks is not None else None,
+            "HR_factor": (
+                float(self.HR_factor)
+                if hasattr(self.HR_factor, "__float__")
+                else self.HR_factor
+            ),
+            "DW_factor": (
+                float(self.DW_factor)
+                if hasattr(self.DW_factor, "__float__")
+                else self.DW_factor
+            ),
+            "iprs": self.iprs.tolist() if self.iprs is not None else None,
+            "iprs_alkauskas": (
+                self.iprs_alkauskas.tolist()
+                if self.iprs_alkauskas is not None
+                else None
+            ),
+            "localization_ratio": (
+                self.localization_ratio.tolist()
+                if self.localization_ratio is not None
+                else None
+            ),
+            "nks": self.nks.tolist() if self.nks is not None else None,
+            "C_omega": self.C_omega.tolist() if self.C_omega is not None else None,
+            "C_total": float(self.C_total),
+            "effective_phonon_freq": (
+                float(self.effective_phonon_freq)
+                if self.effective_phonon_freq is not None
+                else None
+            ),
+            "omega_range": self.omega_range,
+            "S_omega": self.S_omega.tolist() if self.S_omega is not None else None,
+            "absorption": (
+                self.absorption.tolist() if self.absorption is not None else None
+            ),
+            # Drop complex/spectral arrays — cheaply recomputed by from_dict
+            "Sts": None,
+            "Gts": None,
+            "A_abs": None,
+            "Cts": None,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict):
+        """
+        Deserialize from a dictionary produced by :meth:`as_dict`.
+
+        Core inputs and real-valued computed properties are loaded directly;
+        complex arrays (``Sts``, ``Gts``) and the absorption spectrum are
+        recomputed on the fly from the stored S(ω).
+        """
+        obj = cls.__new__(cls)
+
+        # Load Core Inputs
+        obj.frequencies = np.array(d["frequencies"])
+        obj.eigenvectors = np.array(d["eigenvectors"])
+        obj.masses = np.array(d["masses"])
+        obj.dR = np.array(d["dR"]) if d.get("dR") is not None else None
+        obj.dF = np.array(d["dF"]) if d.get("dF") is not None else None
+        obj.EZPL = d["EZPL"]
+        obj.gamma = d["gamma"]
+        obj.resolution = d.get("resolution", 1000)
+        obj.max_energy = d.get("max_energy", 5.0)
+        _sigma = d.get("sigma", 6e-3)
+        obj.sigma = tuple(_sigma) if isinstance(_sigma, list) else _sigma
+        obj.temperature = d.get("temperature", 0.0)
+
+        # Load Stored Real-Valued Properties
+        obj.natoms = d.get("natoms", len(obj.masses))
+        obj.delR = d.get("delR")
+        obj.delQ = d.get("delQ")
+        obj.qks = np.array(d["qks"]) if d.get("qks") is not None else None
+        obj.Sks = np.array(d["Sks"]) if d.get("Sks") is not None else None
+        obj.HR_factor = d.get("HR_factor")
+        obj.DW_factor = d.get("DW_factor")
+        obj.iprs = np.array(d["iprs"]) if d.get("iprs") is not None else None
+        obj.iprs_alkauskas = (
+            np.array(d["iprs_alkauskas"])
+            if d.get("iprs_alkauskas") is not None
+            else None
+        )
+        obj.localization_ratio = (
+            np.array(d["localization_ratio"])
+            if d.get("localization_ratio") is not None
+            else None
+        )
+        obj.nks = np.array(d["nks"]) if d.get("nks") is not None else None
+        obj.C_omega = np.array(d["C_omega"]) if d.get("C_omega") is not None else None
+        obj.C_total = float(d.get("C_total", 0.0))
+        obj.effective_phonon_freq = d.get("effective_phonon_freq")
+        obj.omega_range = d.get(
+            "omega_range", [0.0, obj.max_energy, int(obj.max_energy * obj.resolution)]
+        )
+        obj.S_omega = np.array(d["S_omega"]) if d.get("S_omega") is not None else None
+        obj.absorption = (
+            np.array(d["absorption"]) if d.get("absorption") is not None else None
+        )
+
+        # Placeholders for complex/derived arrays (recomputed below)
+        obj.Sts = None
+        obj.Gts = None
+        obj.A_abs = None
+        obj.Cts = None
+
+        # Recompute complex-dependent pipeline from stored S_omega and C_omega
+        if obj.absorption is None:
+            obj.Cts = utils.calc_Ct(obj.C_omega) if obj.C_omega is not None else None
+            obj.Sts = utils.calc_St(obj.S_omega)
+            obj.Gts = utils.calc_Gts(
+                obj.Sts,
+                obj.HR_factor,
+                obj.gamma,
+                obj.resolution,
+                Cts=obj.Cts,
+                C_total=obj.C_total,
+            )
+            obj.A_abs, obj.absorption = utils.calc_Absorption_Intensity(
+                obj.Gts, obj.EZPL, obj.resolution
+            )
+
+        return obj
+
+    @classmethod
+    def from_dict_expensive(cls, d: dict):
+        """
+        Reconstruct by replaying the full pipeline from primary inputs only.
+
+        Slower than :meth:`from_dict` because ``__post_init__`` recomputes
+        everything from scratch; useful when stored arrays may be stale.
+        """
+        return cls(
+            frequencies=np.array(d["frequencies"]),
+            eigenvectors=np.array(d["eigenvectors"]),
+            masses=np.array(d["masses"]),
+            dR=np.array(d["dR"]) if d.get("dR") is not None else None,
+            dF=np.array(d["dF"]) if d.get("dF") is not None else None,
+            EZPL=d["EZPL"],
+            gamma=d["gamma"],
+            resolution=d.get("resolution", 1000),
+            max_energy=d.get("max_energy", 5.0),
+            sigma=d.get("sigma", 6e-3),
+            temperature=d.get("temperature", 0.0),
+        )
+
+    def generate_plots(
+        self,
+        out_dir: Union[str, Path],
+        max_freq: Optional[float] = None,
+        iylim=None,
+        fig_format="pdf",
+    ):
+        r"""
+        Generate all standard diagnostic plots and save them to *out_dir*.
+
+        Produces fourteen figures: phonon energy vs mode index, traditional IPR vs energy,
+        Alkauskas IPR vs energy, localization ratio vs energy, phonon occupation vs energy,
+        q\ :sub:`k` vs energy, S\ :sub:`k` vs energy, S(ω) alone, C(ω,T) alone,
+        S(ω)+S\ :sub:`k`, S(ω)+S\ :sub:`k` coloured by localization ratio,
+        S(ω)+S\ :sub:`k` coloured by traditional IPR, S(ω)+S\ :sub:`k` coloured by
+        Alkauskas IPR, and the absorption spectrum.
+
+        Parameters
+        ----------
+        out_dir : str or Path
+            Directory where figure files are written (created if absent).
+        max_freq : float, optional
+            Upper frequency cut-off for S(ω) plots in **meV**.
+        iylim : tuple of float, optional
+            ``(ymin, ymax)`` for the absorption plot y-axis (unused; kept for
+            API symmetry with :class:`Photoluminescence`).
+        fig_format : {'pdf', 'png', 'svg', 'jpg'}, optional
+            Output figure format.  Default ``'pdf'``.
+        """
+        plotter = Plotter()
+        iplot_xlim = (max(0.0, self.EZPL - 2.0), self.EZPL + 1.0)
+        freq_limit = (max_freq / 1000.0) if max_freq else None
+
+        plotter.plot_penergy_vs_pmode(
             frequencies=self.frequencies,
-            absorption=self.absorption,
-            resolution=self.resolution,
-            xlim=iplot_xlim,
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
         )
-        plotter.plot_pl_absorption_vs_penergy(
+        plotter.plot_ipr_vs_penergy(
+            self.frequencies,
+            self.iprs,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_ipr_alkauskas_vs_penergy(
+            self.frequencies,
+            self.iprs_alkauskas,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_loc_rat_vs_penergy(
+            self.frequencies,
+            self.localization_ratio,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_qk_vs_penergy(
+            self.frequencies,
+            self.qks,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_HR_factor_vs_penergy(
+            self.frequencies,
+            self.Sks,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_Sks_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            self.Sks,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_Sks_Loc_rat_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            self.Sks,
+            self.localization_ratio,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_Sks_ipr_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            self.Sks,
+            self.iprs,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_Sks_ipr_alkauskas_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            self.Sks,
+            self.iprs_alkauskas,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_nk_vs_penergy(
+            self.frequencies,
+            self.nks,
+            self.temperature,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_C_omega_vs_penergy(
+            self.frequencies,
+            self.C_omega,
+            self.omega_range,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_absorption_vs_penergy(
             frequencies=self.frequencies,
-            intensity=self.intensity,
             absorption=self.absorption,
             resolution=self.resolution,
             xlim=iplot_xlim,

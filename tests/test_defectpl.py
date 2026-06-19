@@ -11,6 +11,7 @@ from pymatgen.core import Structure, Lattice
 
 # Import target classes from the code module layout cleanly
 from defectpl.defectpl import (
+    Photoabsorption,
     Photoluminescence,
     VibrationalSpectra1D,
     ConfigurationCoordinateDiagram,
@@ -49,7 +50,6 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_Ct.return_value = np.zeros(100)
         mock_utils.calc_C_total.return_value = 0.0
         mock_utils.calc_effective_phonon_frequency.return_value = 0.04
-        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(100), np.ones(100))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -81,7 +81,6 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_C_total.return_value = 0.0
         mock_utils.calc_effective_phonon_frequency.return_value = 0.04
         mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
-        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         active_dF = np.array([[0.5, 0.0, 0.0], [0.0, 0.5, 0.0]])
 
@@ -107,7 +106,6 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_C_total.return_value = 0.0
         mock_utils.calc_effective_phonon_frequency.return_value = 0.04
         mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
-        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -149,7 +147,6 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_C_total.return_value = 0.0
         mock_utils.calc_effective_phonon_frequency.return_value = 0.04
         mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
-        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -164,6 +161,112 @@ class TestPhotoluminescence(unittest.TestCase):
         pl.generate_plots(out_dir="/tmp/test_plots")
         self.assertTrue(mock_plotter.plot_penergy_vs_pmode.called)
         self.assertTrue(mock_plotter.plot_intensity_vs_penergy.called)
+
+
+class TestPhotoabsorption(unittest.TestCase):
+    def setUp(self):
+        """Set up dummy array data configurations for Photoabsorption testing."""
+        self.frequencies = np.array([0.02, 0.04, 0.06])  # eV
+        self.eigenvectors = np.ones((3, 2, 3))  # (nmodes, natoms, 3)
+        self.masses = np.array([12.011, 14.007])  # C and N atom mock masses
+        self.dR = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0]])
+        self.EZPL = 2.5
+        self.gamma = 0.01
+
+    def _common_mocks(self, mock_utils, n=10):
+        """Configure common mock return values for utils functions."""
+        mock_utils.calc_delR.return_value = 0.1414
+        mock_utils.calc_delQ.return_value = 0.55
+        mock_utils.calc_qks_vectorized.return_value = np.array([0.1, 0.2, 0.3])
+        mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
+        mock_utils.calc_IPR.return_value = np.array([1.5, 1.5, 1.5])
+        mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
+        mock_utils.calc_S_omega.return_value = np.linspace(0, 1, n)
+        mock_utils.calc_St.return_value = np.linspace(0, 1, n)
+        mock_utils.calc_Gts.return_value = np.linspace(0, 1, n)
+        mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
+        mock_utils.calc_C_omega.return_value = np.zeros(n)
+        mock_utils.calc_Ct.return_value = np.zeros(n)
+        mock_utils.calc_C_total.return_value = 0.0
+        mock_utils.calc_effective_phonon_frequency.return_value = 0.04
+        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(n), np.ones(n))
+
+    @patch("defectpl.defectpl.utils", autospec=True)
+    def test_initialization_computes_absorption(self, mock_utils):
+        """Verify that Photoabsorption computes absorption but not intensity."""
+        self._common_mocks(mock_utils, n=100)
+
+        abs_engine = Photoabsorption(
+            frequencies=self.frequencies,
+            eigenvectors=self.eigenvectors,
+            masses=self.masses,
+            dR=self.dR,
+            dF=None,
+            EZPL=self.EZPL,
+            gamma=self.gamma,
+            resolution=10,
+            max_energy=2.0,
+        )
+
+        self.assertEqual(abs_engine.natoms, 2)
+        self.assertAlmostEqual(abs_engine.HR_factor, 1.7)
+        # Photoabsorption must have absorption attribute
+        self.assertIsNotNone(abs_engine.absorption)
+        # Photoabsorption must NOT have intensity attribute
+        self.assertFalse(hasattr(abs_engine, "intensity"))
+        # calc_Absorption_Intensity must be called; calc_Spectrum_Intensity must not
+        mock_utils.calc_Absorption_Intensity.assert_called_once()
+        mock_utils.calc_Spectrum_Intensity.assert_not_called()
+
+    @patch("defectpl.defectpl.utils", autospec=True)
+    def test_serialization_round_trip(self, mock_utils):
+        """Test as_dict / from_dict cycle for Photoabsorption."""
+        self._common_mocks(mock_utils, n=10)
+
+        abs_engine = Photoabsorption(
+            frequencies=self.frequencies,
+            eigenvectors=self.eigenvectors,
+            masses=self.masses,
+            dR=self.dR,
+            dF=None,
+            EZPL=self.EZPL,
+            gamma=self.gamma,
+        )
+
+        d = abs_engine.as_dict()
+        self.assertIn("absorption", d)
+        self.assertIn("HR_factor", d)
+        self.assertNotIn("intensity", d)
+
+        mock_utils.calc_qks_vectorized.reset_mock()
+
+        restored = Photoabsorption.from_dict(d)
+        self.assertIsInstance(restored, Photoabsorption)
+        # from_dict should not call calc_qks_vectorized (uses stored values)
+        mock_utils.calc_qks_vectorized.assert_not_called()
+        # absorption should be available after round-trip
+        self.assertIsNotNone(restored.absorption)
+
+    @patch("defectpl.defectpl.utils", autospec=True)
+    def test_from_dict_expensive(self, mock_utils):
+        """Test from_dict_expensive replays full pipeline for Photoabsorption."""
+        self._common_mocks(mock_utils, n=10)
+
+        abs_engine = Photoabsorption(
+            frequencies=self.frequencies,
+            eigenvectors=self.eigenvectors,
+            masses=self.masses,
+            dR=self.dR,
+            dF=None,
+            EZPL=self.EZPL,
+            gamma=self.gamma,
+        )
+        d = abs_engine.as_dict()
+        mock_utils.calc_qks_vectorized.reset_mock()
+
+        restored_expensive = Photoabsorption.from_dict_expensive(d)
+        self.assertIsInstance(restored_expensive, Photoabsorption)
+        mock_utils.calc_qks_vectorized.assert_called_once()
 
 
 class TestVibrationalSpectra1D(unittest.TestCase):

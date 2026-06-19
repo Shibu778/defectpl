@@ -4,8 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "docs/**"
-      - "overrides/**"    # MkDocs theme overrides (logo partial etc.)
+      - "docs/**"         # includes docs/overrides/ theme partial
       - "mkdocs.yml"
       - "defectpl/**"     # API docstrings live here
       - "pyproject.toml"

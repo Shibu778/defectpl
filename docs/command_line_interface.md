@@ -121,7 +121,92 @@ defectpl pl from-json properties.json \
 
 ---
 
-## 3. Standalone Plotting (`defectpl plot`)
+## 3. Photoabsorption (`defectpl absorption`)
+
+The `absorption` group computes multi-phonon photoabsorption lineshapes using the
+generating-function formalism with **excited-state phonons**.  The `--band_yaml` passed
+to every `absorption` sub-command must be obtained from a phonopy run on the
+**excited-state geometry** — this is the key physics distinction from `defectpl pl`,
+which uses ground-state phonons.
+
+### A. Displacement Mode (`defectpl absorption displacement`)
+
+```bash
+defectpl absorption displacement \
+  --band_yaml     ./band_es.yaml \
+  --contcar_gs    ./CONTCAR_gs \
+  --contcar_es    ./CONTCAR_es \
+  --ezpl          1.95 \
+  --gamma         2.0 \
+  --temperature   300 \
+  --sigma         "6e-3" \
+  --resolution    1000 \
+  --max_energy    5.0 \
+  --out_dir       ./output_data/ \
+  --json_out      abs_properties.json \
+  --plot_all \
+  --fig_format    pdf
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--band_yaml` | `./band.yaml` | **Excited-state** phonopy `band.yaml` file (phonopy run at ES geometry). |
+| `--contcar_gs` | `./CONTCAR_gs` | Ground-state equilibrium geometry. |
+| `--contcar_es` | `./CONTCAR_es` | Excited-state equilibrium geometry. |
+
+All other options are identical to `defectpl pl displacement`.
+
+### B. Force Mode (`defectpl absorption force`)
+
+```bash
+defectpl absorption force \
+  --band_yaml     ./band_es.yaml \
+  --outcar_gs     ./OUTCAR_gs_at_es_geom \
+  --outcar_es     ./OUTCAR_es_at_es_geom \
+  --ezpl          1.95 \
+  --json_out      abs_force.json
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--band_yaml` | `./band.yaml` | **Excited-state** phonopy `band.yaml`. |
+| `--outcar_gs` | `./OUTCAR_gs` | OUTCAR at ES geometry with GS charge state (for force difference). |
+| `--outcar_es` | `./OUTCAR_es` | OUTCAR at ES geometry with ES charge state. |
+
+### C. Restore from JSON (`defectpl absorption from-json`)
+
+```bash
+defectpl absorption from-json abs_properties.json \
+  --out_dir  ./figs/ \
+  --fig_format png
+```
+
+---
+
+## 4. PL + Absorption Overlay (`defectpl overlay`)
+
+Loads a `Photoluminescence` JSON (computed with GS phonons) and a `Photoabsorption`
+JSON (computed with ES phonons) and renders both spectra on a shared energy axis.
+
+```bash
+defectpl overlay \
+  --pl    pl.json \
+  --abs   abs.json \
+  --out_dir ./figs/ \
+  --fmt   pdf
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--pl` | *(required)* | Path to a serialized `Photoluminescence` JSON. |
+| `--abs` | *(required)* | Path to a serialized `Photoabsorption` JSON. |
+| `--out_dir` | `./` | Output directory for the overlay figure. |
+| `--fmt` | `pdf` | Figure format: `pdf`, `png`, `svg`. |
+| `--iylim` | — | Y-axis limits for the overlay plot (e.g. `"0,1.2"`). |
+
+---
+
+## 5. Standalone Plotting (`defectpl plot`)
 
 Deserializes a saved `properties.json` and renders any individual figure or the full set, without re-running the generating function.
 
@@ -132,7 +217,8 @@ defectpl plot ./properties.json --type absorption --fmt pdf
 defectpl plot ./properties.json --type nk
 ```
 
-**Argument:** Path to a Monty JSON file containing a valid `Photoluminescence` object.
+**Argument:** Path to a Monty JSON file containing a valid `Photoluminescence` or
+`Photoabsorption` object.
 
 | Option | Default | Description |
 |--------|---------|-------------|
@@ -144,29 +230,32 @@ defectpl plot ./properties.json --type nk
 
 ### Available plot types
 
-| `--type` | Output file | Description |
-|----------|-------------|-------------|
-| `mode` | `penergy_vs_pmode.*` | Phonon energy vs mode index scatter. |
-| `ipr` | `ipr_vs_penergy.*` | Traditional IPR vs phonon energy. |
-| `ipr_alkauskas` | `ipr_alkauskas_vs_penergy.*` | Alkauskas-convention IPR (range [1, N]) vs phonon energy. |
-| `loc_ratio` | `loc_rat_vs_penergy.*` | Localization ratio β_k = N × IPR vs phonon energy. |
-| `qk` | `qk_vs_penergy.*` | Mode displacement q_k vs phonon energy. |
-| `hr_factor` | `HR_factor_vs_penergy.*` | Partial HR factor S_k vs phonon energy. |
-| `s_omega` | `S_omega_vs_penergy.*` | Broadened spectral density S(ω). |
-| `s_omega_sk` | `S_omega_Sks_vs_penergy.*` | S(ω) line + S_k scatter (dual-axis). |
-| `s_omega_locrat` | `S_omega_HRf_loc_rat_vs_penergy.*` | S(ω) + S_k scatter coloured by localization ratio. |
-| `s_omega_ipr` | `S_omega_HRf_ipr_vs_penergy.*` | S(ω) + S_k scatter coloured by traditional IPR. |
-| `s_omega_ipr_alkauskas` | `S_omega_HRf_ipr_alkauskas_vs_penergy.*` | S(ω) + S_k scatter coloured by Alkauskas IPR. |
-| `nk` | `nk_vs_penergy.*` | Bose-Einstein phonon occupation n̄_k(T) vs phonon energy. |
-| `c_omega` | `C_omega_vs_penergy.*` | Thermal spectral density C(ω, T). Zero at T = 0. |
-| `intensity` | `intensity_vs_penergy.*` | Normalised PL emission spectrum L(ħω). |
-| `absorption` | `absorption_vs_penergy.*` | Normalised absorption spectrum α(ħω). Sideband on the high-energy side. |
-| `pl_absorption` | `pl_absorption_vs_penergy.*` | PL (solid) and absorption (dashed) overlaid on one axis. |
-| `all` | all of the above | Generate every figure in one call. |
+| `--type` | Required JSON type | Output file | Description |
+|----------|--------------------|-------------|-------------|
+| `mode` | either | `penergy_vs_pmode.*` | Phonon energy vs mode index scatter. |
+| `ipr` | either | `ipr_vs_penergy.*` | Traditional IPR vs phonon energy. |
+| `ipr_alkauskas` | either | `ipr_alkauskas_vs_penergy.*` | Alkauskas-convention IPR (range [1, N]) vs phonon energy. |
+| `loc_ratio` | either | `loc_rat_vs_penergy.*` | Localization ratio β_k = N × IPR vs phonon energy. |
+| `qk` | either | `qk_vs_penergy.*` | Mode displacement q_k vs phonon energy. |
+| `hr_factor` | either | `HR_factor_vs_penergy.*` | Partial HR factor S_k vs phonon energy. |
+| `s_omega` | either | `S_omega_vs_penergy.*` | Broadened spectral density S(ω). |
+| `s_omega_sk` | either | `S_omega_Sks_vs_penergy.*` | S(ω) line + S_k scatter (dual-axis). |
+| `s_omega_locrat` | either | `S_omega_HRf_loc_rat_vs_penergy.*` | S(ω) + S_k scatter coloured by localization ratio. |
+| `s_omega_ipr` | either | `S_omega_HRf_ipr_vs_penergy.*` | S(ω) + S_k scatter coloured by traditional IPR. |
+| `s_omega_ipr_alkauskas` | either | `S_omega_HRf_ipr_alkauskas_vs_penergy.*` | S(ω) + S_k scatter coloured by Alkauskas IPR. |
+| `nk` | either | `nk_vs_penergy.*` | Bose-Einstein phonon occupation n̄_k(T) vs phonon energy. |
+| `c_omega` | either | `C_omega_vs_penergy.*` | Thermal spectral density C(ω, T). Zero at T = 0. |
+| `intensity` | `Photoluminescence` only | `intensity_vs_penergy.*` | Normalised PL emission spectrum L(ħω). Raises an error if a `Photoabsorption` JSON is provided. |
+| `absorption` | `Photoabsorption` only | `absorption_vs_penergy.*` | Normalised absorption spectrum α(ħω). Raises an error if a `Photoluminescence` JSON is provided. |
+| `all` | either | all of the above (applicable) | Generate every figure valid for the given JSON type. |
+
+> **Note:** To overlay PL and absorption on a single plot, use `defectpl overlay` (Section 4)
+> rather than `defectpl plot -t pl_absorption`.  The `pl_absorption` type has been removed
+> because PL and absorption now come from separate JSON files (different phonon inputs).
 
 ---
 
-## 4. Generalized Displacements (`defectpl dq`)
+## 6. Generalized Displacements (`defectpl dq`)
 
 Calculates the mass-weighted configuration coordinate vector offset (ΔQ) across any two matching structural geometry supercells.
 
@@ -183,7 +272,7 @@ defectpl dq ./CONTCAR_GS ./CONTCAR_ES --format json --out delta_q.json
 
 ---
 
-## 5. Analytical 1D Lineshapes (`defectpl spectra1d`)
+## 7. Analytical 1D Lineshapes (`defectpl spectra1d`)
 
 Simulates a decoupled 1D displaced-distorted harmonic oscillator spectrum without assuming identical Hessians (ω₁ ≠ ω₂). Boltzmann-weighted Franck–Condon overlaps are summed explicitly over vibrational quantum numbers.
 
@@ -220,7 +309,7 @@ defectpl spectra1d \
 
 ---
 
-## 6. Configuration Coordinate Diagrams (`defectpl setup-ccd` / `analyze-ccd`)
+## 8. Configuration Coordinate Diagrams (`defectpl setup-ccd` / `analyze-ccd`)
 
 Automates linear structure interpolation tasks across structural potential surfaces to map the classical harmonic potential energy curves.
 
@@ -254,7 +343,7 @@ defectpl analyze-ccd \
 
 ---
 
-## 7. Comparative Benchmark Suites (`defectpl compare-json` / `compare-yaml`)
+## 9. Comparative Benchmark Suites (`defectpl compare-json` / `compare-yaml`)
 
 Compiles and plots multiple calculated datasets side-by-side to benchmark modelling parameters.
 
@@ -284,7 +373,7 @@ defectpl compare-yaml \
 
 ---
 
-## 8. Phonon and Lattice Utilities
+## 10. Phonon and Lattice Utilities
 
 Exposes administrative shortcuts for mapping Gamma-point lattice frequencies within your processing directories.
 
@@ -322,7 +411,7 @@ defectpl phonon-parse ./band.yaml --json_out parsed_phonons.json
 
 ---
 
-## 9. Kohn-Sham Level Visualization (`defectpl ksplot`)
+## 11. Kohn-Sham Level Visualization (`defectpl ksplot`)
 
 Parses a VASP `EIGENVAL` file to resolve degeneracies, handle spin polarization, and plot single-particle defect states within the bandgap.
 
@@ -347,7 +436,7 @@ defectpl ksplot ./EIGENVAL \
 
 ---
 
-## 10. Participation Ratio (`defectpl pr`)
+## 12. Participation Ratio (`defectpl pr`)
 
 The `pr` group computes electronic-state **P-ratio** and **IPR** from VASP PROCAR data, and provides utilities to generate all prerequisite JSON files without pydefect.
 

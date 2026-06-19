@@ -1,8 +1,6 @@
 site_name: DefectPL
 site_url: https://Shibu778.github.io/defectpl/
-site_description: >-
-  First-principles photoluminescence lineshapes, electron-phonon coupling, and
-  electronic-state localization for point defects in semiconductors and insulators.
+site_description: A unified Python package for the optical properties of point defects in solids.
 site_author: Shibu Meher
 
 repo_name: Shibu778/defectpl
@@ -17,9 +15,8 @@ copyright: Copyright &copy; 2024 Shibu Meher
 # ──────────────────────────────────────────────────────────────────────────────
 theme:
   name: material
-  custom_dir: overrides                      # logo.html partial for light/dark sidebar swap
   language: en
-  logo: assets/defectpl-mark-color.svg      # light-mode sidebar / header icon
+  logo: assets/defectpl-logo-horizontal.svg  # light-mode header logo (wordmark)
   favicon: assets/defectpl-appicon.svg      # browser tab
   palette:
     # Light mode
@@ -168,9 +165,14 @@ markdown_extensions:
 # ──────────────────────────────────────────────────────────────────────────────
 # Extra JavaScript & CSS
 # ──────────────────────────────────────────────────────────────────────────────
+exclude_docs: |
+  overrides/**
+
 extra_javascript:
-  - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - path: javascripts/mathjax.js
+    defer: true
+  - path: https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+    defer: true
 
 extra_css:
   - stylesheets/extra.css

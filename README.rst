@@ -1,10 +1,7 @@
 DefectPL
 ========
 
-A high-performance computational toolkit for calculating and visualizing
-the photoluminescence (PL) spectra, electron-phonon coupling
-characteristics, and optical lineshapes of quantum defect centers in
-insulators and semiconductors.
+A unified Python package for the optical properties of point defects in solids.
 
 |PyPI Version| |Conda Recipe| |Anaconda Version| |Downloads| |License:
 MIT|
@@ -194,13 +191,10 @@ portal or submit a structured Pull Request.
 
 **Project Lead Maintainers:** \* **Shibu Meher** \* **Manoj Dey**
 
-Special Acknowledgements
-~~~~~~~~~~~~~~~~~~~~~~~~
+Acknowledgements
+~~~~~~~~~~~~~~~~
 
-The development of this software was supported and inspired by several
-foundational open-source packages within the materials physics
-community: \* **``PyPhotonics``** \* **``nonrad``** \* **``sumo``** \*
-**``phonopy``**
+**DefectPL** is inspired by ``pyphotonics``, integrating specialized functionalities from ``pypl``, ``pydefect``, and ``nonrad`` with the refined plotting aesthetics of ``sumo``.
 
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/defectpl.svg?color=blue
    :target: https://pypi.org/pypi/defectpl

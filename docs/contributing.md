@@ -107,10 +107,10 @@ defectpl/
 ├── docs/               # MkDocs documentation source
 │   ├── assets/         # SVG logos and icons
 │   ├── stylesheets/    # Custom CSS (extra.css)
-│   └── javascripts/    # MathJax config (mathjax.js)
-├── overrides/          # MkDocs Material theme overrides
-│   └── partials/
-│       └── logo.html   # Light/dark sidebar logo swap
+│   ├── javascripts/    # MathJax config (mathjax.js)
+│   └── overrides/      # MkDocs Material theme overrides
+│       └── partials/
+│           └── logo.html   # Light/dark navbar logo swap
 ├── environment.yaml    # Conda dev environment
 ├── pyproject.toml      # Package metadata and dependencies
 ├── .pre-commit-config.yaml
@@ -141,15 +141,16 @@ All brand assets live in `docs/assets/`:
 |---|---|
 | `defectpl-logo-horizontal.svg` | Horizontal logo — light background (README hero, docs hero in light mode) |
 | `defectpl-logo-horizontal-reverse.svg` | Horizontal logo — dark background (docs hero in dark mode, GitHub dark README) |
-| `defectpl-logo-stacked.svg` | Stacked logo — centered layouts |
+| `defectpl-logo-stacked.svg` | Stacked logo — home page hero in light mode |
+| `defectpl-logo-stacked-reverse.svg` | Stacked logo — home page hero in dark mode |
 | `defectpl-mark-color.svg` | Color mark — sidebar icon in light mode |
 | `defectpl-mark-mono-white.svg` | White mark — sidebar icon in dark mode |
 | `defectpl-mark-mono-ink.svg` | Dark mark — monochrome use on light backgrounds |
 | `defectpl-icon.svg` | Minimal 3-node icon mark |
 | `defectpl-appicon.svg` | Rounded-rect app icon — browser favicon |
 
-The sidebar logo is swapped between light and dark mode via
-`overrides/partials/logo.html` (sets `logo-light-mode` / `logo-dark-mode` CSS classes)
+The navbar logo is swapped between light and dark mode via
+`docs/overrides/partials/logo.html` (sets `logo-light-mode` / `logo-dark-mode` CSS classes)
 and the corresponding rules in `docs/stylesheets/extra.css`.
 
 ### Install docs dependencies

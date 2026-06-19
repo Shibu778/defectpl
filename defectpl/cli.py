@@ -444,6 +444,402 @@ def pl_from_json(json_file, out_dir, fig_format, iylim, max_freq):
 
 
 # =====================================================================
+# PHOTOABSORPTION ENGINE COMMANDS (DISPLACEMENT & FORCE MODES)
+# =====================================================================
+
+
+@click.group(name="absorption")
+def absorption_group():
+    """Execute photoabsorption spectral calculations using excited-state phonons."""
+    pass
+
+
+@absorption_group.command(name="displacement")
+@click.option(
+    "--band_yaml",
+    default="./band.yaml",
+    type=click.Path(exists=True),
+    help="Excited-state phonopy band.yaml (phonopy run on the ES geometry).",
+)
+@click.option(
+    "--contcar_gs",
+    default="./CONTCAR_gs",
+    type=click.Path(exists=True),
+    help="Pymatgen readable Ground State equilibrium configuration structure file path.",
+)
+@click.option(
+    "--contcar_es",
+    default="./CONTCAR_es",
+    type=click.Path(exists=True),
+    help="Pymatgen readable Excited State equilibrium configuration structure file path.",
+)
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Output directory path endpoint to drop calculated results database records.",
+)
+@click.option(
+    "--ezpl",
+    default=1.95,
+    type=float,
+    help="Energy value designating Zero-Phonon Line baseline transitions boundary in eV.",
+)
+@click.option(
+    "--gamma",
+    default=2.0,
+    type=float,
+    help="Lorentzian ZPL broadening in meV.",
+)
+@click.option(
+    "--temperature",
+    default=0.0,
+    type=float,
+    help="Lattice temperature in K for Bose-Einstein thermal weighting (0 = T=0 limit).",
+)
+@click.option(
+    "--sigma",
+    "sigma_str",
+    default="6e-3",
+    help=(
+        "Gaussian broadening in eV: scalar '6e-3' for uniform, or two comma-separated "
+        "values '3e-3,8e-3' for frequency-dependent (low-freq,high-freq) broadening."
+    ),
+)
+@click.option(
+    "--resolution",
+    default=1000,
+    type=int,
+    help="Number of spectral grid points per eV.",
+)
+@click.option(
+    "--max_energy",
+    default=5.0,
+    type=float,
+    help="Upper energy axis limit in eV.",
+)
+@click.option(
+    "--json_out",
+    default=None,
+    help="Optional output path to serialize the complete Photoabsorption data model as a JSON file.",
+)
+@click.option(
+    "--plot_all",
+    is_flag=True,
+    default=False,
+    help="If flagged, automatically spawns all downstream visualization graphics profiles.",
+)
+@click.option(
+    "--fig_format",
+    default="pdf",
+    help="Export graphic file extension target layout standard (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated limits for the absorption plot y-axis (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+)
+def absorption_displacement(
+    band_yaml,
+    contcar_gs,
+    contcar_es,
+    out_dir,
+    ezpl,
+    gamma,
+    temperature,
+    sigma_str,
+    resolution,
+    max_energy,
+    json_out,
+    plot_all,
+    fig_format,
+    iylim,
+    max_freq,
+):
+    """Run photoabsorption calculations using atomic structural shifts (Displacement Mode)."""
+    from defectpl.phonon import read_band_yaml
+    from pymatgen.core import Structure
+    from defectpl.io.vasp import calc_dR
+    from defectpl.defectpl import Photoabsorption
+    from monty.serialization import dumpfn
+
+    try:
+        sigma = _parse_sigma(sigma_str)
+        click.echo("Initializing photoabsorption calculation via Displacement Mode...")
+        frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
+        struct_gs = Structure.from_file(contcar_gs)
+        struct_es = Structure.from_file(contcar_es)
+        dR = calc_dR(struct_gs, struct_es)
+
+        abs_engine = Photoabsorption(
+            frequencies=frequencies,
+            eigenvectors=eigenvectors,
+            masses=masses,
+            dR=dR,
+            dF=None,
+            EZPL=ezpl,
+            gamma=gamma,
+            resolution=resolution,
+            max_energy=max_energy,
+            sigma=sigma,
+            temperature=temperature,
+        )
+        click.echo("Photoabsorption engine data properties calculated successfully.")
+        click.echo(f"  HR factor      : {abs_engine.HR_factor:.4f}")
+        click.echo(f"  DW factor      : {abs_engine.DW_factor:.4f}")
+        click.echo(f"  Temperature    : {temperature} K")
+        click.echo(f"  C_total        : {abs_engine.C_total:.4f}")
+
+        if json_out:
+            dumpfn(abs_engine, json_out, indent=2)
+            click.echo(
+                f"Serialized Photoabsorption class properties safely to {json_out}"
+            )
+
+        if plot_all:
+            parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            out_path = Path(out_dir)
+            out_path.mkdir(parents=True, exist_ok=True)
+            abs_engine.generate_plots(
+                out_dir=out_dir,
+                fig_format=fig_format,
+                iylim=parsed_iylim,
+                max_freq=max_freq,
+            )
+            click.echo(f"All plots written to {out_dir}")
+
+    except Exception as exc:
+        if _verbose:
+            raise
+        raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
+
+
+@absorption_group.command(name="force")
+@click.option(
+    "--band_yaml",
+    default="./band.yaml",
+    type=click.Path(exists=True),
+    help="Excited-state phonopy band.yaml (phonopy run on the ES geometry).",
+)
+@click.option(
+    "--outcar_gs",
+    default="./OUTCAR_gs",
+    type=click.Path(exists=True),
+    help="OUTCAR at ES geometry with GS charge state (for force difference).",
+)
+@click.option(
+    "--outcar_es",
+    default="./OUTCAR_es",
+    type=click.Path(exists=True),
+    help="OUTCAR at ES geometry with ES charge state.",
+)
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Output directory path endpoint to drop calculated results database records.",
+)
+@click.option(
+    "--ezpl",
+    default=1.95,
+    type=float,
+    help="Energy value designating Zero-Phonon Line baseline transitions boundary in eV.",
+)
+@click.option(
+    "--gamma",
+    default=2.0,
+    type=float,
+    help="Lorentzian ZPL broadening in meV.",
+)
+@click.option(
+    "--temperature",
+    default=0.0,
+    type=float,
+    help="Lattice temperature in K for Bose-Einstein thermal weighting (0 = T=0 limit).",
+)
+@click.option(
+    "--sigma",
+    "sigma_str",
+    default="6e-3",
+    help=(
+        "Gaussian broadening in eV: scalar '6e-3' for uniform, or two comma-separated "
+        "values '3e-3,8e-3' for frequency-dependent (low-freq,high-freq) broadening."
+    ),
+)
+@click.option(
+    "--resolution",
+    default=1000,
+    type=int,
+    help="Number of spectral grid points per eV.",
+)
+@click.option(
+    "--max_energy",
+    default=5.0,
+    type=float,
+    help="Upper energy axis limit in eV.",
+)
+@click.option(
+    "--json_out",
+    default=None,
+    help="Optional output path to serialize the complete Photoabsorption data model as a JSON file.",
+)
+@click.option(
+    "--plot_all",
+    is_flag=True,
+    default=False,
+    help="If flagged, automatically spawns all downstream visualization graphics profiles.",
+)
+@click.option(
+    "--fig_format",
+    default="pdf",
+    help="Export graphic file extension target layout standard (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated limits for the absorption plot y-axis (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+)
+def absorption_force(
+    band_yaml,
+    outcar_gs,
+    outcar_es,
+    out_dir,
+    ezpl,
+    gamma,
+    temperature,
+    sigma_str,
+    resolution,
+    max_energy,
+    json_out,
+    plot_all,
+    fig_format,
+    iylim,
+    max_freq,
+):
+    """Run photoabsorption calculations using force-difference vectors (Force Mode)."""
+    from defectpl.phonon import read_band_yaml
+    from defectpl.io.vasp import prepare_dF_files
+    from defectpl.defectpl import Photoabsorption
+    from monty.serialization import dumpfn
+
+    try:
+        sigma = _parse_sigma(sigma_str)
+        click.echo("Initializing photoabsorption calculation via Force Mode...")
+        frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
+        dF = prepare_dF_files(outcar_gs, outcar_es)
+
+        abs_engine = Photoabsorption(
+            frequencies=frequencies,
+            eigenvectors=eigenvectors,
+            masses=masses,
+            dR=None,
+            dF=dF,
+            EZPL=ezpl,
+            gamma=gamma,
+            resolution=resolution,
+            max_energy=max_energy,
+            sigma=sigma,
+            temperature=temperature,
+        )
+        click.echo("Photoabsorption engine data properties calculated successfully.")
+        click.echo(f"  HR factor      : {abs_engine.HR_factor:.4f}")
+        click.echo(f"  DW factor      : {abs_engine.DW_factor:.4f}")
+        click.echo(f"  Temperature    : {temperature} K")
+        click.echo(f"  C_total        : {abs_engine.C_total:.4f}")
+
+        if json_out:
+            dumpfn(abs_engine, json_out, indent=2)
+            click.echo(
+                f"Serialized Photoabsorption class properties safely to {json_out}"
+            )
+
+        if plot_all:
+            parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            out_path = Path(out_dir)
+            out_path.mkdir(parents=True, exist_ok=True)
+            abs_engine.generate_plots(
+                out_dir=out_dir,
+                fig_format=fig_format,
+                iylim=parsed_iylim,
+                max_freq=max_freq,
+            )
+            click.echo(f"All plots written to {out_dir}")
+
+    except Exception as exc:
+        if _verbose:
+            raise
+        raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
+
+
+@absorption_group.command(name="from-json")
+@click.argument("json_file", type=click.Path(exists=True))
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Directory to write plots.",
+)
+@click.option(
+    "--fig_format",
+    default="pdf",
+    help="Export graphic file extension (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated y-axis limits for absorption plot (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency for mode plots (meV).",
+)
+def absorption_from_json(json_file, out_dir, fig_format, iylim, max_freq):
+    """Restore a saved Photoabsorption JSON and regenerate all plots.
+
+    \b
+        defectpl absorption from-json abs_results.json --out_dir plots/ --fig_format png
+    """
+    from defectpl.defectpl import Photoabsorption
+    from monty.serialization import loadfn
+
+    try:
+        click.echo(f"Loading: {json_file}")
+        abs_engine = loadfn(json_file)
+        if not isinstance(abs_engine, Photoabsorption):
+            raise ValueError("JSON does not contain a Photoabsorption object.")
+
+        click.echo(
+            f"  HR factor : {abs_engine.HR_factor:.4f}  |  "
+            f"EZPL : {abs_engine.EZPL} eV  |  T : {abs_engine.temperature} K"
+        )
+        parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+        out_path = Path(out_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+        abs_engine.generate_plots(
+            out_dir=out_dir,
+            fig_format=fig_format,
+            iylim=parsed_iylim,
+            max_freq=max_freq,
+        )
+        click.echo(f"All plots written to {out_dir}")
+    except Exception as exc:
+        if _verbose:
+            raise
+        raise click.ClickException(str(exc))
+
+
+# =====================================================================
 # INDIVIDUAL PLOT CONTROLLER COMMAND
 # =====================================================================
 
@@ -465,7 +861,6 @@ _PLOT_TYPES = [
     "c_omega",
     "intensity",
     "absorption",
-    "pl_absorption",
 ]
 
 
@@ -492,9 +887,9 @@ _PLOT_TYPES = [
         "  s_omega_ipr_alkauskas  S(omega) coloured by Alkauskas IPR\n"
         "  nk                Bose-Einstein phonon occupation vs phonon energy\n"
         "  c_omega           thermal spectral density C(omega,T)\n"
-        "  intensity         normalised PL emission spectrum\n"
-        "  absorption        normalised absorption spectrum\n"
-        "  pl_absorption     PL and absorption overlaid\n"
+        "  intensity         normalised PL emission spectrum (Photoluminescence JSON only)\n"
+        "  absorption        normalised absorption spectrum (Photoabsorption JSON only)\n"
+        "  (for PL+absorption overlay use: defectpl overlay --pl pl.json --abs abs.json)\n"
     ),
 )
 @click.option(
@@ -519,24 +914,28 @@ _PLOT_TYPES = [
     help="Upper phonon-frequency cut-off for mode/S(omega) plots (meV).",
 )
 def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
-    """Deserialize a saved Photoluminescence JSON and render one or all plots.
+    """Deserialize a saved Photoluminescence or Photoabsorption JSON and render one or all plots.
 
     \b
     Examples:
       defectpl plot pl.json -t intensity
-      defectpl plot pl.json -t absorption --fmt png
+      defectpl plot abs.json -t absorption --fmt png
       defectpl plot pl.json -t all --out_dir figs/
       defectpl plot pl.json -t nk
     """
-    from defectpl.defectpl import Photoluminescence
+    from defectpl.defectpl import Photoluminescence, Photoabsorption
     from defectpl.plot import Plotter
     from monty.serialization import loadfn
 
     try:
         click.echo(f"Loading: {json_file}")
-        pl_engine = loadfn(json_file)
-        if not isinstance(pl_engine, Photoluminescence):
-            raise ValueError("JSON does not contain a Photoluminescence object.")
+        engine = loadfn(json_file)
+        if not isinstance(engine, (Photoluminescence, Photoabsorption)):
+            raise ValueError(
+                "JSON does not contain a Photoluminescence or Photoabsorption object."
+            )
+        # Convenience alias used throughout the block below
+        pl_engine = engine
 
         plotter = Plotter()
         parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
@@ -715,6 +1114,11 @@ def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
             )
 
         if pt in ("intensity", "all"):
+            if not isinstance(pl_engine, Photoluminescence):
+                raise ValueError(
+                    "'intensity' plot type requires a Photoluminescence JSON. "
+                    "For absorption use a Photoabsorption JSON with '-t absorption'."
+                )
             _do(
                 "intensity",
                 plotter.plot_intensity_vs_penergy,
@@ -729,6 +1133,11 @@ def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
             )
 
         if pt in ("absorption", "all"):
+            if not isinstance(pl_engine, Photoabsorption):
+                raise ValueError(
+                    "'absorption' plot type requires a Photoabsorption JSON. "
+                    "For PL emission use a Photoluminescence JSON with '-t intensity'."
+                )
             _do(
                 "absorption",
                 plotter.plot_absorption_vs_penergy,
@@ -741,24 +1150,98 @@ def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
                 fig_format=fmt,
             )
 
-        if pt in ("pl_absorption", "all"):
-            _do(
-                "pl_absorption",
-                plotter.plot_pl_absorption_vs_penergy,
-                frequencies=pl_engine.frequencies,
-                intensity=pl_engine.intensity,
-                absorption=pl_engine.absorption,
-                resolution=pl_engine.resolution,
-                xlim=iplot_xlim,
-                plot=False,
-                out_dir=out_dir,
-                fig_format=fmt,
-            )
-
     except Exception as exc:
         if _verbose:
             raise
         raise click.ClickException(f"Failed to generate plot: {exc}")
+
+
+# =====================================================================
+# PL + ABSORPTION OVERLAY COMMAND
+# =====================================================================
+
+
+@main.command(name="overlay")
+@click.option(
+    "--pl",
+    "pl_json",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to a serialized Photoluminescence JSON file.",
+)
+@click.option(
+    "--abs",
+    "abs_json",
+    required=True,
+    type=click.Path(exists=True),
+    help="Path to a serialized Photoabsorption JSON file.",
+)
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Output directory for the overlay figure.",
+)
+@click.option(
+    "--fmt",
+    default="pdf",
+    help="Figure file format (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated y-axis limits for the overlay plot (e.g., '0,1.2').",
+)
+def overlay(pl_json, abs_json, out_dir, fmt, iylim):
+    """Overlay PL emission and photoabsorption spectra on a single plot.
+
+    Loads a Photoluminescence JSON (GS phonons) and a Photoabsorption JSON
+    (ES phonons) and calls plot_pl_absorption_vs_penergy to render both on
+    a shared energy axis.
+
+    \b
+    Example:
+      defectpl overlay --pl pl.json --abs abs.json --out_dir figs/ --fmt png
+    """
+    from defectpl.defectpl import Photoluminescence, Photoabsorption
+    from defectpl.plot import Plotter
+    from monty.serialization import loadfn
+
+    try:
+        click.echo(f"Loading PL JSON: {pl_json}")
+        pl_engine = loadfn(pl_json)
+        if not isinstance(pl_engine, Photoluminescence):
+            raise ValueError(
+                f"'{pl_json}' does not contain a Photoluminescence object."
+            )
+
+        click.echo(f"Loading absorption JSON: {abs_json}")
+        abs_engine = loadfn(abs_json)
+        if not isinstance(abs_engine, Photoabsorption):
+            raise ValueError(f"'{abs_json}' does not contain a Photoabsorption object.")
+
+        plotter = Plotter()
+        iplot_xlim = (
+            max(0.0, min(pl_engine.EZPL, abs_engine.EZPL) - 2.0),
+            max(pl_engine.EZPL, abs_engine.EZPL) + 1.0,
+        )
+        out_path = Path(out_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+
+        plotter.plot_pl_absorption_vs_penergy(
+            frequencies=pl_engine.frequencies,
+            intensity=pl_engine.intensity,
+            absorption=abs_engine.absorption,
+            resolution=pl_engine.resolution,
+            xlim=iplot_xlim,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fmt,
+        )
+        click.echo(f"Overlay plot written to {out_dir}")
+    except Exception as exc:
+        if _verbose:
+            raise
+        raise click.ClickException(f"Failed to generate overlay plot: {exc}")
 
 
 # =====================================================================
@@ -1419,6 +1902,9 @@ def ksplot(eigenval, vbm, cbm, espan, kidx, out_img, out_json):
 
 # Link the nested PL group structure into our root application workspace
 main.add_command(pl_group)
+
+# Link the absorption group into the root application workspace
+main.add_command(absorption_group)
 
 
 # =====================================================================
