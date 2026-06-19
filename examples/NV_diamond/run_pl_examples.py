@@ -254,13 +254,12 @@ def run_pl_analysis(
 
 # --- Execution Entry Point ---
 if __name__ == "__main__":
-
     # SCRIPT_DIR resolves to: ...\defectpl\examples\NV_diamond
     SCRIPT_DIR = Path(__file__).resolve().parent
 
     # DATA_DIR steps up twice and goes into data: ...\defectpl\data
     DATA_DIR = SCRIPT_DIR.parents[1] / "data"
-    
+
     # EXAMPLES_BASE keeps outputs localized to the current directory
     EXAMPLES_BASE = SCRIPT_DIR
 

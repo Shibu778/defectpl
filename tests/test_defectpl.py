@@ -40,7 +40,10 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_S_omega.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_St.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_Gts.return_value = np.linspace(0, 1, 100)
-        mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(100), np.ones(100) * 5)
+        mock_utils.calc_Spectrum_Intensity.return_value = (
+            np.ones(100),
+            np.ones(100) * 5,
+        )
         mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
         mock_utils.calc_C_omega.return_value = np.zeros(100)
         mock_utils.calc_Ct.return_value = np.zeros(100)

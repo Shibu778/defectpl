@@ -417,7 +417,7 @@ def calc_S_omega(
         n=n_fft,
     )
     # Peak for a mode at original grid index i appears in S_conv at 2*half_w+i
-    return S_conv[2 * half_w: 2 * half_w + npts]
+    return S_conv[2 * half_w : 2 * half_w + npts]
 
 
 def calc_IPR(eigenvectors: np.ndarray) -> np.ndarray:
@@ -510,12 +510,12 @@ def _sigma_per_mode(
     f_min, f_max = float(np.min(frequencies)), float(np.max(frequencies))
     if f_max == f_min:
         return np.full(len(frequencies), sigma_low)
-    return sigma_low + (sigma_high - sigma_low) * (frequencies - f_min) / (f_max - f_min)
+    return sigma_low + (sigma_high - sigma_low) * (frequencies - f_min) / (
+        f_max - f_min
+    )
 
 
-def calc_phonon_occupation(
-    frequencies: np.ndarray, temperature: float
-) -> np.ndarray:
+def calc_phonon_occupation(frequencies: np.ndarray, temperature: float) -> np.ndarray:
     """
     Compute the Bose-Einstein phonon occupation number for each mode.
 
@@ -618,7 +618,7 @@ def calc_C_omega(
         )
         C_grid += ck * gauss
 
-    return C_grid[half_w: half_w + npts]
+    return C_grid[half_w : half_w + npts]
 
 
 def calc_Ct(C_omega: np.ndarray) -> np.ndarray:
@@ -711,7 +711,9 @@ def calc_effective_phonon_frequency(
     dq2 = delta_Q_k**2
     denom = float(np.sum(dq2))
     if denom == 0.0:
-        raise ValueError("All delta_Q_k values are zero; effective frequency is undefined.")
+        raise ValueError(
+            "All delta_Q_k values are zero; effective frequency is undefined."
+        )
     return float(np.sum(frequencies**2 * dq2) / denom)
 
 

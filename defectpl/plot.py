@@ -664,7 +664,6 @@ class Plotter:
 
         self._save_or_show(fig, out_dir, file_name, fig_format, plot)
 
-
     def plot_nk_vs_penergy(
         self,
         frequencies: np.ndarray,

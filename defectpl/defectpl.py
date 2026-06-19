@@ -189,7 +189,9 @@ class Photoluminescence(MSONable):
     )
     resolution: int = 1000  # Density step intervals per 1 eV boundary limit
     max_energy: float = 5.0  # Range tracking upper caps conditions in eV
-    sigma: Union[float, Tuple[float, float]] = 6e-3  # Broadening: scalar or (low, high) eV
+    sigma: Union[float, Tuple[float, float]] = (
+        6e-3  # Broadening: scalar or (low, high) eV
+    )
     gamma: float = 2.0  # Homogeneous/inhomogeneous ZPL broadening factor
     temperature: float = 0.0  # Lattice temperature in K (0 = T=0 limit)
 
@@ -247,7 +249,9 @@ class Photoluminescence(MSONable):
                 self.masses, self.dF, self.eigenvectors, self.frequencies
             )
         elif self.dR is not None and np.any(self.dR):
-            self.qks = utils.calc_qks_vectorized(self.masses, self.dR, self.eigenvectors)
+            self.qks = utils.calc_qks_vectorized(
+                self.masses, self.dR, self.eigenvectors
+            )
         else:
             raise ValueError(
                 "Either dR or dF must be provided and non-zero to compute qks."
@@ -276,8 +280,12 @@ class Photoluminescence(MSONable):
         )
         self.Sts = utils.calc_St(self.S_omega)
         self.Gts = utils.calc_Gts(
-            self.Sts, self.HR_factor, self.gamma, self.resolution,
-            Cts=self.Cts, C_total=self.C_total,
+            self.Sts,
+            self.HR_factor,
+            self.gamma,
+            self.resolution,
+            Cts=self.Cts,
+            C_total=self.C_total,
         )
         self.A_line, self.intensity = utils.calc_Spectrum_Intensity(
             self.Gts, self.EZPL, self.resolution
@@ -327,7 +335,9 @@ class Photoluminescence(MSONable):
             ),
             "iprs": self.iprs.tolist() if self.iprs is not None else None,
             "iprs_alkauskas": (
-                self.iprs_alkauskas.tolist() if self.iprs_alkauskas is not None else None
+                self.iprs_alkauskas.tolist()
+                if self.iprs_alkauskas is not None
+                else None
             ),
             "localization_ratio": (
                 self.localization_ratio.tolist()
@@ -392,7 +402,9 @@ class Photoluminescence(MSONable):
         obj.DW_factor = d.get("DW_factor")
         obj.iprs = np.array(d["iprs"]) if d.get("iprs") is not None else None
         obj.iprs_alkauskas = (
-            np.array(d["iprs_alkauskas"]) if d.get("iprs_alkauskas") is not None else None
+            np.array(d["iprs_alkauskas"])
+            if d.get("iprs_alkauskas") is not None
+            else None
         )
         obj.localization_ratio = (
             np.array(d["localization_ratio"])
@@ -424,8 +436,12 @@ class Photoluminescence(MSONable):
             obj.Cts = utils.calc_Ct(obj.C_omega) if obj.C_omega is not None else None
             obj.Sts = utils.calc_St(obj.S_omega)
             obj.Gts = utils.calc_Gts(
-                obj.Sts, obj.HR_factor, obj.gamma, obj.resolution,
-                Cts=obj.Cts, C_total=obj.C_total,
+                obj.Sts,
+                obj.HR_factor,
+                obj.gamma,
+                obj.resolution,
+                Cts=obj.Cts,
+                C_total=obj.C_total,
             )
             obj.A_line, obj.intensity = utils.calc_Spectrum_Intensity(
                 obj.Gts, obj.EZPL, obj.resolution
