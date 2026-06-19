@@ -385,11 +385,39 @@ def calc_S_omega(
     --------
     calc_St : Transforms S(ω) to the time domain via inverse FFT.
     """
-    omega = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
-    S_omega = np.zeros_like(omega)
-    for i, w in enumerate(omega):
-        S_omega[i] = np.sum(Sks * gaussian_broadening(w, frequencies, sigma))
-    return S_omega
+    npts = int(omega_range[2])
+    omega_start, omega_stop = omega_range[0], omega_range[1]
+    dw = (omega_stop - omega_start) / (npts - 1)
+
+    # Pad working grid by 5σ on each side so Gaussian tails from near-edge
+    # modes are captured correctly.
+    half_w = int(np.ceil(5.0 * sigma / dw))
+    npts_pad = npts + 2 * half_w
+    omega_start_pad = omega_start - half_w * dw
+
+    # Distribute each S_k between its two nearest grid points (linear
+    # interpolation) to eliminate per-mode quantisation error.
+    pos = (frequencies - omega_start_pad) / dw
+    idx_lo = np.floor(pos).astype(int)
+    frac = pos - idx_lo
+    S_discrete = np.zeros(npts_pad)
+    in_lo = (idx_lo >= 0) & (idx_lo < npts_pad)
+    in_hi = (idx_lo + 1 >= 0) & (idx_lo + 1 < npts_pad)
+    np.add.at(S_discrete, idx_lo[in_lo], Sks[in_lo] * (1.0 - frac[in_lo]))
+    np.add.at(S_discrete, (idx_lo + 1)[in_hi], Sks[in_hi] * frac[in_hi])
+
+    # Gaussian convolution kernel spanning ±5σ
+    kx = np.arange(-half_w, half_w + 1) * dw
+    kernel = np.exp(-0.5 * (kx / sigma) ** 2) / (sigma * np.sqrt(2.0 * np.pi))
+
+    # Linear (non-circular) FFT convolution
+    n_fft = npts_pad + len(kernel) - 1
+    S_conv = np.fft.irfft(
+        np.fft.rfft(S_discrete, n=n_fft) * np.fft.rfft(kernel, n=n_fft),
+        n=n_fft,
+    )
+    # Peak for a mode at original grid index i appears in S_conv at 2*half_w+i
+    return S_conv[2 * half_w: 2 * half_w + npts]
 
 
 def calc_IPR(eigenvectors: np.ndarray) -> np.ndarray:
@@ -419,6 +447,42 @@ def calc_IPR(eigenvectors: np.ndarray) -> np.ndarray:
     """
     participations = np.sum(eigenvectors * eigenvectors, axis=2)
     return np.sum(participations**2, axis=1) / np.sum(participations, axis=1) ** 2
+
+
+def calc_IPR_alkauskas(eigenvectors: np.ndarray) -> np.ndarray:
+    """
+    Calculate the phonon IPR following Alkauskas et al. (New J. Phys. 16, 073026, 2014), eq. 12.
+
+    For each normal mode k the per-atom weight is:
+
+        p_{k,α} = Σ_i e_{k,α,i}²
+
+    and the Alkauskas IPR is:
+
+        IPR_k = (Σ_α p_{k,α})² / Σ_α p_{k,α}²
+
+    For phonopy-normalized eigenvectors (Σ_α p_{k,α} = 1) this reduces to 1 / Σ_α p_{k,α}².
+
+    Range: 1 (fully localized on one atom) to N (fully delocalized over N atoms).
+
+    This is the reciprocal of the traditional IPR returned by :func:`calc_IPR`, and equals the
+    paper's equation 12 for normalized eigenvectors.  The localization ratio β_k = N × IPR_k⁻¹
+    (traditional) = N / IPR_k (Alkauskas) — both conventions give the same β_k via
+    ``natoms * calc_IPR(evecs)`` or ``natoms / calc_IPR_alkauskas(evecs)``.
+
+    Parameters
+    ----------
+    eigenvectors : np.ndarray
+        Phonon normal mode eigenvectors, shape (nmodes, natoms, 3).
+        Works for both normalized (phonopy) and un-normalized eigenvectors.
+
+    Returns
+    -------
+    np.ndarray
+        Alkauskas IPR value for each normal mode, shape (nmodes,).
+    """
+    participations = np.sum(eigenvectors * eigenvectors, axis=2)
+    return np.sum(participations, axis=1) ** 2 / np.sum(participations**2, axis=1)
 
 
 def calc_St(S_omega: np.ndarray) -> np.ndarray:
@@ -527,13 +591,12 @@ def calc_Spectrum_Intensity(
 
     The :math:`\\omega^3` prefactor originates from the photon density of states.
     """
-    A = np.fft.fft(Gts)
-    A1 = A.copy()
-    n = len(A)
+    A1 = np.fft.fft(Gts)
+    n = len(A1)
     shift_idx = int(EZPL * resolution)
-    for i in range(n):
-        A[(shift_idx - i) % n] = A1[i]
-    omega_3 = (np.arange(n) / resolution) ** 3
+    j = np.arange(n)
+    A = A1[(shift_idx - j) % n]
+    omega_3 = (j / resolution) ** 3
     return A, A * omega_3
 
 

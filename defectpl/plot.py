@@ -68,7 +68,11 @@ class Plotter:
     plot_S_omega_Sks_Loc_rat_vs_penergy
         S(ω) + S_k scatter coloured by localization ratio.
     plot_S_omega_Sks_ipr_vs_penergy
-        S(ω) + S_k scatter coloured by IPR.
+        S(ω) + S_k scatter coloured by IPR (traditional convention).
+    plot_ipr_alkauskas_vs_penergy
+        Phonon IPR (Alkauskas eq. 12 convention) vs phonon energy.
+    plot_S_omega_Sks_ipr_alkauskas_vs_penergy
+        S(ω) + S_k scatter coloured by Alkauskas IPR.
     plot_intensity_vs_penergy
         Normalised PL intensity spectrum vs photon energy.
     """
@@ -500,6 +504,106 @@ class Plotter:
         # When using layout="constrained", we can target ax2 directly with an explicit pad
         cbar = fig.colorbar(sc, ax=ax2, pad=0.12)
         cbar.set_label("Inverse Participation Ratio")
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+    def plot_ipr_alkauskas_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        iprs_alkauskas: np.ndarray,
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "ipr_alkauskas_vs_penergy",
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (3.3, 2.5),
+    ):
+        """
+        Scatter plot of phonon IPR (Alkauskas eq. 12 convention) vs phonon energy (meV).
+
+        IPR_k = (Σp)²/Σp² ranges from 1 (fully localized) to N (fully delocalized).
+        This is the reciprocal of the traditional IPR plotted by :meth:`plot_ipr_vs_penergy`.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        iprs_alkauskas : numpy.ndarray, shape (nmodes,)
+            Alkauskas-convention IPR per mode (Alkauskas 2014, eq. 12).
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax = plt.subplots(figsize=figsize)
+        freq_mev = np.array(frequencies) * 1000.0
+
+        ax.scatter(freq_mev, iprs_alkauskas, edgecolor="black", alpha=0.85)
+        ax.set_xlabel("Phonon Energy (meV)")
+        ax.set_ylabel(r"$\mathrm{IPR}_k$ (Alkauskas)")
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+    def plot_S_omega_Sks_ipr_alkauskas_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        S_omega: Union[list, np.ndarray],
+        omega_range: List[Union[int, float]],
+        Sks: np.ndarray,
+        iprs_alkauskas: np.ndarray,
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "S_omega_HRf_ipr_alkauskas_vs_penergy",
+        max_freq: Optional[float] = None,
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (4.2, 2.5),
+        cmap: str = "viridis",
+    ):
+        """
+        S(ω) line + S_k scatter coloured by Alkauskas-convention phonon IPR.
+
+        Modes with low IPR_k (close to 1) are localized; modes with high IPR_k
+        (close to N) are bulk-like delocalized.
+
+        Parameters
+        ----------
+        frequencies, S_omega, omega_range
+            See :meth:`plot_S_omega_vs_penergy`.
+        Sks : numpy.ndarray, shape (nmodes,)
+            Partial Huang–Rhys factors (right y-axis).
+        iprs_alkauskas : numpy.ndarray, shape (nmodes,)
+            Alkauskas-convention IPR per mode used as colour code.
+        cmap : str, optional
+            Matplotlib colormap name.  Default ``"viridis"``.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax1 = plt.subplots(figsize=figsize, layout="constrained")
+        omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
+
+        cutoff = max_freq if max_freq is not None else float(max(frequencies))
+        mask = omega_set <= cutoff
+
+        ax1.set_xlabel("Phonon Energy (meV)")
+        ax1.set_ylabel(r"$S(\hbar\omega)$ ($1/\mathrm{meV}$)", color="black")
+        ax1.plot(
+            omega_set[mask] * 1000.0, np.array(S_omega)[mask] / 1000.0, color="black"
+        )
+        ax1.tick_params(axis="y", labelcolor="black")
+
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(r"Partial HR Factor ($S_k$)", color="black")
+
+        sc = ax2.scatter(
+            np.array(frequencies) * 1000.0,
+            Sks,
+            c=iprs_alkauskas,
+            cmap=plt.get_cmap(cmap),
+            edgecolor="black",
+            alpha=0.85,
+        )
+        ax2.tick_params(axis="y", labelcolor="black")
+        ax1.set_xlim(0, cutoff * 1000.0)
+
+        cbar = fig.colorbar(sc, ax=ax2, pad=0.12)
+        cbar.set_label(r"$\mathrm{IPR}_k$ (Alkauskas)")
 
         self._save_or_show(fig, out_dir, file_name, fig_format, plot)
 

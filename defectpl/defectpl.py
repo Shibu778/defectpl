@@ -89,7 +89,11 @@ class Photoluminescence(MSONable):
     DW_factor : float
         Debye–Waller factor exp(−S).
     iprs : numpy.ndarray, shape (nmodes,)
-        Phonon inverse participation ratio (IPR) per mode; range [1/N, 1].
+        Phonon inverse participation ratio (traditional convention): Σp²/(Σp)²;
+        range [1/N, 1] where large = localized.
+    iprs_alkauskas : numpy.ndarray, shape (nmodes,)
+        Phonon IPR following Alkauskas *et al.* (2014) eq. 12: (Σp)²/Σp²;
+        range [1, N] where small = localized.  Reciprocal of ``iprs``.
     localization_ratio : numpy.ndarray, shape (nmodes,)
         Localization ratio β\\ :sub:`k` = N · IPR\\ :sub:`k`; range [1, N].
     S_omega : numpy.ndarray
@@ -170,6 +174,7 @@ class Photoluminescence(MSONable):
     HR_factor: float = field(init=False, default=None)
     DW_factor: float = field(init=False, default=None)
     iprs: np.ndarray = field(init=False, default=None)
+    iprs_alkauskas: np.ndarray = field(init=False, default=None)
     localization_ratio: np.ndarray = field(init=False, default=None)
     omega_range: List[Union[float, int]] = field(init=False, default=None)
     S_omega: np.ndarray = field(init=False, default=None)
@@ -203,11 +208,11 @@ class Photoluminescence(MSONable):
         )
 
         if self.dF is not None and np.any(self.dF):
-            self.qks = utils.calc_qks_force_mode(
+            self.qks = utils.calc_qks_force_vectorized(
                 self.masses, self.dF, self.eigenvectors, self.frequencies
             )
         elif self.dR is not None and np.any(self.dR):
-            self.qks = utils.calc_qks(self.masses, self.dR, self.eigenvectors)
+            self.qks = utils.calc_qks_vectorized(self.masses, self.dR, self.eigenvectors)
         else:
             raise ValueError(
                 "Either dR or dF must be provided and non-zero to compute qks."
@@ -218,6 +223,7 @@ class Photoluminescence(MSONable):
         self.DW_factor = float(np.exp(-self.HR_factor))
 
         self.iprs = utils.calc_IPR(self.eigenvectors)
+        self.iprs_alkauskas = utils.calc_IPR_alkauskas(self.eigenvectors)
         self.localization_ratio = self.natoms * self.iprs
 
         self.S_omega = utils.calc_S_omega(
@@ -268,6 +274,9 @@ class Photoluminescence(MSONable):
                 else self.DW_factor
             ),
             "iprs": self.iprs.tolist() if self.iprs is not None else None,
+            "iprs_alkauskas": (
+                self.iprs_alkauskas.tolist() if self.iprs_alkauskas is not None else None
+            ),
             "localization_ratio": (
                 self.localization_ratio.tolist()
                 if self.localization_ratio is not None
@@ -315,6 +324,9 @@ class Photoluminescence(MSONable):
         obj.HR_factor = d.get("HR_factor")
         obj.DW_factor = d.get("DW_factor")
         obj.iprs = np.array(d["iprs"]) if d.get("iprs") is not None else None
+        obj.iprs_alkauskas = (
+            np.array(d["iprs_alkauskas"]) if d.get("iprs_alkauskas") is not None else None
+        )
         obj.localization_ratio = (
             np.array(d["localization_ratio"])
             if d.get("localization_ratio") is not None
@@ -373,11 +385,11 @@ class Photoluminescence(MSONable):
         r"""
         Generate all standard diagnostic plots and save them to *out_dir*.
 
-        Produces ten figures: phonon energy vs mode index, IPR vs energy,
-        localization ratio vs energy, q\ :sub:`k` vs energy,
+        Produces twelve figures: phonon energy vs mode index, traditional IPR vs energy,
+        Alkauskas IPR vs energy, localization ratio vs energy, q\ :sub:`k` vs energy,
         S\ :sub:`k` vs energy, S(ω) alone, S(ω)+S\ :sub:`k`, S(ω)+S\ :sub:`k`
-        coloured by localization ratio, S(ω)+S\ :sub:`k` coloured by IPR,
-        and the final PL intensity spectrum.
+        coloured by localization ratio, S(ω)+S\ :sub:`k` coloured by traditional IPR,
+        S(ω)+S\ :sub:`k` coloured by Alkauskas IPR, and the final PL intensity spectrum.
 
         Parameters
         ----------
@@ -404,6 +416,13 @@ class Photoluminescence(MSONable):
         plotter.plot_ipr_vs_penergy(
             self.frequencies,
             self.iprs,
+            plot=False,
+            out_dir=out_dir,
+            fig_format=fig_format,
+        )
+        plotter.plot_ipr_alkauskas_vs_penergy(
+            self.frequencies,
+            self.iprs_alkauskas,
             plot=False,
             out_dir=out_dir,
             fig_format=fig_format,
@@ -466,6 +485,17 @@ class Photoluminescence(MSONable):
             self.omega_range,
             self.Sks,
             self.iprs,
+            plot=False,
+            out_dir=out_dir,
+            max_freq=freq_limit,
+            fig_format=fig_format,
+        )
+        plotter.plot_S_omega_Sks_ipr_alkauskas_vs_penergy(
+            self.frequencies,
+            self.S_omega,
+            self.omega_range,
+            self.Sks,
+            self.iprs_alkauskas,
             plot=False,
             out_dir=out_dir,
             max_freq=freq_limit,

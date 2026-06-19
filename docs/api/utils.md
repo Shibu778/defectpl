@@ -24,6 +24,8 @@
 
 ::: defectpl.utils.calc_IPR
 
+::: defectpl.utils.calc_IPR_alkauskas
+
 ## Generating function and spectrum
 
 ::: defectpl.utils.calc_St

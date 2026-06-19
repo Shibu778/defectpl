@@ -144,7 +144,75 @@ $$L(E) = \text{DOS}(E) \cdot E^{3}$$
 
 ---
 
-## 5. Software Pipeline Mapping
+## 5. Phonon Mode Localization
+
+### Inverse Participation Ratio (IPR)
+
+To identify which phonon modes are spatially localized near the defect, defectpl computes two
+complementary IPR metrics for each normal mode $k$.
+
+The per-atom participation weight is (Alkauskas 2014, eq. 13):
+
+$$p_{k;\alpha} = \sum_i \Delta r_{k;\alpha i}^2$$
+
+where $\Delta r_{k;\alpha i}$ is the normalized phonon eigenvector component for atom $\alpha$,
+direction $i$, in mode $k$.
+
+#### Traditional (condensed-matter) IPR — `iprs` attribute
+
+$$\mathrm{IPR}_k^{\mathrm{trad}} = \frac{\displaystyle\sum_\alpha p_{k;\alpha}^2}{\left(\displaystyle\sum_\alpha p_{k;\alpha}\right)^2}$$
+
+| Value | Interpretation |
+|-------|----------------|
+| $1$ | Fully localized on one atom |
+| $1/N$ | Fully delocalized over $N$ atoms |
+
+Large = more localized.  Scale-invariant: gives identical results for normalized and un-normalized
+eigenvectors.
+
+#### Alkauskas-convention IPR — `iprs_alkauskas` attribute
+
+Defined by Alkauskas *et al.* (2014), eq. 12:
+
+$$\mathrm{IPR}_k = \frac{\left(\displaystyle\sum_\alpha p_{k;\alpha}\right)^2}{\displaystyle\sum_\alpha p_{k;\alpha}^2}$$
+
+For phonopy-normalized eigenvectors this simplifies to $1/\sum_\alpha p_{k;\alpha}^2$.
+
+| Value | Interpretation |
+|-------|----------------|
+| $1$ | Fully localized on one atom |
+| $N$ | Fully delocalized over $N$ atoms |
+
+Small = more localized.  This is the reciprocal of the traditional IPR.
+
+#### Relationship between the two conventions
+
+$$\mathrm{IPR}_k^{\mathrm{Alkauskas}} = \frac{1}{\mathrm{IPR}_k^{\mathrm{trad}}}$$
+
+### Localization ratio — `localization_ratio` attribute
+
+Alkauskas *et al.* (2014), eq. 14, define the **localization ratio** $\beta_k$ as:
+
+$$\beta_k = \frac{M}{\mathrm{IPR}_k^{\mathrm{Alkauskas}}} = M \cdot \mathrm{IPR}_k^{\mathrm{trad}}$$
+
+where $M$ is the total number of atoms in the supercell.  In defectpl:
+
+```python
+self.localization_ratio = self.natoms * self.iprs   # = natoms × IPR_trad = β_k
+```
+
+| $\beta_k$ | Interpretation |
+|-----------|----------------|
+| $\approx 1$ | Delocalized bulk phonon |
+| $\approx M$ | Fully localized on a single atom |
+
+A large $\beta_k$ combined with a large $S_k$ identifies a phonon resonance that couples strongly
+to the optical transition *and* is spatially confined near the defect — the diagnostic signature
+of a localized vibrational mode.
+
+---
+
+## 6. Software Pipeline Mapping
 
 The math detailed in this tutorial maps directly to modules in the `defectpl` repository:
 * **`defectpl.defectpl.Photoluminescence`**: Rehydrates the cached JSON properties (frequencies $\omega_{k}$, partial factors $S_{k}$, force matrices, and energy grids), manages the evaluation of equations for $S(\hbar\omega)$, and executes the numeric integration of $G(t)$ to transform it into the final luminescence vector $L(\hbar\omega)$.

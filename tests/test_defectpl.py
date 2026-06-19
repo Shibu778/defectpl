@@ -33,7 +33,7 @@ class TestPhotoluminescence(unittest.TestCase):
         """Verify the post-init lifecycle triggers calculations and assignments correctly."""
         mock_utils.calc_delR.return_value = 0.1414
         mock_utils.calc_delQ.return_value = 0.55
-        mock_utils.calc_qks.return_value = np.array([0.1, 0.2, 0.3])
+        mock_utils.calc_qks_vectorized.return_value = np.array([0.1, 0.2, 0.3])
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
         mock_utils.calc_IPR.return_value = np.array([1.5, 1.5, 1.5])
         mock_utils.calc_S_omega.return_value = np.linspace(0, 1, 100)
@@ -59,13 +59,13 @@ class TestPhotoluminescence(unittest.TestCase):
         self.assertEqual(pl.natoms, 2)
         self.assertAlmostEqual(pl.HR_factor, 1.7)
         self.assertAlmostEqual(pl.DW_factor, np.exp(-1.7))
-        mock_utils.calc_qks.assert_called_once()
-        mock_utils.calc_qks_force_mode.assert_not_called()
+        mock_utils.calc_qks_vectorized.assert_called_once()
+        mock_utils.calc_qks_force_vectorized.assert_not_called()
 
     @patch("defectpl.defectpl.utils", autospec=True)
     def test_force_mode_fallback_switch(self, mock_utils):
         """Ensure dF triggers force-mode calculation blocks over structural changes."""
-        mock_utils.calc_qks_force_mode.return_value = np.array([0.1, 0.2, 0.3])
+        mock_utils.calc_qks_force_vectorized.return_value = np.array([0.1, 0.2, 0.3])
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
 
@@ -80,7 +80,7 @@ class TestPhotoluminescence(unittest.TestCase):
             EZPL=self.EZPL,
             gamma=self.gamma,
         )
-        mock_utils.calc_qks_force_mode.assert_called_once()
+        mock_utils.calc_qks_force_vectorized.assert_called_once()
 
     @patch("defectpl.defectpl.utils", autospec=True)
     def test_asymmetric_serialization_and_deserialization(self, mock_utils):
@@ -102,18 +102,18 @@ class TestPhotoluminescence(unittest.TestCase):
         self.assertIn("intensity", d)
         self.assertIn("HR_factor", d)
 
-        mock_utils.calc_qks.reset_mock()
+        mock_utils.calc_qks_vectorized.reset_mock()
 
-        # 1. Test standard from_dict: loads pre-computed qks/Sks from dict, skips calc_qks
+        # 1. Test standard from_dict: loads pre-computed qks/Sks from dict, skips calc_qks_vectorized
         restored_fast = Photoluminescence.from_dict(d)
         self.assertIsInstance(restored_fast, Photoluminescence)
-        mock_utils.calc_qks.assert_not_called()
+        mock_utils.calc_qks_vectorized.assert_not_called()
 
         # 2. Test from_dict_expensive: recomputes everything from scratch via __post_init__
-        mock_utils.calc_qks.reset_mock()
+        mock_utils.calc_qks_vectorized.reset_mock()
         restored_expensive = Photoluminescence.from_dict_expensive(d)
         self.assertIsInstance(restored_expensive, Photoluminescence)
-        mock_utils.calc_qks.assert_called_once()
+        mock_utils.calc_qks_vectorized.assert_called_once()
 
     @patch("defectpl.defectpl.Plotter")
     @patch("defectpl.defectpl.utils", autospec=True)
