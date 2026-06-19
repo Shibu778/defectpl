@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="First-principles photoluminescence lineshapes, electron-phonon coupling, and electronic-state localization for point defects in semiconductors and insulators.">
+        <meta name="description" content="A unified Python package for the optical properties of point defects in solids.">
       
       
         <meta name="author" content="Shibu Meher">
@@ -100,7 +100,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="DefectPL" class="md-header__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="assets/defectpl-mark-color.svg" alt="logo">
+  <img src="assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -378,7 +378,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="DefectPL" class="md-nav__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="assets/defectpl-mark-color.svg" alt="logo">
+  <img src="assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     DefectPL
@@ -1553,18 +1553,17 @@
   <h1>Home</h1>
 
 <div style="text-align:center; padding: 2.5rem 0 0.5rem;">
-  <img src="assets/defectpl-logo-horizontal.svg"
+  <img src="assets/defectpl-logo-stacked.svg"
        alt="DefectPL"
        class="hero-logo hero-logo-light"
-       style="max-width:460px; width:80%;">
-  <img src="assets/defectpl-logo-horizontal-reverse.svg"
+       style="max-width:320px; width:60%;">
+  <img src="assets/defectpl-logo-stacked-reverse.svg"
        alt="DefectPL"
        class="hero-logo hero-logo-dark"
-       style="max-width:460px; width:80%;">
+       style="max-width:320px; width:60%;">
 
   <p style="font-size:1.1rem; opacity:0.8; max-width:620px; margin:0.8rem auto 1.4rem;">
-    First-principles photoluminescence lineshapes, electron–phonon coupling, and<br>
-    electronic-state localization for point defects in semiconductors and insulators.
+    A unified Python package for the optical properties of point defects in solids.
   </p>
 
   <div class="badge-row">
@@ -1572,7 +1571,7 @@
     <a href="https://anaconda.org/conda-forge/defectpl"><img src="https://anaconda.org/conda-forge/defectpl/badges/version.svg" alt="Conda"></a>
     <a href="https://pepy.tech/project/defectpl"><img src="https://static.pepy.tech/badge/defectpl" alt="Downloads"></a>
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT"></a>
-    <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python 3.10+">
+    <a><img src="https://img.shields.io/badge/python-3.11%2B-blue" alt="Python 3.11+"></a>
   </div>
 
   <div style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin-bottom:2.5rem;">
@@ -1672,11 +1671,7 @@ Defects as Spin-photon Interfaces in 4H-SiC</strong>, <em>Phys. Rev. B</em> <str
 </blockquote>
 <hr />
 <h2 id="acknowledgements">Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permanent link">&para;</a></h2>
-<p>DefectPL implements the generating-function formalism of
-Alkauskas, Buckley, Awschalom &amp; Van de Walle (<em>New J. Phys.</em> <strong>16</strong>, 073026, 2014)
-and the Franck–Condon overlap approach of Alkauskas, Yan &amp; Van de Walle
-(<em>Phys. Rev. B</em> <strong>90</strong>, 075202, 2014).
-Electronic P-ratio follows Kumagai <em>et al.</em> (<em>Phys. Rev. B</em> <strong>103</strong>, 104102, 2021).</p>
+<p>DefectPL is inspired by <code>pyphotonics</code>, integrating specialized functionalities from <code>pypl</code>, <code>pydefect</code>, and <code>nonrad</code> with the refined plotting aesthetics of <code>sumo</code>.</p>
 
 
 
@@ -1801,9 +1796,9 @@ Electronic P-ratio follows Kumagai <em>et al.</em> (<em>Phys. Rev. B</em> <stron
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="javascripts/mathjax.js"></script>
+        <script src="javascripts/mathjax.js" defer></script>
       
-        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js" defer></script>
       
     
   </body>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="First-principles photoluminescence lineshapes, electron-phonon coupling, and electronic-state localization for point defects in semiconductors and insulators.">
+        <meta name="description" content="A unified Python package for the optical properties of point defects in solids.">
       
       
         <meta name="author" content="Shibu Meher">
@@ -102,7 +102,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="DefectPL" class="md-header__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="../assets/defectpl-mark-color.svg" alt="logo">
+  <img src="../assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -378,7 +378,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="DefectPL" class="md-nav__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="../assets/defectpl-mark-color.svg" alt="logo">
+  <img src="../assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     DefectPL
@@ -1445,36 +1445,25 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-project-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Project structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-adding-a-new-feature" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Adding a new feature
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3. Adding a new feature">
+    <nav class="md-nav" aria-label="1. Development environment">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#docstring-style-numpy" class="md-nav__link">
+  <a href="#conda-recommended" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Docstring style (numpy)
+        Conda (recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pip-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pip only
       
     </span>
   </a>
@@ -1487,16 +1476,110 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-managing-the-documentation" class="md-nav__link">
+  <a href="#2-pre-commit-hooks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Managing the documentation
+        2. Pre-commit hooks
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="4. Managing the documentation">
+    <nav class="md-nav" aria-label="2. Pre-commit hooks">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#one-time-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One-time setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-runs-and-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What runs and when
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-dry-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual dry run
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-hook-versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update hook versions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Project structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-adding-a-new-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Adding a new feature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-managing-the-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Managing the documentation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Managing the documentation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#asset-inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asset inventory
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#install-docs-dependencies" class="md-nav__link">
@@ -1559,15 +1642,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-publishing-to-pypi" class="md-nav__link">
+  <a href="#6-publishing-to-pypi" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Publishing to PyPI
+        6. Publishing to PyPI
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Publishing to PyPI">
+    <nav class="md-nav" aria-label="6. Publishing to PyPI">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1609,15 +1692,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-publishing-to-conda-forge" class="md-nav__link">
+  <a href="#7-publishing-to-conda-forge" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Publishing to conda-forge
+        7. Publishing to conda-forge
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. Publishing to conda-forge">
+    <nav class="md-nav" aria-label="7. Publishing to conda-forge">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1648,10 +1731,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-github-actions-ci" class="md-nav__link">
+  <a href="#8-docstring-style-numpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. GitHub Actions CI
+        8. Docstring style (numpy)
       
     </span>
   </a>
@@ -1659,10 +1742,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-code-style" class="md-nav__link">
+  <a href="#9-code-style" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Code style
+        9. Code style
       
     </span>
   </a>
@@ -1734,155 +1817,244 @@
 
 
 <h1 id="developer-guide">Developer Guide<a class="headerlink" href="#developer-guide" title="Permanent link">&para;</a></h1>
-<p>This page covers everything you need to contribute to DefectPL, manage the documentation
-website, publish new releases to PyPI, and submit to conda-forge.</p>
+<p>This page covers everything you need to contribute to DefectPL: setting up your
+environment, running the quality-gate tools locally, managing the documentation
+site, publishing releases to PyPI, and submitting to conda-forge.</p>
 <hr />
 <h2 id="1-development-environment">1. Development environment<a class="headerlink" href="#1-development-environment" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Shibu778/defectpl.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>defectpl
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">          </span><span class="c1"># Windows: .venv\Scripts\activate</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest<span class="w"> </span>pytest-cov<span class="w"> </span>ruff
+<h3 id="conda-recommended">Conda (recommended)<a class="headerlink" href="#conda-recommended" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yaml<span class="w">   </span><span class="c1"># creates the &#39;defectpl-dev&#39; environment</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>defectpl-dev
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span><span class="w">                </span><span class="c1"># editable install of defectpl itself</span>
+</span></code></pre></div>
+<p>The <code>environment.yaml</code> at the repo root pins all runtime and tooling dependencies.</p>
+<h3 id="pip-only">Pip only<a class="headerlink" href="#pip-only" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Shibu778/defectpl.git
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>defectpl
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">          </span><span class="c1"># Windows: .venv\Scripts\activate</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>pip<span class="w"> </span>install<span class="w"> </span>pytest<span class="w"> </span>pytest-cov<span class="w"> </span>ruff<span class="w"> </span>pre-commit
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
 </span></code></pre></div>
 <p>Run the test suite:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pytest<span class="w"> </span>-q<span class="w">                          </span><span class="c1"># all tests</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pytest<span class="w"> </span>-q<span class="w"> </span>tests/test_utils.py<span class="w">      </span><span class="c1"># single module</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pytest<span class="w"> </span>-q<span class="w"> </span>--cov<span class="o">=</span>defectpl<span class="w">           </span><span class="c1"># with coverage</span>
-</span></code></pre></div>
-<p>Run the linter:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ruff<span class="w"> </span>check<span class="w"> </span>defectpl/
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>pytest<span class="w"> </span>-q<span class="w">                          </span><span class="c1"># all tests</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pytest<span class="w"> </span>-q<span class="w"> </span>tests/test_utils.py<span class="w">      </span><span class="c1"># single module</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>pytest<span class="w"> </span>-q<span class="w"> </span>--cov<span class="o">=</span>defectpl<span class="w">           </span><span class="c1"># with coverage</span>
 </span></code></pre></div>
 <hr />
-<h2 id="2-project-structure">2. Project structure<a class="headerlink" href="#2-project-structure" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>defectpl/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>├── defectpl/           # Python package
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>│   ├── __init__.py
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   ├── cli.py          # Click command-line entry points
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>│   ├── constants.py    # Physical constants
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│   ├── data.py         # Atomic masses, isotope data
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│   ├── defect_utils.py # defect_entry / defect_structure_info generators
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>│   ├── defectpl.py     # Core: Photoluminescence, VibrationalSpectra1D, CCD
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>│   ├── ks_analysis.py  # Kohn–Sham eigenvalue analysis
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│   ├── participation_ratio.py
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│   ├── phonon.py
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>│   ├── plot.py         # Plotter class
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>│   ├── utils.py        # Pure math
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>│   ├── vasp.py         # VASP file I/O (lazy pymatgen)
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>│   └── vasp_wrapper.py # High-level VASP wrappers
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>├── tests/              # pytest test suite
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>├── docs/               # MkDocs documentation source
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>├── development/        # Papers, benchmarks, scratch scripts
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>├── pyproject.toml      # Package metadata and dependencies
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>└── mkdocs.yml          # Documentation site configuration
+<h2 id="2-pre-commit-hooks">2. Pre-commit hooks<a class="headerlink" href="#2-pre-commit-hooks" title="Permanent link">&para;</a></h2>
+<p>The repo ships a <code>.pre-commit-config.yaml</code> that mirrors the CI pipeline so that
+lint, format, and test failures are caught locally before you push.</p>
+<h3 id="one-time-setup">One-time setup<a class="headerlink" href="#one-time-setup" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span>pre-commit
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pre-commit<span class="w"> </span>install<span class="w">                      </span><span class="c1"># installs the pre-commit hook</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>pre-commit<span class="w"> </span>install<span class="w"> </span>--hook-type<span class="w"> </span>pre-push<span class="w"> </span><span class="c1"># installs the pre-push hook (runs pytest)</span>
+</span></code></pre></div>
+<h3 id="what-runs-and-when">What runs and when<a class="headerlink" href="#what-runs-and-when" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Hook</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>end-of-file-fixer</code></td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>trailing-whitespace</code></td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>check-yaml</code> (excl. <code>mkdocs.yml</code>)</td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>check-toml</code></td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>check-merge-conflict</code></td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><code>check-added-large-files</code> (&gt;500 KB)</td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><strong>ruff lint</strong> — auto-fix then exit 1</td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-commit</code></td>
+<td><strong>ruff format</strong></td>
+<td>every commit</td>
+</tr>
+<tr>
+<td><code>pre-push</code></td>
+<td><strong>pytest</strong> <code>tests/ -q --tb=short</code></td>
+<td>every push</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why <code>ruff lint</code> exits 1 after auto-fixing?</strong><br />
+When ruff rewrites a file it exits with a non-zero code so the commit is
+blocked. Re-stage the auto-fixed files (<code>git add -u</code>) and commit again.</p>
+</blockquote>
+<h3 id="manual-dry-run">Manual dry run<a class="headerlink" href="#manual-dry-run" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</span></code></pre></div>
+<h3 id="update-hook-versions">Update hook versions<a class="headerlink" href="#update-hook-versions" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pre-commit<span class="w"> </span>autoupdate
 </span></code></pre></div>
 <hr />
-<h2 id="3-adding-a-new-feature">3. Adding a new feature<a class="headerlink" href="#3-adding-a-new-feature" title="Permanent link">&para;</a></h2>
+<h2 id="3-project-structure">3. Project structure<a class="headerlink" href="#3-project-structure" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>defectpl/
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>├── defectpl/           # Python package
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>│   ├── __init__.py
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│   ├── cli.py          # Click command-line entry points
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│   ├── constants.py    # Physical constants
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│   ├── data.py         # Atomic masses, isotope data
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>│   ├── defect_utils.py # defect_entry / defect_structure_info generators
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>│   ├── defectpl.py     # Core: Photoluminescence, VibrationalSpectra1D, CCD
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>│   ├── ks_analysis.py  # Kohn-Sham eigenvalue analysis
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>│   ├── participation_ratio.py
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>│   ├── phonon.py
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>│   ├── plot.py         # Plotter class
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>│   ├── utils.py        # Pure math / physics utilities
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>│   ├── vasp.py         # VASP file I/O (lazy pymatgen)
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>│   └── vasp_wrapper.py # High-level VASP wrappers
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>├── tests/              # pytest test suite
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>├── docs/               # MkDocs documentation source
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>│   ├── assets/         # SVG logos and icons
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>│   ├── stylesheets/    # Custom CSS (extra.css)
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>│   ├── javascripts/    # MathJax config (mathjax.js)
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>│   └── overrides/      # MkDocs Material theme overrides
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>│       └── partials/
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>│           └── logo.html   # Light/dark navbar logo swap
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>├── environment.yaml    # Conda dev environment
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>├── pyproject.toml      # Package metadata and dependencies
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>├── .pre-commit-config.yaml
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>└── mkdocs.yml          # Documentation site configuration
+</span></code></pre></div>
+<hr />
+<h2 id="4-adding-a-new-feature">4. Adding a new feature<a class="headerlink" href="#4-adding-a-new-feature" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Create a feature branch: <code>git checkout -b feat/my-feature</code></li>
-<li>Write the code with <strong>numpy-style docstrings</strong> (see §6 below).</li>
+<li>Write the code with <strong>numpy-style docstrings</strong> (see §7 below).</li>
 <li>Add tests in <code>tests/test_&lt;module&gt;.py</code>.</li>
-<li>If the feature is user-facing, add a CLI command in <code>cli.py</code> and document it in
-   <code>docs/command_line_interface.md</code>.</li>
+<li>If the feature is user-facing, add a CLI command in <code>cli.py</code> and document
+   it in <code>docs/command_line_interface.md</code>.</li>
 <li>Update <code>docs/api/&lt;module&gt;.md</code> to expose the new symbol via mkdocstrings.</li>
 <li>Open a pull request against <code>main</code>.</li>
 </ol>
-<h3 id="docstring-style-numpy">Docstring style (numpy)<a class="headerlink" href="#docstring-style-numpy" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">calc_delQ</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">dR</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="sd">    Compute the mass-weighted configuration coordinate difference ΔQ.</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="sd">    Parameters</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="sd">    ----------</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="sd">    masses : np.ndarray</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="sd">        Atomic masses in AMU, shape ``(natoms,)``.</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="sd">    dR : np.ndarray</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="sd">        Cartesian displacement matrix in Å, shape ``(natoms, 3)``.</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="sd">    Returns</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="sd">    -------</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="sd">    float</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="sd">        ΔQ in units of ``sqrt(amu) · Å``.</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="sd">    Notes</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="sd">    -----</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="sd">    The formula is :math:`\\Delta Q = \\sqrt{\\sum_a m_a |\\Delta\\mathbf{R}_a|^2}`.</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="sd">    Examples</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="sd">    --------</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="sd">    &gt;&gt;&gt; import numpy as np</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="sd">    &gt;&gt;&gt; masses = np.array([12.011, 15.999])</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="sd">    &gt;&gt;&gt; dR = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0]])</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="sd">    &gt;&gt;&gt; calc_delQ(masses, dR)</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="sd">    0.5744...</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span></code></pre></div>
 <hr />
-<h2 id="4-managing-the-documentation">4. Managing the documentation<a class="headerlink" href="#4-managing-the-documentation" title="Permanent link">&para;</a></h2>
+<h2 id="5-managing-the-documentation">5. Managing the documentation<a class="headerlink" href="#5-managing-the-documentation" title="Permanent link">&para;</a></h2>
+<h3 id="asset-inventory">Asset inventory<a class="headerlink" href="#asset-inventory" title="Permanent link">&para;</a></h3>
+<p>All brand assets live in <code>docs/assets/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defectpl-logo-horizontal.svg</code></td>
+<td>Horizontal logo — light background (README hero, docs hero in light mode)</td>
+</tr>
+<tr>
+<td><code>defectpl-logo-horizontal-reverse.svg</code></td>
+<td>Horizontal logo — dark background (docs hero in dark mode, GitHub dark README)</td>
+</tr>
+<tr>
+<td><code>defectpl-logo-stacked.svg</code></td>
+<td>Stacked logo — home page hero in light mode</td>
+</tr>
+<tr>
+<td><code>defectpl-logo-stacked-reverse.svg</code></td>
+<td>Stacked logo — home page hero in dark mode</td>
+</tr>
+<tr>
+<td><code>defectpl-mark-color.svg</code></td>
+<td>Color mark — sidebar icon in light mode</td>
+</tr>
+<tr>
+<td><code>defectpl-mark-mono-white.svg</code></td>
+<td>White mark — sidebar icon in dark mode</td>
+</tr>
+<tr>
+<td><code>defectpl-mark-mono-ink.svg</code></td>
+<td>Dark mark — monochrome use on light backgrounds</td>
+</tr>
+<tr>
+<td><code>defectpl-icon.svg</code></td>
+<td>Minimal 3-node icon mark</td>
+</tr>
+<tr>
+<td><code>defectpl-appicon.svg</code></td>
+<td>Rounded-rect app icon — browser favicon</td>
+</tr>
+</tbody>
+</table>
+<p>The navbar logo is swapped between light and dark mode via
+<code>docs/overrides/partials/logo.html</code> (sets <code>logo-light-mode</code> / <code>logo-dark-mode</code> CSS classes)
+and the corresponding rules in <code>docs/stylesheets/extra.css</code>.</p>
 <h3 id="install-docs-dependencies">Install docs dependencies<a class="headerlink" href="#install-docs-dependencies" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># mkdocs&gt;=1.6, mkdocs-material&gt;=9.5, mkdocstrings[python]&gt;=0.25</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># mkdocs&gt;=1.6, mkdocs-material&gt;=9.5, mkdocstrings[python]&gt;=0.25</span>
 </span></code></pre></div>
 <h3 id="preview-locally">Preview locally<a class="headerlink" href="#preview-locally" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mkdocs<span class="w"> </span>serve
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># Opens http://127.0.0.1:8000 with live reload</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mkdocs<span class="w"> </span>serve
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># Opens http://127.0.0.1:8000 with live reload</span>
 </span></code></pre></div>
 <h3 id="build-static-html">Build static HTML<a class="headerlink" href="#build-static-html" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mkdocs<span class="w"> </span>build<span class="w">            </span><span class="c1"># output in site/</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdocs<span class="w"> </span>build<span class="w">            </span><span class="c1"># output in site/</span>
 </span></code></pre></div>
 <h3 id="deploy-to-github-pages">Deploy to GitHub Pages<a class="headerlink" href="#deploy-to-github-pages" title="Permanent link">&para;</a></h3>
-<h4 id="one-time-setup">One-time setup<a class="headerlink" href="#one-time-setup" title="Permanent link">&para;</a></h4>
+<h4 id="one-time-setup_1">One-time setup<a class="headerlink" href="#one-time-setup_1" title="Permanent link">&para;</a></h4>
 <ol>
 <li>Go to <strong>GitHub → Settings → Pages</strong>.</li>
 <li>Set Source to <strong>GitHub Actions</strong>.</li>
 </ol>
 <h4 id="automatic-deployment-recommended">Automatic deployment (recommended)<a class="headerlink" href="#automatic-deployment-recommended" title="Permanent link">&para;</a></h4>
-<p>Create <code>.github/workflows/docs.yml</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy docs</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">on</span><span class="p">:</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">push</span><span class="p">:</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">workflow_dispatch</span><span class="p">:</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nt">jobs</span><span class="p">:</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="nt">deploy</span><span class="p">:</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">          </span><span class="nt">fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">          </span><span class="c1"># needed for git-revision-date plugin</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v5</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.11&quot;</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Install dependencies</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">          </span><span class="no">pip install &quot;.[all]&quot;</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">          </span><span class="no">pip install -r docs/requirements.txt</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy</span>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mkdocs gh-deploy --force</span>
-</span></code></pre></div>
-<p>Push to <code>main</code> — GitHub Actions builds the site and pushes it to the <code>gh-pages</code> branch
-automatically. The site will be live at <code>https://Shibu778.github.io/defectpl/</code>.</p>
+<p>A workflow at <code>.github/workflows/docs.yml</code> builds and deploys on every push to
+<code>main</code> that touches <code>docs/**</code>, <code>mkdocs.yml</code>, <code>defectpl/**</code>, or <code>pyproject.toml</code>.
+It also runs on <code>workflow_dispatch</code> (manual trigger from the GitHub UI).</p>
+<p>Key design decisions that keep local and deployed builds identical:</p>
+<ul>
+<li><code>pip install -r docs/requirements.txt</code> pins <code>mkdocs-material&gt;=9.5.0</code> and
+  <code>pymdown-extensions&gt;=10.7</code> so CI always uses the same feature set as local.</li>
+<li><code>overrides/partials/logo.html</code> and <code>docs/stylesheets/extra.css</code> are part of
+  the mkdocs build; they are included automatically because <code>custom_dir: overrides</code>
+  is set in <code>mkdocs.yml</code>.</li>
+<li><code>mkdocs gh-deploy --force --clean --verbose</code> rebuilds from scratch on every
+  deploy so stale assets never persist on the <code>gh-pages</code> branch.</li>
+</ul>
 <h4 id="manual-deployment">Manual deployment<a class="headerlink" href="#manual-deployment" title="Permanent link">&para;</a></h4>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>mkdocs<span class="w"> </span>gh-deploy<span class="w">          </span><span class="c1"># builds + pushes to gh-pages in one step</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>mkdocs<span class="w"> </span>gh-deploy<span class="w">          </span><span class="c1"># builds + pushes to gh-pages in one step</span>
 </span></code></pre></div>
 <h3 id="versioned-docs-optional-using-mike">Versioned docs (optional, using mike)<a class="headerlink" href="#versioned-docs-optional-using-mike" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mike
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>mike<span class="w"> </span>deploy<span class="w"> </span><span class="m">0</span>.2<span class="w"> </span>latest<span class="w"> </span>--update-aliases
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>mike<span class="w"> </span>set-default<span class="w"> </span>latest
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>mike<span class="w"> </span>serve<span class="w">                </span><span class="c1"># preview versioned docs</span>
-</span></code></pre></div>
-<p>Then replace <code>mkdocs gh-deploy</code> in the GitHub Action with:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>config<span class="w"> </span>user.name<span class="w"> </span><span class="s2">&quot;github-actions[bot]&quot;</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>git<span class="w"> </span>config<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;github-actions[bot]@users.noreply.github.com&quot;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>mike<span class="w"> </span>deploy<span class="w"> </span>--push<span class="w"> </span>--update-aliases<span class="w"> </span><span class="k">$(</span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import defectpl; print(defectpl.__version__)&quot;</span><span class="k">)</span><span class="w"> </span>latest
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>pip<span class="w"> </span>install<span class="w"> </span>mike
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>mike<span class="w"> </span>deploy<span class="w"> </span><span class="m">0</span>.2<span class="w"> </span>latest<span class="w"> </span>--update-aliases
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>mike<span class="w"> </span>set-default<span class="w"> </span>latest
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>mike<span class="w"> </span>serve<span class="w">                </span><span class="c1"># preview versioned docs</span>
 </span></code></pre></div>
 <hr />
-<h2 id="5-publishing-to-pypi">5. Publishing to PyPI<a class="headerlink" href="#5-publishing-to-pypi" title="Permanent link">&para;</a></h2>
+<h2 id="6-publishing-to-pypi">6. Publishing to PyPI<a class="headerlink" href="#6-publishing-to-pypi" title="Permanent link">&para;</a></h2>
 <h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
 <ul>
 <li>PyPI account at <a href="https://pypi.org">pypi.org</a></li>
@@ -1892,7 +2064,7 @@ automatically. The site will be live at <code>https://Shibu778.github.io/defectp
 <h3 id="version-bump">Version bump<a class="headerlink" href="#version-bump" title="Permanent link">&para;</a></h3>
 <p>Edit <code>pyproject.toml</code>:</p>
 <div class="language-toml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[tool.poetry]</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.3.0&quot;</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.4.0&quot;</span>
 </span></code></pre></div>
 <p>Also update <code>defectpl/__init__.py</code> if it has a <code>__version__</code> string.</p>
 <h3 id="build-and-upload">Build and upload<a class="headerlink" href="#build-and-upload" title="Permanent link">&para;</a></h3>
@@ -1901,41 +2073,15 @@ automatically. The site will be live at <code>https://Shibu778.github.io/defectp
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>twine<span class="w"> </span>check<span class="w"> </span>dist/*<span class="w">                 </span><span class="c1"># verify the package</span>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>twine<span class="w"> </span>upload<span class="w"> </span>dist/*<span class="w">                </span><span class="c1"># upload (prompts for credentials)</span>
 </span></code></pre></div>
-<p>Or with GitHub Actions (create <code>.github/workflows/publish.yml</code>):</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Publish to PyPI</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nt">on</span><span class="p">:</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">push</span><span class="p">:</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">tags</span><span class="p">:</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;v*&quot;</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="nt">jobs</span><span class="p">:</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="nt">publish</span><span class="p">:</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">release</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="nt">permissions</span><span class="p">:</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">      </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">write</span><span class="w">             </span><span class="c1"># OIDC trusted publishing (no token needed)</span>
-</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
-</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
-</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v5</span>
-</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
-</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.11&quot;</span>
-</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install build</span>
-</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python -m build</span>
-</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pypa/gh-action-pypi-publish@release/v1</span>
+<p>Or via GitHub Actions (<code>.github/workflows/publish.yml</code>) — push a version tag:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>git<span class="w"> </span>tag<span class="w"> </span>v0.4.0
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v0.4.0
 </span></code></pre></div>
-<p>Tag a release to trigger:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>git<span class="w"> </span>tag<span class="w"> </span>v0.3.0
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v0.3.0
-</span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Trusted publishing</p>
-<p>The workflow above uses PyPI's <strong>OIDC trusted publishing</strong> — no API token secret needed.
+<p>The workflow uses PyPI OIDC trusted publishing — no API token secret needed.
 Configure it at <strong>PyPI → Project → Publishing → Add a new publisher → GitHub Actions</strong>.</p>
-</div>
 <hr />
-<h2 id="6-publishing-to-conda-forge">6. Publishing to conda-forge<a class="headerlink" href="#6-publishing-to-conda-forge" title="Permanent link">&para;</a></h2>
-<p>conda-forge uses a <strong>feedstock</strong> repository that is separate from the main package.</p>
+<h2 id="7-publishing-to-conda-forge">7. Publishing to conda-forge<a class="headerlink" href="#7-publishing-to-conda-forge" title="Permanent link">&para;</a></h2>
+<p>conda-forge uses a <strong>feedstock</strong> repository separate from the main package.</p>
 <h3 id="first-submission">First submission<a class="headerlink" href="#first-submission" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Ensure the package is already on PyPI.</li>
@@ -1946,69 +2092,63 @@ Configure it at <strong>PyPI → Project → Publishing → Add a new publisher 
 <li>You will be added as a maintainer of the new <code>defectpl-feedstock</code> repository.</li>
 </ol>
 <h3 id="subsequent-releases">Subsequent releases<a class="headerlink" href="#subsequent-releases" title="Permanent link">&para;</a></h3>
-<p>After a new PyPI release, the <code>regro-cf-autotick-bot</code> usually opens a PR automatically in
-<code>defectpl-feedstock</code> within a few hours. Review and merge it:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Clone your feedstock</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/&lt;your-gh-username&gt;/defectpl-feedstock
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nb">cd</span><span class="w"> </span>defectpl-feedstock
+<p>After a new PyPI release, the <code>regro-cf-autotick-bot</code> usually opens a PR in
+<code>defectpl-feedstock</code> within a few hours. Review and merge it, or update manually:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># meta.yaml — bump version and sha256</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="p p-Indicator">{</span><span class="err">%</span><span class="w"> </span><span class="nv">set version = &quot;0.4.0&quot; %</span><span class="p p-Indicator">}</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="nt">source</span><span class="p">:</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://pypi.io/packages/source/d/defectpl/defectpl-{{ version }}.tar.gz</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;new-hash&gt;</span>
+</span></code></pre></div>
+<hr />
+<h2 id="8-docstring-style-numpy">8. Docstring style (numpy)<a class="headerlink" href="#8-docstring-style-numpy" title="Permanent link">&para;</a></h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">calc_delQ</span><span class="p">(</span><span class="n">masses</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">dR</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="sd">    Compute the mass-weighted configuration coordinate difference Delta-Q.</span>
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="c1"># The bot already made a branch; review meta.yaml, check the SHA256 hash</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="c1"># matches the new PyPI tarball:</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>pip<span class="w"> </span>download<span class="w"> </span><span class="nv">defectpl</span><span class="o">==</span><span class="m">0</span>.3.0<span class="w"> </span>--no-deps<span class="w"> </span>--dest<span class="w"> </span>/tmp/dl/
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>sha256sum<span class="w"> </span>/tmp/dl/defectpl-0.3.0.tar.gz
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="c1"># Approve and merge the bot&#39;s PR on GitHub</span>
-</span></code></pre></div>
-<p>If the bot is slow, update manually:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># recipes/meta.yaml — bump version and sha256</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="p p-Indicator">{</span><span class="err">%</span><span class="w"> </span><span class="nv">set version = &quot;0.3.0&quot; %</span><span class="p p-Indicator">}</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="nt">source</span><span class="p">:</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://pypi.io/packages/source/d/defectpl/defectpl-{{ version }}.tar.gz</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span><span class="nt">sha256</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;new-hash&gt;</span>
-</span></code></pre></div>
-<hr />
-<h2 id="7-github-actions-ci">7. GitHub Actions CI<a class="headerlink" href="#7-github-actions-ci" title="Permanent link">&para;</a></h2>
-<p>Create <code>.github/workflows/ci.yml</code> to run tests on every push and pull request:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CI</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">push</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pull_request</span><span class="p p-Indicator">]</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="nt">jobs</span><span class="p">:</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="nt">test</span><span class="p">:</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.os }}</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="nt">os</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ubuntu-latest</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">windows-latest</span><span class="p p-Indicator">]</span>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">        </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;3.10&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.11&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3.12&quot;</span><span class="p p-Indicator">]</span>
-</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
-</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
-</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
-</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/setup-python@v5</span>
-</span><span id="__span-18-16"><a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
-</span><span id="__span-18-17"><a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">          </span><span class="nt">python-version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ matrix.python-version }}</span>
-</span><span id="__span-18-18"><a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pip install &quot;.[all]&quot; pytest pytest-cov</span>
-</span><span id="__span-18-19"><a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest -q --cov=defectpl --cov-report=xml</span>
-</span><span id="__span-18-20"><a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">codecov/codecov-action@v4</span>
-</span><span id="__span-18-21"><a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">        </span><span class="nt">with</span><span class="p">:</span>
-</span><span id="__span-18-22"><a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">          </span><span class="nt">token</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.CODECOV_TOKEN }}</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="sd">    Parameters</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="sd">    ----------</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="sd">    masses : np.ndarray</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="sd">        Atomic masses in AMU, shape ``(natoms,)``.</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="sd">    dR : np.ndarray</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="sd">        Cartesian displacement matrix in Ang, shape ``(natoms, 3)``.</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="sd">    Returns</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="sd">    -------</span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="sd">    float</span>
+</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="sd">        Delta-Q in units of ``sqrt(amu) * Ang``.</span>
+</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>
+</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a><span class="sd">    Notes</span>
+</span><span id="__span-16-18"><a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="sd">    -----</span>
+</span><span id="__span-16-19"><a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="sd">    The formula is :math:`\\Delta Q = \\sqrt{\\sum_a m_a |\\Delta\\mathbf{R}_a|^2}`.</span>
+</span><span id="__span-16-20"><a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>
+</span><span id="__span-16-21"><a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="sd">    Examples</span>
+</span><span id="__span-16-22"><a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a><span class="sd">    --------</span>
+</span><span id="__span-16-23"><a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+</span><span id="__span-16-24"><a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="sd">    &gt;&gt;&gt; masses = np.array([12.011, 15.999])</span>
+</span><span id="__span-16-25"><a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="sd">    &gt;&gt;&gt; dR = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0]])</span>
+</span><span id="__span-16-26"><a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a><span class="sd">    &gt;&gt;&gt; calc_delQ(masses, dR)</span>
+</span><span id="__span-16-27"><a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a><span class="sd">    0.5744...</span>
+</span><span id="__span-16-28"><a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span></code></pre></div>
 <hr />
-<h2 id="8-code-style">8. Code style<a class="headerlink" href="#8-code-style" title="Permanent link">&para;</a></h2>
+<h2 id="9-code-style">9. Code style<a class="headerlink" href="#9-code-style" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Formatter: <a href="https://docs.astral.sh/ruff/">Ruff</a> (<code>ruff format defectpl/</code>)</li>
-<li>Linter: Ruff (<code>ruff check defectpl/</code>)</li>
-<li>Docstrings: numpy style</li>
-<li>Type hints: standard Python annotations; <code>from __future__ import annotations</code> where needed</li>
-<li>Max line length: 99 characters</li>
+<li><strong>Formatter</strong>: <a href="https://docs.astral.sh/ruff/">Ruff</a> — <code>ruff format defectpl/ tests/</code></li>
+<li><strong>Linter</strong>: Ruff — <code>ruff check defectpl/ tests/</code></li>
+<li><strong>Docstrings</strong>: numpy style (see §8)</li>
+<li><strong>Type hints</strong>: standard Python annotations; <code>from __future__ import annotations</code> where needed</li>
+<li><strong>Max line length</strong>: 99 characters (set in <code>pyproject.toml</code>)</li>
+<li><strong>Pre-commit</strong>: all of the above are enforced automatically; see §2</li>
 </ul>
-<p>Add to <code>pyproject.toml</code>:</p>
-<div class="language-toml highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">[tool.ruff]</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">target-version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;py310&quot;</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">[tool.ruff.lint]</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="n">select</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;E&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;F&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;W&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># pyproject.toml</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="k">[tool.ruff]</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">99</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">target-version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;py311&quot;</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="k">[tool.ruff.lint]</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">select</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;E&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;F&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;W&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;I&quot;</span><span class="p">]</span>
 </span></code></pre></div>
 
 
@@ -2143,9 +2283,9 @@ Configure it at <strong>PyPI → Project → Publishing → Add a new publisher 
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
+        <script src="../javascripts/mathjax.js" defer></script>
       
-        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js" defer></script>
       
     
   </body>

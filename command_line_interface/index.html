@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="First-principles photoluminescence lineshapes, electron-phonon coupling, and electronic-state localization for point defects in semiconductors and insulators.">
+        <meta name="description" content="A unified Python package for the optical properties of point defects in solids.">
       
       
         <meta name="author" content="Shibu Meher">
@@ -102,7 +102,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="DefectPL" class="md-header__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="../assets/defectpl-mark-color.svg" alt="logo">
+  <img src="../assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -378,7 +378,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="DefectPL" class="md-nav__button md-logo" aria-label="DefectPL" data-md-component="logo">
       
-  <img src="../assets/defectpl-mark-color.svg" alt="logo">
+  <img src="../assets/defectpl-logo-horizontal.svg" alt="logo">
 
     </a>
     DefectPL
@@ -1409,15 +1409,76 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-standalone-plotting-defectpl-plot" class="md-nav__link">
+  <a href="#3-photoabsorption-defectpl-absorption" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Standalone Plotting (defectpl plot)
+        3. Photoabsorption (defectpl absorption)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Standalone Plotting (defectpl plot)">
+    <nav class="md-nav" aria-label="3. Photoabsorption (defectpl absorption)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-displacement-mode-defectpl-absorption-displacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A. Displacement Mode (defectpl absorption displacement)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-force-mode-defectpl-absorption-force" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B. Force Mode (defectpl absorption force)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-restore-from-json-defectpl-absorption-from-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C. Restore from JSON (defectpl absorption from-json)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-pl-absorption-overlay-defectpl-overlay" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. PL + Absorption Overlay (defectpl overlay)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-standalone-plotting-defectpl-plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Standalone Plotting (defectpl plot)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Standalone Plotting (defectpl plot)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1437,10 +1498,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-generalized-displacements-defectpl-dq" class="md-nav__link">
+  <a href="#6-generalized-displacements-defectpl-dq" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Generalized Displacements (defectpl dq)
+        6. Generalized Displacements (defectpl dq)
       
     </span>
   </a>
@@ -1448,10 +1509,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-analytical-1d-lineshapes-defectpl-spectra1d" class="md-nav__link">
+  <a href="#7-analytical-1d-lineshapes-defectpl-spectra1d" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Analytical 1D Lineshapes (defectpl spectra1d)
+        7. Analytical 1D Lineshapes (defectpl spectra1d)
       
     </span>
   </a>
@@ -1459,15 +1520,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd" class="md-nav__link">
+  <a href="#8-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. Configuration Coordinate Diagrams (defectpl setup-ccd / analyze-ccd)
+        8. Configuration Coordinate Diagrams (defectpl setup-ccd / analyze-ccd)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. Configuration Coordinate Diagrams (defectpl setup-ccd / analyze-ccd)">
+    <nav class="md-nav" aria-label="8. Configuration Coordinate Diagrams (defectpl setup-ccd / analyze-ccd)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1498,15 +1559,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-comparative-benchmark-suites-defectpl-compare-json-compare-yaml" class="md-nav__link">
+  <a href="#9-comparative-benchmark-suites-defectpl-compare-json-compare-yaml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Comparative Benchmark Suites (defectpl compare-json / compare-yaml)
+        9. Comparative Benchmark Suites (defectpl compare-json / compare-yaml)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="7. Comparative Benchmark Suites (defectpl compare-json / compare-yaml)">
+    <nav class="md-nav" aria-label="9. Comparative Benchmark Suites (defectpl compare-json / compare-yaml)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1537,15 +1598,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-phonon-and-lattice-utilities" class="md-nav__link">
+  <a href="#10-phonon-and-lattice-utilities" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Phonon and Lattice Utilities
+        10. Phonon and Lattice Utilities
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="8. Phonon and Lattice Utilities">
+    <nav class="md-nav" aria-label="10. Phonon and Lattice Utilities">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1598,10 +1659,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-kohn-sham-level-visualization-defectpl-ksplot" class="md-nav__link">
+  <a href="#11-kohn-sham-level-visualization-defectpl-ksplot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Kohn-Sham Level Visualization (defectpl ksplot)
+        11. Kohn-Sham Level Visualization (defectpl ksplot)
       
     </span>
   </a>
@@ -1609,15 +1670,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-participation-ratio-defectpl-pr" class="md-nav__link">
+  <a href="#12-participation-ratio-defectpl-pr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Participation Ratio (defectpl pr)
+        12. Participation Ratio (defectpl pr)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="10. Participation Ratio (defectpl pr)">
+    <nav class="md-nav" aria-label="12. Participation Ratio (defectpl pr)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2060,14 +2121,150 @@
 </tbody>
 </table>
 <hr />
-<h2 id="3-standalone-plotting-defectpl-plot">3. Standalone Plotting (<code>defectpl plot</code>)<a class="headerlink" href="#3-standalone-plotting-defectpl-plot" title="Permanent link">&para;</a></h2>
-<p>Deserializes a saved <code>properties.json</code> and renders any individual figure or the full set, without re-running the generating function.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>intensity
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>all<span class="w"> </span>--out_dir<span class="w"> </span>figs/<span class="w"> </span>--fmt<span class="w"> </span>png
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>absorption<span class="w"> </span>--fmt<span class="w"> </span>pdf
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>nk
+<h2 id="3-photoabsorption-defectpl-absorption">3. Photoabsorption (<code>defectpl absorption</code>)<a class="headerlink" href="#3-photoabsorption-defectpl-absorption" title="Permanent link">&para;</a></h2>
+<p>The <code>absorption</code> group computes multi-phonon photoabsorption lineshapes using the
+generating-function formalism with <strong>excited-state phonons</strong>.  The <code>--band_yaml</code> passed
+to every <code>absorption</code> sub-command must be obtained from a phonopy run on the
+<strong>excited-state geometry</strong> — this is the key physics distinction from <code>defectpl pl</code>,
+which uses ground-state phonons.</p>
+<h3 id="a-displacement-mode-defectpl-absorption-displacement">A. Displacement Mode (<code>defectpl absorption displacement</code>)<a class="headerlink" href="#a-displacement-mode-defectpl-absorption-displacement" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>defectpl<span class="w"> </span>absorption<span class="w"> </span>displacement<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span>--band_yaml<span class="w">     </span>./band_es.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span>--contcar_gs<span class="w">    </span>./CONTCAR_gs<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span>--contcar_es<span class="w">    </span>./CONTCAR_es<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span>--ezpl<span class="w">          </span><span class="m">1</span>.95<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span>--gamma<span class="w">         </span><span class="m">2</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span>--temperature<span class="w">   </span><span class="m">300</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span>--sigma<span class="w">         </span><span class="s2">&quot;6e-3&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span>--resolution<span class="w">    </span><span class="m">1000</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span>--max_energy<span class="w">    </span><span class="m">5</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span>--out_dir<span class="w">       </span>./output_data/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span>--json_out<span class="w">      </span>abs_properties.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span>--plot_all<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">  </span>--fig_format<span class="w">    </span>pdf
 </span></code></pre></div>
-<p><strong>Argument:</strong> Path to a Monty JSON file containing a valid <code>Photoluminescence</code> object.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--band_yaml</code></td>
+<td><code>./band.yaml</code></td>
+<td><strong>Excited-state</strong> phonopy <code>band.yaml</code> file (phonopy run at ES geometry).</td>
+</tr>
+<tr>
+<td><code>--contcar_gs</code></td>
+<td><code>./CONTCAR_gs</code></td>
+<td>Ground-state equilibrium geometry.</td>
+</tr>
+<tr>
+<td><code>--contcar_es</code></td>
+<td><code>./CONTCAR_es</code></td>
+<td>Excited-state equilibrium geometry.</td>
+</tr>
+</tbody>
+</table>
+<p>All other options are identical to <code>defectpl pl displacement</code>.</p>
+<h3 id="b-force-mode-defectpl-absorption-force">B. Force Mode (<code>defectpl absorption force</code>)<a class="headerlink" href="#b-force-mode-defectpl-absorption-force" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>defectpl<span class="w"> </span>absorption<span class="w"> </span>force<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--band_yaml<span class="w">     </span>./band_es.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--outcar_gs<span class="w">     </span>./OUTCAR_gs_at_es_geom<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--outcar_es<span class="w">     </span>./OUTCAR_es_at_es_geom<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>--ezpl<span class="w">          </span><span class="m">1</span>.95<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>--json_out<span class="w">      </span>abs_force.json
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--band_yaml</code></td>
+<td><code>./band.yaml</code></td>
+<td><strong>Excited-state</strong> phonopy <code>band.yaml</code>.</td>
+</tr>
+<tr>
+<td><code>--outcar_gs</code></td>
+<td><code>./OUTCAR_gs</code></td>
+<td>OUTCAR at ES geometry with GS charge state (for force difference).</td>
+</tr>
+<tr>
+<td><code>--outcar_es</code></td>
+<td><code>./OUTCAR_es</code></td>
+<td>OUTCAR at ES geometry with ES charge state.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c-restore-from-json-defectpl-absorption-from-json">C. Restore from JSON (<code>defectpl absorption from-json</code>)<a class="headerlink" href="#c-restore-from-json-defectpl-absorption-from-json" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>defectpl<span class="w"> </span>absorption<span class="w"> </span>from-json<span class="w"> </span>abs_properties.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--out_dir<span class="w">  </span>./figs/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--fig_format<span class="w"> </span>png
+</span></code></pre></div>
+<hr />
+<h2 id="4-pl-absorption-overlay-defectpl-overlay">4. PL + Absorption Overlay (<code>defectpl overlay</code>)<a class="headerlink" href="#4-pl-absorption-overlay-defectpl-overlay" title="Permanent link">&para;</a></h2>
+<p>Loads a <code>Photoluminescence</code> JSON (computed with GS phonons) and a <code>Photoabsorption</code>
+JSON (computed with ES phonons) and renders both spectra on a shared energy axis.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>defectpl<span class="w"> </span>overlay<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--pl<span class="w">    </span>pl.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--abs<span class="w">   </span>abs.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--out_dir<span class="w"> </span>./figs/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--fmt<span class="w">   </span>pdf
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--pl</code></td>
+<td><em>(required)</em></td>
+<td>Path to a serialized <code>Photoluminescence</code> JSON.</td>
+</tr>
+<tr>
+<td><code>--abs</code></td>
+<td><em>(required)</em></td>
+<td>Path to a serialized <code>Photoabsorption</code> JSON.</td>
+</tr>
+<tr>
+<td><code>--out_dir</code></td>
+<td><code>./</code></td>
+<td>Output directory for the overlay figure.</td>
+</tr>
+<tr>
+<td><code>--fmt</code></td>
+<td><code>pdf</code></td>
+<td>Figure format: <code>pdf</code>, <code>png</code>, <code>svg</code>.</td>
+</tr>
+<tr>
+<td><code>--iylim</code></td>
+<td>—</td>
+<td>Y-axis limits for the overlay plot (e.g. <code>"0,1.2"</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-standalone-plotting-defectpl-plot">5. Standalone Plotting (<code>defectpl plot</code>)<a class="headerlink" href="#5-standalone-plotting-defectpl-plot" title="Permanent link">&para;</a></h2>
+<p>Deserializes a saved <code>properties.json</code> and renders any individual figure or the full set, without re-running the generating function.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>intensity
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>all<span class="w"> </span>--out_dir<span class="w"> </span>figs/<span class="w"> </span>--fmt<span class="w"> </span>png
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>absorption<span class="w"> </span>--fmt<span class="w"> </span>pdf
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>defectpl<span class="w"> </span>plot<span class="w"> </span>./properties.json<span class="w"> </span>--type<span class="w"> </span>nk
+</span></code></pre></div>
+<p><strong>Argument:</strong> Path to a Monty JSON file containing a valid <code>Photoluminescence</code> or
+<code>Photoabsorption</code> object.</p>
 <table>
 <thead>
 <tr>
@@ -2109,6 +2306,7 @@
 <thead>
 <tr>
 <th><code>--type</code></th>
+<th>Required JSON type</th>
 <th>Output file</th>
 <th>Description</th>
 </tr>
@@ -2116,95 +2314,111 @@
 <tbody>
 <tr>
 <td><code>mode</code></td>
+<td>either</td>
 <td><code>penergy_vs_pmode.*</code></td>
 <td>Phonon energy vs mode index scatter.</td>
 </tr>
 <tr>
 <td><code>ipr</code></td>
+<td>either</td>
 <td><code>ipr_vs_penergy.*</code></td>
 <td>Traditional IPR vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>ipr_alkauskas</code></td>
+<td>either</td>
 <td><code>ipr_alkauskas_vs_penergy.*</code></td>
 <td>Alkauskas-convention IPR (range [1, N]) vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>loc_ratio</code></td>
+<td>either</td>
 <td><code>loc_rat_vs_penergy.*</code></td>
 <td>Localization ratio β_k = N × IPR vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>qk</code></td>
+<td>either</td>
 <td><code>qk_vs_penergy.*</code></td>
 <td>Mode displacement q_k vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>hr_factor</code></td>
+<td>either</td>
 <td><code>HR_factor_vs_penergy.*</code></td>
 <td>Partial HR factor S_k vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>s_omega</code></td>
+<td>either</td>
 <td><code>S_omega_vs_penergy.*</code></td>
 <td>Broadened spectral density S(ω).</td>
 </tr>
 <tr>
 <td><code>s_omega_sk</code></td>
+<td>either</td>
 <td><code>S_omega_Sks_vs_penergy.*</code></td>
 <td>S(ω) line + S_k scatter (dual-axis).</td>
 </tr>
 <tr>
 <td><code>s_omega_locrat</code></td>
+<td>either</td>
 <td><code>S_omega_HRf_loc_rat_vs_penergy.*</code></td>
 <td>S(ω) + S_k scatter coloured by localization ratio.</td>
 </tr>
 <tr>
 <td><code>s_omega_ipr</code></td>
+<td>either</td>
 <td><code>S_omega_HRf_ipr_vs_penergy.*</code></td>
 <td>S(ω) + S_k scatter coloured by traditional IPR.</td>
 </tr>
 <tr>
 <td><code>s_omega_ipr_alkauskas</code></td>
+<td>either</td>
 <td><code>S_omega_HRf_ipr_alkauskas_vs_penergy.*</code></td>
 <td>S(ω) + S_k scatter coloured by Alkauskas IPR.</td>
 </tr>
 <tr>
 <td><code>nk</code></td>
+<td>either</td>
 <td><code>nk_vs_penergy.*</code></td>
 <td>Bose-Einstein phonon occupation n̄_k(T) vs phonon energy.</td>
 </tr>
 <tr>
 <td><code>c_omega</code></td>
+<td>either</td>
 <td><code>C_omega_vs_penergy.*</code></td>
 <td>Thermal spectral density C(ω, T). Zero at T = 0.</td>
 </tr>
 <tr>
 <td><code>intensity</code></td>
+<td><code>Photoluminescence</code> only</td>
 <td><code>intensity_vs_penergy.*</code></td>
-<td>Normalised PL emission spectrum L(ħω).</td>
+<td>Normalised PL emission spectrum L(ħω). Raises an error if a <code>Photoabsorption</code> JSON is provided.</td>
 </tr>
 <tr>
 <td><code>absorption</code></td>
+<td><code>Photoabsorption</code> only</td>
 <td><code>absorption_vs_penergy.*</code></td>
-<td>Normalised absorption spectrum α(ħω). Sideband on the high-energy side.</td>
-</tr>
-<tr>
-<td><code>pl_absorption</code></td>
-<td><code>pl_absorption_vs_penergy.*</code></td>
-<td>PL (solid) and absorption (dashed) overlaid on one axis.</td>
+<td>Normalised absorption spectrum α(ħω). Raises an error if a <code>Photoluminescence</code> JSON is provided.</td>
 </tr>
 <tr>
 <td><code>all</code></td>
-<td>all of the above</td>
-<td>Generate every figure in one call.</td>
+<td>either</td>
+<td>all of the above (applicable)</td>
+<td>Generate every figure valid for the given JSON type.</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Note:</strong> To overlay PL and absorption on a single plot, use <code>defectpl overlay</code> (Section 4)
+rather than <code>defectpl plot -t pl_absorption</code>.  The <code>pl_absorption</code> type has been removed
+because PL and absorption now come from separate JSON files (different phonon inputs).</p>
+</blockquote>
 <hr />
-<h2 id="4-generalized-displacements-defectpl-dq">4. Generalized Displacements (<code>defectpl dq</code>)<a class="headerlink" href="#4-generalized-displacements-defectpl-dq" title="Permanent link">&para;</a></h2>
+<h2 id="6-generalized-displacements-defectpl-dq">6. Generalized Displacements (<code>defectpl dq</code>)<a class="headerlink" href="#6-generalized-displacements-defectpl-dq" title="Permanent link">&para;</a></h2>
 <p>Calculates the mass-weighted configuration coordinate vector offset (ΔQ) across any two matching structural geometry supercells.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>defectpl<span class="w"> </span>dq<span class="w"> </span>./CONTCAR_GS<span class="w"> </span>./CONTCAR_ES<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>--out<span class="w"> </span>delta_q.json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>defectpl<span class="w"> </span>dq<span class="w"> </span>./CONTCAR_GS<span class="w"> </span>./CONTCAR_ES<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>--out<span class="w"> </span>delta_q.json
 </span></code></pre></div>
 <table>
 <thead>
@@ -2238,21 +2452,21 @@
 </tbody>
 </table>
 <hr />
-<h2 id="5-analytical-1d-lineshapes-defectpl-spectra1d">5. Analytical 1D Lineshapes (<code>defectpl spectra1d</code>)<a class="headerlink" href="#5-analytical-1d-lineshapes-defectpl-spectra1d" title="Permanent link">&para;</a></h2>
+<h2 id="7-analytical-1d-lineshapes-defectpl-spectra1d">7. Analytical 1D Lineshapes (<code>defectpl spectra1d</code>)<a class="headerlink" href="#7-analytical-1d-lineshapes-defectpl-spectra1d" title="Permanent link">&para;</a></h2>
 <p>Simulates a decoupled 1D displaced-distorted harmonic oscillator spectrum without assuming identical Hessians (ω₁ ≠ ω₂). Boltzmann-weighted Franck–Condon overlaps are summed explicitly over vibrational quantum numbers.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>defectpl<span class="w"> </span>spectra1d<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--ezpl<span class="w">       </span><span class="m">2</span>.60<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--w1<span class="w">         </span><span class="m">35</span>.75<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>--w2<span class="w">         </span><span class="m">41</span>.56<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span>--dq_val<span class="w">     </span><span class="m">1</span>.5476<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span>--temp<span class="w">       </span><span class="m">300</span>.0<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span>--e0<span class="w">         </span><span class="m">1</span>.8<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span>--de<span class="w">         </span><span class="m">0</span>.001<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span>--points<span class="w">     </span><span class="m">5000</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span>--nn1<span class="w">        </span><span class="m">22</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span>--nn2<span class="w">        </span><span class="m">52</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span>--plot<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span>--save_prefix<span class="w"> </span>tracking_1d
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>defectpl<span class="w"> </span>spectra1d<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>--ezpl<span class="w">       </span><span class="m">2</span>.60<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>--w1<span class="w">         </span><span class="m">35</span>.75<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span>--w2<span class="w">         </span><span class="m">41</span>.56<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span>--dq_val<span class="w">     </span><span class="m">1</span>.5476<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span>--temp<span class="w">       </span><span class="m">300</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span>--e0<span class="w">         </span><span class="m">1</span>.8<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span>--de<span class="w">         </span><span class="m">0</span>.001<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">  </span>--points<span class="w">     </span><span class="m">5000</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">  </span>--nn1<span class="w">        </span><span class="m">22</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span>--nn2<span class="w">        </span><span class="m">52</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">  </span>--plot<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">  </span>--save_prefix<span class="w"> </span>tracking_1d
 </span></code></pre></div>
 <table>
 <thead>
@@ -2326,77 +2540,77 @@
 </tbody>
 </table>
 <hr />
-<h2 id="6-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd">6. Configuration Coordinate Diagrams (<code>defectpl setup-ccd</code> / <code>analyze-ccd</code>)<a class="headerlink" href="#6-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd" title="Permanent link">&para;</a></h2>
+<h2 id="8-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd">8. Configuration Coordinate Diagrams (<code>defectpl setup-ccd</code> / <code>analyze-ccd</code>)<a class="headerlink" href="#8-configuration-coordinate-diagrams-defectpl-setup-ccd-analyze-ccd" title="Permanent link">&para;</a></h2>
 <p>Automates linear structure interpolation tasks across structural potential surfaces to map the classical harmonic potential energy curves.</p>
 <h3 id="a-initialization-defectpl-setup-ccd">A. Initialization (<code>defectpl setup-ccd</code>)<a class="headerlink" href="#a-initialization-defectpl-setup-ccd" title="Permanent link">&para;</a></h3>
 <p>Generates interpolated structural task directories scaled across a displacement grid.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>defectpl<span class="w"> </span>setup-ccd<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--gs<span class="w">      </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--es<span class="w">      </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>--tmpl_gs<span class="w"> </span>./template_GS_dir/<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--tmpl_es<span class="w"> </span>./template_ES_dir/<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span>--out_dir<span class="w"> </span>./ccd_workspace/<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span>--steps<span class="w">   </span><span class="s2">&quot;-0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>defectpl<span class="w"> </span>setup-ccd<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>--gs<span class="w">      </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>--es<span class="w">      </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span>--tmpl_gs<span class="w"> </span>./template_GS_dir/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span>--tmpl_es<span class="w"> </span>./template_ES_dir/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span>--out_dir<span class="w"> </span>./ccd_workspace/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span>--steps<span class="w">   </span><span class="s2">&quot;-0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2&quot;</span>
 </span></code></pre></div>
 <h3 id="b-curvature-analysis-defectpl-analyze-ccd">B. Curvature Analysis (<code>defectpl analyze-ccd</code>)<a class="headerlink" href="#b-curvature-analysis-defectpl-analyze-ccd" title="Permanent link">&para;</a></h3>
 <p>Parses completed calculations to fit parabolic potential energy surfaces and report effective phonon frequencies.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>defectpl<span class="w"> </span>analyze-ccd<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>--gs<span class="w">      </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span>--es<span class="w">      </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span>--gs_runs<span class="w"> </span><span class="s2">&quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span>--es_runs<span class="w"> </span><span class="s2">&quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span>--de<span class="w">      </span><span class="m">1</span>.95<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span>--save_plot<span class="w"> </span>ccd_fit.pdf
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>defectpl<span class="w"> </span>analyze-ccd<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>--gs<span class="w">      </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>--es<span class="w">      </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span>--gs_runs<span class="w"> </span><span class="s2">&quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span>--es_runs<span class="w"> </span><span class="s2">&quot;./run_0/vasprun.xml ./run_1/vasprun.xml&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span>--de<span class="w">      </span><span class="m">1</span>.95<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">  </span>--save_plot<span class="w"> </span>ccd_fit.pdf
 </span></code></pre></div>
 <hr />
-<h2 id="7-comparative-benchmark-suites-defectpl-compare-json-compare-yaml">7. Comparative Benchmark Suites (<code>defectpl compare-json</code> / <code>compare-yaml</code>)<a class="headerlink" href="#7-comparative-benchmark-suites-defectpl-compare-json-compare-yaml" title="Permanent link">&para;</a></h2>
+<h2 id="9-comparative-benchmark-suites-defectpl-compare-json-compare-yaml">9. Comparative Benchmark Suites (<code>defectpl compare-json</code> / <code>compare-yaml</code>)<a class="headerlink" href="#9-comparative-benchmark-suites-defectpl-compare-json-compare-yaml" title="Permanent link">&para;</a></h2>
 <p>Compiles and plots multiple calculated datasets side-by-side to benchmark modelling parameters.</p>
 <h3 id="a-json-spectra-comparisons-defectpl-compare-json">A. JSON Spectra Comparisons (<code>defectpl compare-json</code>)<a class="headerlink" href="#a-json-spectra-comparisons-defectpl-compare-json" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>defectpl<span class="w"> </span>compare-json<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>--files<span class="w">   </span><span class="s2">&quot;run1/properties.json run2/properties.json&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--legends<span class="w"> </span><span class="s2">&quot;Functional-A,Functional-B&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span>--xmin<span class="w"> </span><span class="m">1</span>.2<span class="w"> </span>--xmax<span class="w"> </span><span class="m">2</span>.2<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span>--out_dir<span class="w"> </span>./comparisons/
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>defectpl<span class="w"> </span>compare-json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--files<span class="w">   </span><span class="s2">&quot;run1/properties.json run2/properties.json&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--legends<span class="w"> </span><span class="s2">&quot;Functional-A,Functional-B&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--xmin<span class="w"> </span><span class="m">1</span>.2<span class="w"> </span>--xmax<span class="w"> </span><span class="m">2</span>.2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span>--out_dir<span class="w"> </span>./comparisons/
 </span></code></pre></div>
 <h3 id="b-raw-phonopy-input-comparisons-defectpl-compare-yaml">B. Raw Phonopy Input Comparisons (<code>defectpl compare-yaml</code>)<a class="headerlink" href="#b-raw-phonopy-input-comparisons-defectpl-compare-yaml" title="Permanent link">&para;</a></h3>
 <p>Evaluate lineshape variations against different phonon datasets without running separate pipeline loops.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>defectpl<span class="w"> </span>compare-yaml<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>--yamls<span class="w"> </span><span class="s2">&quot;phonon_90_atoms/band.yaml phonon_216_atoms/band.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>--gs<span class="w">    </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span>--es<span class="w">    </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span>--ezpl<span class="w">  </span><span class="m">1</span>.945<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span>--xmin<span class="w">  </span><span class="m">1</span>.0<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span>--xmax<span class="w">  </span><span class="m">2</span>.5
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>defectpl<span class="w"> </span>compare-yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>--yamls<span class="w"> </span><span class="s2">&quot;phonon_90_atoms/band.yaml phonon_216_atoms/band.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>--gs<span class="w">    </span>./CONTCAR_GS<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>--es<span class="w">    </span>./CONTCAR_ES<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span>--ezpl<span class="w">  </span><span class="m">1</span>.945<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span>--xmin<span class="w">  </span><span class="m">1</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span>--xmax<span class="w">  </span><span class="m">2</span>.5
 </span></code></pre></div>
 <hr />
-<h2 id="8-phonon-and-lattice-utilities">8. Phonon and Lattice Utilities<a class="headerlink" href="#8-phonon-and-lattice-utilities" title="Permanent link">&para;</a></h2>
+<h2 id="10-phonon-and-lattice-utilities">10. Phonon and Lattice Utilities<a class="headerlink" href="#10-phonon-and-lattice-utilities" title="Permanent link">&para;</a></h2>
 <p>Exposes administrative shortcuts for mapping Gamma-point lattice frequencies within your processing directories.</p>
 <h3 id="a-extract-force-constants-defectpl-phonon-fc">A. Extract Force Constants (<code>defectpl phonon-fc</code>)<a class="headerlink" href="#a-extract-force-constants-defectpl-phonon-fc" title="Permanent link">&para;</a></h3>
 <p>Parses a <code>vasprun.xml</code> file and writes Phonopy force constants.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>defectpl<span class="w"> </span>phonon-fc<span class="w"> </span>./vasprun.xml<span class="w"> </span>--hdf5
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>defectpl<span class="w"> </span>phonon-fc<span class="w"> </span>./vasprun.xml<span class="w"> </span>--hdf5
 </span></code></pre></div>
 <h3 id="b-phonon-irreducible-representations-defectpl-phonon-symm">B. Phonon Irreducible Representations (<code>defectpl phonon-symm</code>)<a class="headerlink" href="#b-phonon-irreducible-representations-defectpl-phonon-symm" title="Permanent link">&para;</a></h3>
 <p>Identifies point-group irreducible representation labels for Gamma-point modes.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>defectpl<span class="w"> </span>phonon-symm<span class="w"> </span>--poscar<span class="w"> </span>./POSCAR<span class="w"> </span>--fc<span class="w"> </span>./FORCE_CONSTANTS<span class="w"> </span>--dim<span class="w"> </span><span class="s2">&quot;1 1 1&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>defectpl<span class="w"> </span>phonon-symm<span class="w"> </span>--poscar<span class="w"> </span>./POSCAR<span class="w"> </span>--fc<span class="w"> </span>./FORCE_CONSTANTS<span class="w"> </span>--dim<span class="w"> </span><span class="s2">&quot;1 1 1&quot;</span>
 </span></code></pre></div>
 <h3 id="c-compute-bandyaml-defectpl-phonon-band">C. Compute <code>band.yaml</code> (<code>defectpl phonon-band</code>)<a class="headerlink" href="#c-compute-bandyaml-defectpl-phonon-band" title="Permanent link">&para;</a></h3>
 <p>Evaluates eigenvalues at the Gamma point from a <code>FORCE_CONSTANTS</code> file and writes <code>band.yaml</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>defectpl<span class="w"> </span>phonon-band<span class="w"> </span>--poscar<span class="w"> </span>./POSCAR<span class="w"> </span>--fc<span class="w"> </span>./FORCE_CONSTANTS<span class="w"> </span>--dim<span class="w"> </span><span class="s2">&quot;1 1 1&quot;</span><span class="w"> </span>--out<span class="w"> </span>band.yaml
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>defectpl<span class="w"> </span>phonon-band<span class="w"> </span>--poscar<span class="w"> </span>./POSCAR<span class="w"> </span>--fc<span class="w"> </span>./FORCE_CONSTANTS<span class="w"> </span>--dim<span class="w"> </span><span class="s2">&quot;1 1 1&quot;</span><span class="w"> </span>--out<span class="w"> </span>band.yaml
 </span></code></pre></div>
 <h3 id="d-re-serialize-phonon-data-defectpl-phonon-parse">D. Re-serialize Phonon Data (<code>defectpl phonon-parse</code>)<a class="headerlink" href="#d-re-serialize-phonon-data-defectpl-phonon-parse" title="Permanent link">&para;</a></h3>
 <p>Converts a <code>band.yaml</code> to eV and writes an MSONable JSON data model.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>defectpl<span class="w"> </span>phonon-parse<span class="w"> </span>./band.yaml<span class="w"> </span>--json_out<span class="w"> </span>parsed_phonons.json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>defectpl<span class="w"> </span>phonon-parse<span class="w"> </span>./band.yaml<span class="w"> </span>--json_out<span class="w"> </span>parsed_phonons.json
 </span></code></pre></div>
 <hr />
-<h2 id="9-kohn-sham-level-visualization-defectpl-ksplot">9. Kohn-Sham Level Visualization (<code>defectpl ksplot</code>)<a class="headerlink" href="#9-kohn-sham-level-visualization-defectpl-ksplot" title="Permanent link">&para;</a></h2>
+<h2 id="11-kohn-sham-level-visualization-defectpl-ksplot">11. Kohn-Sham Level Visualization (<code>defectpl ksplot</code>)<a class="headerlink" href="#11-kohn-sham-level-visualization-defectpl-ksplot" title="Permanent link">&para;</a></h2>
 <p>Parses a VASP <code>EIGENVAL</code> file to resolve degeneracies, handle spin polarization, and plot single-particle defect states within the bandgap.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>defectpl<span class="w"> </span>ksplot<span class="w"> </span>./EIGENVAL<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span>--vbm<span class="w">     </span><span class="m">9</span>.6747<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>--cbm<span class="w">     </span><span class="m">13</span>.7934<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span>--espan<span class="w">   </span><span class="m">1</span>.5<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span>--kidx<span class="w">    </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span>--out_img<span class="w"> </span>bandgap_levels.png<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span>--out_json<span class="w"> </span>defect_states.json
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>defectpl<span class="w"> </span>ksplot<span class="w"> </span>./EIGENVAL<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span>--vbm<span class="w">     </span><span class="m">9</span>.6747<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span>--cbm<span class="w">     </span><span class="m">13</span>.7934<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span>--espan<span class="w">   </span><span class="m">1</span>.5<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span>--kidx<span class="w">    </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span>--out_img<span class="w"> </span>bandgap_levels.png<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span>--out_json<span class="w"> </span>defect_states.json
 </span></code></pre></div>
 <table>
 <thead>
@@ -2440,19 +2654,19 @@
 </tbody>
 </table>
 <hr />
-<h2 id="10-participation-ratio-defectpl-pr">10. Participation Ratio (<code>defectpl pr</code>)<a class="headerlink" href="#10-participation-ratio-defectpl-pr" title="Permanent link">&para;</a></h2>
+<h2 id="12-participation-ratio-defectpl-pr">12. Participation Ratio (<code>defectpl pr</code>)<a class="headerlink" href="#12-participation-ratio-defectpl-pr" title="Permanent link">&para;</a></h2>
 <p>The <code>pr</code> group computes electronic-state <strong>P-ratio</strong> and <strong>IPR</strong> from VASP PROCAR data, and provides utilities to generate all prerequisite JSON files without pydefect.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>--help
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>--help
 </span></code></pre></div>
 <h3 id="a-generate-defect_entryjson-defectpl-pr-make-entry">A. Generate <code>defect_entry.json</code> (<code>defectpl pr make-entry</code>)<a class="headerlink" href="#a-generate-defect_entryjson-defectpl-pr-make-entry" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Manual (provide centre directly)</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-entry<span class="w"> </span>--name<span class="w"> </span>Va_O1_2<span class="w"> </span>--center<span class="w"> </span><span class="m">0</span>.5,0.5,0.5
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Auto-detect vacancy from perfect vs defect structure</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-entry<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span>--name<span class="w">    </span>Va_O1_2<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span>--perfect<span class="w"> </span>../perfect/POSCAR<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span>--defect<span class="w">  </span>CONTCAR
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Manual (provide centre directly)</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-entry<span class="w"> </span>--name<span class="w"> </span>Va_O1_2<span class="w"> </span>--center<span class="w"> </span><span class="m">0</span>.5,0.5,0.5
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Auto-detect vacancy from perfect vs defect structure</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-entry<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="w">    </span>--name<span class="w">    </span>Va_O1_2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">    </span>--perfect<span class="w"> </span>../perfect/POSCAR<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">    </span>--defect<span class="w">  </span>CONTCAR
 </span></code></pre></div>
 <table>
 <thead>
@@ -2496,10 +2710,10 @@
 </tbody>
 </table>
 <h3 id="b-generate-defect_structure_infojson-defectpl-pr-make-dsi">B. Generate <code>defect_structure_info.json</code> (<code>defectpl pr make-dsi</code>)<a class="headerlink" href="#b-generate-defect_structure_infojson-defectpl-pr-make-dsi" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-dsi<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span>--poscar<span class="w"> </span>CONTCAR<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span>--center<span class="w"> </span><span class="m">0</span>.5,0.5,0.5<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span>--cutoff<span class="w"> </span><span class="m">3</span>.5
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>make-dsi<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span>--poscar<span class="w"> </span>CONTCAR<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span>--center<span class="w"> </span><span class="m">0</span>.5,0.5,0.5<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span>--cutoff<span class="w"> </span><span class="m">3</span>.5
 </span></code></pre></div>
 <table>
 <thead>
@@ -2533,15 +2747,15 @@
 </tbody>
 </table>
 <h3 id="c-run-the-p-ratio-calculation-defectpl-pr-calc">C. Run the P-ratio calculation (<code>defectpl pr calc</code>)<a class="headerlink" href="#c-run-the-p-ratio-calculation-defectpl-pr-calc" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Minimal (auto-detect all file paths in current directory)</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>calc
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c1"># Explicit paths</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>calc<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span>--procar<span class="w">  </span>Va_O1_2/PROCAR<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span>--entry<span class="w">   </span>Va_O1_2/defect_entry.json<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span>--dsi<span class="w">     </span>Va_O1_2/defect_structure_info.json<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">    </span>--out<span class="w">     </span>Va_O1_2/
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Minimal (auto-detect all file paths in current directory)</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>calc
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="c1"># Explicit paths</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>calc<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span>--procar<span class="w">  </span>Va_O1_2/PROCAR<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span>--entry<span class="w">   </span>Va_O1_2/defect_entry.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span>--dsi<span class="w">     </span>Va_O1_2/defect_structure_info.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">    </span>--out<span class="w">     </span>Va_O1_2/
 </span></code></pre></div>
 <table>
 <thead>
@@ -2600,30 +2814,30 @@
 </tbody>
 </table>
 <h3 id="d-batch-processing-defectpl-pr-batch">D. Batch processing (<code>defectpl pr batch</code>)<a class="headerlink" href="#d-batch-processing-defectpl-pr-batch" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>batch<span class="w"> </span>--dir<span class="w"> </span>defects/Va_O1/<span class="w"> </span>--cutoff<span class="w"> </span><span class="m">4</span>.0
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>batch<span class="w"> </span>--dir<span class="w"> </span>defects/Va_O1/<span class="w"> </span>--cutoff<span class="w"> </span><span class="m">4</span>.0
 </span></code></pre></div>
 <p>Walks all immediate subdirectories of <code>--dir</code>, runs <code>pr calc</code> in each one that contains <code>PROCAR</code> + <code>defect_entry.json</code>, and writes a combined CSV.</p>
 <h3 id="e-inspect-results-defectpl-pr-summary-defectpl-pr-top">E. Inspect results (<code>defectpl pr summary</code> / <code>defectpl pr top</code>)<a class="headerlink" href="#e-inspect-results-defectpl-pr-summary-defectpl-pr-top" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Pretty-print summary table</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>summary<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># List top-5 most localised states by IPR</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>top<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--n<span class="w"> </span><span class="m">5</span><span class="w"> </span>--metric<span class="w"> </span>ipr
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Pretty-print summary table</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>summary<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--top<span class="w"> </span><span class="m">20</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="c1"># List top-5 most localised states by IPR</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>top<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--n<span class="w"> </span><span class="m">5</span><span class="w"> </span>--metric<span class="w"> </span>ipr
 </span></code></pre></div>
 <h3 id="f-scatter-plot-defectpl-pr-plot">F. Scatter plot (<code>defectpl pr plot</code>)<a class="headerlink" href="#f-scatter-plot-defectpl-pr-plot" title="Permanent link">&para;</a></h3>
 <p>Plot P-ratio or IPR against <strong>energy</strong> (default) or <strong>band index</strong>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1"># P-ratio vs energy (default)</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="c1"># P-ratio vs band index</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--xaxis<span class="w"> </span>band
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="c1"># IPR vs energy with gap markers and energy window</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">    </span>--metric<span class="w"> </span>ipr<span class="w"> </span>--xaxis<span class="w"> </span>energy<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">    </span>--vbm<span class="w"> </span><span class="m">5</span>.20<span class="w"> </span>--cbm<span class="w"> </span><span class="m">8</span>.10<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">    </span>--emin<span class="w"> </span><span class="m">4</span>.0<span class="w"> </span>--emax<span class="w"> </span><span class="m">9</span>.5<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">    </span>--threshold<span class="w"> </span><span class="m">0</span>.05<span class="w"> </span>--out<span class="w"> </span>ipr.pdf
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1"># P-ratio vs energy (default)</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="c1"># P-ratio vs band index</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span>--xaxis<span class="w"> </span>band
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="c1"># IPR vs energy with gap markers and energy window</span>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>plot<span class="w"> </span>Va_O1_2/participation_ratio.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">    </span>--metric<span class="w"> </span>ipr<span class="w"> </span>--xaxis<span class="w"> </span>energy<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">    </span>--vbm<span class="w"> </span><span class="m">5</span>.20<span class="w"> </span>--cbm<span class="w"> </span><span class="m">8</span>.10<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">    </span>--emin<span class="w"> </span><span class="m">4</span>.0<span class="w"> </span>--emax<span class="w"> </span><span class="m">9</span>.5<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">    </span>--threshold<span class="w"> </span><span class="m">0</span>.05<span class="w"> </span>--out<span class="w"> </span>ipr.pdf
 </span></code></pre></div>
 <table>
 <thead>
@@ -2694,14 +2908,14 @@
 <p>Filled markers = occupied (occ ≥ 0.5); open = empty. Spin channels: blue = spin up, red = spin down.</p>
 <h3 id="g-ks-level-diagram-with-p-ratio-colour-code-defectpl-pr-ksplot">G. KS level diagram with P-ratio colour code (<code>defectpl pr ksplot</code>)<a class="headerlink" href="#g-ks-level-diagram-with-p-ratio-colour-code-defectpl-pr-ksplot" title="Permanent link">&para;</a></h3>
 <p>Renders the standard Kohn-Sham level diagram where each horizontal bar is coloured by the P-ratio or IPR of that state. A colorbar is added on the right.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>ksplot<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span>--eigenval<span class="w"> </span>EIGENVAL<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span>--pr-json<span class="w">  </span>Va_O1_2/participation_ratio.json<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span>--vbm<span class="w"> </span><span class="m">5</span>.20<span class="w"> </span>--cbm<span class="w"> </span><span class="m">8</span>.10<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span>--espan<span class="w"> </span><span class="m">1</span>.5<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span>--metric<span class="w"> </span>p_ratio<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span>--cmap<span class="w"> </span>RdYlGn_r<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span>--out<span class="w"> </span>ks_pr_plot.png
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>defectpl<span class="w"> </span>pr<span class="w"> </span>ksplot<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">    </span>--eigenval<span class="w"> </span>EIGENVAL<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">    </span>--pr-json<span class="w">  </span>Va_O1_2/participation_ratio.json<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">    </span>--vbm<span class="w"> </span><span class="m">5</span>.20<span class="w"> </span>--cbm<span class="w"> </span><span class="m">8</span>.10<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">    </span>--espan<span class="w"> </span><span class="m">1</span>.5<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">    </span>--metric<span class="w"> </span>p_ratio<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="w">    </span>--cmap<span class="w"> </span>RdYlGn_r<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="w">    </span>--out<span class="w"> </span>ks_pr_plot.png
 </span></code></pre></div>
 <table>
 <thead>
@@ -2907,9 +3121,9 @@
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
+        <script src="../javascripts/mathjax.js" defer></script>
       
-        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js" defer></script>
       
     
   </body>
