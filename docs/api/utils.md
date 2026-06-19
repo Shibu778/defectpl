@@ -26,6 +26,20 @@
 
 ::: defectpl.utils.calc_IPR_alkauskas
 
+## Temperature-dependent PL and absorption
+
+::: defectpl.utils.calc_phonon_occupation
+
+::: defectpl.utils.calc_C_omega
+
+::: defectpl.utils.calc_Ct
+
+::: defectpl.utils.calc_C_total
+
+::: defectpl.utils.calc_Absorption_Intensity
+
+::: defectpl.utils.calc_effective_phonon_frequency
+
 ## Generating function and spectrum
 
 ::: defectpl.utils.calc_St

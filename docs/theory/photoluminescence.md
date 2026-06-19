@@ -212,7 +212,81 @@ of a localized vibrational mode.
 
 ---
 
-## 6. Software Pipeline Mapping
+## 6. Finite-Temperature Extension
+
+At temperatures above 0 K, phonons are thermally occupied and both emission and absorption of
+phonons contribute to the optical lineshape.  The formalism follows Jin *et al.* (2021) [3].
+
+### 6.1 Bose-Einstein Phonon Occupation
+
+The mean phonon occupation of mode $k$ at temperature $T$ is:
+
+$$\bar{n}_k(T) = \frac{1}{\exp\!\left(\dfrac{\hbar\omega_k}{k_B T}\right) - 1}$$
+
+At $T = 0$, $\bar{n}_k = 0$ and the T=0 formalism is recovered exactly.
+
+### 6.2 Thermal Spectral Density
+
+The thermal extension adds a new spectral density $C(\hbar\omega, T)$ defined as:
+
+$$C(\hbar\omega, T) = \sum_k \bar{n}_k(T)\, S_k\, \delta(\hbar\omega - \hbar\omega_k)$$
+
+This quantity encodes the contribution of thermally occupied phonons to the lineshape.
+The time-domain counterpart is:
+
+$$C(t, T) = \int_0^\infty C(\hbar\omega, T)\, e^{i\omega t}\, d(\hbar\omega)$$
+
+computed numerically as $C(t) = \mathcal{F}^{-1}[C(\omega)]$ via FFT (identical to how $S(t)$
+is obtained from $S(\omega)$).
+
+### 6.3 Temperature-Dependent Generating Function
+
+The generating function generalises to [3, Eq. 7]:
+
+$$G(t, T) = \exp\!\Big[S(t) - S(0) + 2C(t,T) - 2C(0,T)\Big]\, e^{-\gamma|t|}$$
+
+where:
+- $S(0) = \sum_k S_k$ is the total Huang-Rhys factor $S_{\mathrm{HR}}$,
+- $C(0, T) = \sum_k \bar{n}_k(T)\, S_k$ is the thermal sum.
+
+At $T = 0$, $C(t,T) = C(0,T) = 0$ and the original formula is recovered.
+
+### 6.4 Absorption Spectrum
+
+The absorption spectral function is obtained from the complex conjugate of the PL generating
+function [3, Eq. 8]:
+
+$$G_{\mathrm{abs}}(t, T) = G^*(t, T)$$
+
+because replacing $S(t)$ with its complex conjugate $S^*(-t)$ is equivalent to reversing
+the phonon-energy axis: phonon sidebands appear on the **high-energy side** of the ZPL
+(phonon absorption raises the photon energy), opposite to the PL emission sideband.
+
+The absorption intensity uses a linear $\omega$ prefactor (photon density of states in
+absorption) rather than the $\omega^3$ factor used for emission:
+
+$$\alpha(\hbar\omega) \propto \omega\, A_{\mathrm{abs}}(\hbar\omega)$$
+
+### 6.5 Frequency-Dependent Gaussian Broadening
+
+When `sigma` is supplied as a 2-tuple `(σ_low, σ_high)`, the broadening width varies linearly
+with phonon frequency:
+
+$$\sigma(\omega_k) = \sigma_{\mathrm{low}} +
+\frac{(\sigma_{\mathrm{high}} - \sigma_{\mathrm{low}})(\omega_k - \omega_{\min})}
+{\omega_{\max} - \omega_{\min}}$$
+
+A scalar `sigma` value is equivalent to setting $\sigma_{\mathrm{low}} = \sigma_{\mathrm{high}}$.
+
+### 6.6 Effective Phonon Frequency
+
+A single characteristic phonon frequency that captures the mass-weighted average coupling is [3, Eq. 16]:
+
+$$\Omega_{\mathrm{eff}} = \sqrt{\frac{\sum_k \omega_k^2\, \Delta Q_k^2}{\sum_k \Delta Q_k^2}}$$
+
+---
+
+## 7. Software Pipeline Mapping
 
 The math detailed in this tutorial maps directly to modules in the `defectpl` repository:
 * **`defectpl.defectpl.Photoluminescence`**: Rehydrates the cached JSON properties (frequencies $\omega_{k}$, partial factors $S_{k}$, force matrices, and energy grids), manages the evaluation of equations for $S(\hbar\omega)$, and executes the numeric integration of $G(t)$ to transform it into the final luminescence vector $L(\hbar\omega)$.
@@ -225,3 +299,5 @@ The math detailed in this tutorial maps directly to modules in the `defectpl` re
 [1] Alkauskas, A., Buckley, B. B., Awschalom, D. D., & Van de Walle, C. G. (2014). First-principles theory of the luminescence lineshape for the triplet transition in diamond NV centres. *New Journal of Physics*, 16(7), 073026. https://doi.org/10.1088/1367-2630/16/7/073026
 
 [2] Alkauskas, A., Yan, Q., & Van de Walle, C. G. (2014). First-principles theory of nonradiative carrier capture via multiphonon emission. *Physical Review B*, 90(7), 075202. https://doi.org/10.1103/PhysRevB.90.075202
+
+[3] Jin, Y., Govoni, M., Wolfowicz, G., Rice, S. E., Heremans, F. J., Awschalom, D. D., & Galli, G. (2021). Photoluminescence spectra of point defects in semiconductors: Validation of first-principles calculations. *Physical Review Materials*, 5(8), 084603. https://doi.org/10.1103/PhysRevMaterials.5.084603

@@ -51,6 +51,9 @@ ANG2M: float = 1e-10
 EV2MEV: float = 1e3
 """Conversion factor from Electron-volts (eV) to Millielectron-volts (meV)."""
 
+KB_EV: float = 8.617333262e-5
+"""Boltzmann constant (k_B) in Electron-volts per Kelvin (eV/K). CODATA 2018."""
+
 
 # =====================================================================
 # Derived Constants & Conversion Factors

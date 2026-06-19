@@ -36,13 +36,17 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_qks_vectorized.return_value = np.array([0.1, 0.2, 0.3])
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
         mock_utils.calc_IPR.return_value = np.array([1.5, 1.5, 1.5])
+        mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
         mock_utils.calc_S_omega.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_St.return_value = np.linspace(0, 1, 100)
         mock_utils.calc_Gts.return_value = np.linspace(0, 1, 100)
-        mock_utils.calc_Spectrum_Intensity.return_value = (
-            np.ones(100),
-            np.ones(100) * 5,
-        )
+        mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(100), np.ones(100) * 5)
+        mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
+        mock_utils.calc_C_omega.return_value = np.zeros(100)
+        mock_utils.calc_Ct.return_value = np.zeros(100)
+        mock_utils.calc_C_total.return_value = 0.0
+        mock_utils.calc_effective_phonon_frequency.return_value = 0.04
+        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(100), np.ones(100))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -68,6 +72,13 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_utils.calc_qks_force_vectorized.return_value = np.array([0.1, 0.2, 0.3])
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
+        mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
+        mock_utils.calc_C_omega.return_value = np.zeros(10)
+        mock_utils.calc_Ct.return_value = np.zeros(10)
+        mock_utils.calc_C_total.return_value = 0.0
+        mock_utils.calc_effective_phonon_frequency.return_value = 0.04
+        mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
+        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         active_dF = np.array([[0.5, 0.0, 0.0], [0.0, 0.5, 0.0]])
 
@@ -87,6 +98,13 @@ class TestPhotoluminescence(unittest.TestCase):
         """Test both standard loading (instant state restore) and expensive regeneration methods."""
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
+        mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
+        mock_utils.calc_C_omega.return_value = np.zeros(10)
+        mock_utils.calc_Ct.return_value = np.zeros(10)
+        mock_utils.calc_C_total.return_value = 0.0
+        mock_utils.calc_effective_phonon_frequency.return_value = 0.04
+        mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
+        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,
@@ -122,6 +140,13 @@ class TestPhotoluminescence(unittest.TestCase):
         mock_plotter = mock_plotter_cls.return_value
         mock_utils.calc_Spectrum_Intensity.return_value = (np.ones(10), np.ones(10))
         mock_utils.calc_Sks.return_value = np.array([1.0, 0.5, 0.2])
+        mock_utils.calc_phonon_occupation.return_value = np.zeros(3)
+        mock_utils.calc_C_omega.return_value = np.zeros(10)
+        mock_utils.calc_Ct.return_value = np.zeros(10)
+        mock_utils.calc_C_total.return_value = 0.0
+        mock_utils.calc_effective_phonon_frequency.return_value = 0.04
+        mock_utils.calc_IPR_alkauskas.return_value = np.array([0.67, 0.67, 0.67])
+        mock_utils.calc_Absorption_Intensity.return_value = (np.ones(10), np.ones(10))
 
         pl = Photoluminescence(
             frequencies=self.frequencies,

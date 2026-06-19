@@ -22,6 +22,13 @@ from defectpl.utils import (
     calc_delta_Q,
     calculate_hermite,
     calculate_overlap_element,
+    calc_phonon_occupation,
+    calc_C_omega,
+    calc_Ct,
+    calc_C_total,
+    calc_Absorption_Intensity,
+    calc_effective_phonon_frequency,
+    calc_IPR_alkauskas,
 )
 
 # =====================================================================
@@ -196,3 +203,149 @@ def test_calculate_overlap_element():
 
     ix = calculate_overlap_element(m, n, rho, cosfi, sinfi)
     assert isinstance(ix, float)
+
+
+# =====================================================================
+# TEMPERATURE-DEPENDENT FUNCTIONS
+# =====================================================================
+
+
+def test_calc_phonon_occupation_zero_temperature():
+    freqs = np.array([0.02, 0.04, 0.06])
+    nks = calc_phonon_occupation(freqs, temperature=0.0)
+    np.testing.assert_array_equal(nks, np.zeros(3))
+
+
+def test_calc_phonon_occupation_high_temperature():
+    # At very high T, n̄_k ≈ k_B T / ħω → large positive values
+    freqs = np.array([0.01, 0.02])
+    nks = calc_phonon_occupation(freqs, temperature=1e6)
+    assert np.all(nks > 0)
+    # Higher T → lower frequency → larger occupation
+    assert nks[0] > nks[1]
+
+
+def test_calc_phonon_occupation_bose_einstein_limit():
+    # At room temperature for a mid-range phonon, check non-zero occupation
+    freqs = np.array([0.05])  # 50 meV phonon
+    nks = calc_phonon_occupation(freqs, temperature=300.0)
+    assert nks[0] > 0.0
+    # Reference: x = 0.05 / (8.617e-5 * 300) ≈ 1.934 → n̄ ≈ 0.169
+    assert nks[0] == pytest.approx(0.169, abs=0.01)
+
+
+def test_calc_C_omega_zero_temperature():
+    freqs = np.array([0.02, 0.04])
+    Sks = np.array([0.5, 0.3])
+    nks = np.zeros(2)
+    omega_range = [0.0, 0.08, 500]
+    C = calc_C_omega(freqs, Sks, nks, omega_range, sigma=6e-3)
+    assert C.shape == (500,)
+    np.testing.assert_array_equal(C, np.zeros(500))
+
+
+def test_calc_C_omega_finite_temperature():
+    freqs = np.array([0.02, 0.04])
+    Sks = np.array([0.5, 0.3])
+    nks = np.array([1.0, 0.5])
+    omega_range = [0.0, 0.08, 500]
+    C = calc_C_omega(freqs, Sks, nks, omega_range, sigma=6e-3)
+    assert C.shape == (500,)
+    assert np.all(C >= 0.0)
+    assert np.max(C) > 0.0
+
+
+def test_calc_Ct_zero_temperature():
+    C_omega = np.zeros(1000)
+    Ct = calc_Ct(C_omega)
+    assert Ct.shape == (1000,)
+    np.testing.assert_allclose(Ct, np.zeros(1000), atol=1e-10)
+
+
+def test_calc_Ct_is_real():
+    freqs = np.array([0.02, 0.04])
+    Sks = np.array([0.5, 0.3])
+    nks = np.array([0.5, 0.2])
+    omega_range = [0.0, 0.08, 500]
+    C_omega = calc_C_omega(freqs, Sks, nks, omega_range, sigma=6e-3)
+    Ct = calc_Ct(C_omega)
+    assert np.isrealobj(Ct) or np.all(np.imag(Ct) == 0)
+
+
+def test_calc_C_total_zero_occupation():
+    nks = np.zeros(3)
+    Sks = np.array([1.0, 0.5, 0.2])
+    result = calc_C_total(nks, Sks)
+    assert result == pytest.approx(0.0)
+
+
+def test_calc_C_total_dot_product():
+    nks = np.array([1.0, 2.0, 3.0])
+    Sks = np.array([0.1, 0.2, 0.3])
+    result = calc_C_total(nks, Sks)
+    assert result == pytest.approx(0.1 + 0.4 + 0.9)
+
+
+def test_calc_Gts_temperature_zero_matches_default():
+    # With Cts=None (old API) and temperature=0 (Cts=zeros, C_total=0),
+    # the result should be identical
+    n = 200
+    Sts = np.linspace(-1, 1, n)
+    total_HR = 1.0
+    gamma = 0.01
+    resolution = 100
+
+    Gt_old = calc_Gts(Sts, total_HR, gamma, resolution)
+    Ct_zero = np.zeros(n)
+    Gt_new = calc_Gts(Sts, total_HR, gamma, resolution, Cts=Ct_zero, C_total=0.0)
+    np.testing.assert_allclose(Gt_old, Gt_new, rtol=1e-12)
+
+
+def test_calc_Absorption_Intensity_shape():
+    n = 500
+    Gts = np.ones(n, dtype=complex)
+    A_abs, intensity_abs = calc_Absorption_Intensity(Gts, EZPL=2.0, resolution=100)
+    assert A_abs.shape == (n,)
+    assert intensity_abs.shape == (n,)
+
+
+def test_calc_Absorption_Intensity_omega1_prefactor():
+    n = 500
+    Gts = np.ones(n, dtype=complex)
+    A_abs, intensity_abs = calc_Absorption_Intensity(Gts, EZPL=1.0, resolution=100)
+    # intensity = A_abs * ω¹; check ratio where A_abs is non-negligible
+    j = np.arange(n)
+    omega = j / 100.0
+    np.testing.assert_allclose(np.abs(intensity_abs), np.abs(A_abs) * omega, rtol=1e-10)
+
+
+def test_calc_effective_phonon_frequency_uniform():
+    freqs = np.array([0.02, 0.04, 0.06])
+    dq = np.array([1.0, 1.0, 1.0])
+    omega_eff = calc_effective_phonon_frequency(freqs, dq)
+    expected = float(np.sum(freqs**2 * dq**2) / np.sum(dq**2))
+    assert omega_eff == pytest.approx(expected)
+
+
+def test_calc_effective_phonon_frequency_zero_raises():
+    freqs = np.array([0.02, 0.04])
+    dq = np.zeros(2)
+    with pytest.raises(ValueError, match="zero"):
+        calc_effective_phonon_frequency(freqs, dq)
+
+
+def test_calc_IPR_alkauskas_reciprocal():
+    # IPR_alkauskas = 1 / IPR_trad when both are computed for the same eigenvectors
+    eigenvectors = np.random.rand(5, 3, 3)
+    ipr_alk = calc_IPR_alkauskas(eigenvectors)
+    ipr_trad = calc_IPR(eigenvectors)
+    np.testing.assert_allclose(ipr_alk, 1.0 / ipr_trad, rtol=1e-10)
+
+
+def test_calc_IPR_alkauskas_range():
+    # Alkauskas IPR lies in [1, N] where N = natoms
+    natoms = 4
+    eigenvectors = np.abs(np.random.rand(6, natoms, 3)) + 0.01
+    ipr_alk = calc_IPR_alkauskas(eigenvectors)
+    assert np.all(ipr_alk >= 1.0 - 1e-10)
+    assert np.all(ipr_alk <= natoms + 1e-10)

@@ -8,7 +8,7 @@ import math
 from typing import List, Tuple, Union
 import numpy as np
 
-from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J
+from defectpl.constants import AMU2KG, ANG2M, HBAR_JS, HBAR_EVS, EV2J, KB_EV
 
 
 def calc_delR(dR: np.ndarray) -> float:
@@ -485,6 +485,236 @@ def calc_IPR_alkauskas(eigenvectors: np.ndarray) -> np.ndarray:
     return np.sum(participations, axis=1) ** 2 / np.sum(participations**2, axis=1)
 
 
+def _sigma_per_mode(
+    frequencies: np.ndarray, sigma: Union[float, Tuple[float, float]]
+) -> np.ndarray:
+    """Return per-mode Gaussian broadening widths in eV.
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Phonon frequencies in eV, shape (nmodes,).
+    sigma : float or (float, float)
+        Scalar → uniform broadening for all modes (eV).
+        2-tuple (sigma_low, sigma_high) → linearly interpolated from the
+        lowest to the highest frequency mode (Jin et al. 2021, Fig. 5 caption).
+
+    Returns
+    -------
+    np.ndarray
+        Per-mode broadening widths, shape (nmodes,), in eV.
+    """
+    if np.ndim(sigma) == 0:
+        return np.full(len(frequencies), float(sigma))
+    sigma_low, sigma_high = float(sigma[0]), float(sigma[1])
+    f_min, f_max = float(np.min(frequencies)), float(np.max(frequencies))
+    if f_max == f_min:
+        return np.full(len(frequencies), sigma_low)
+    return sigma_low + (sigma_high - sigma_low) * (frequencies - f_min) / (f_max - f_min)
+
+
+def calc_phonon_occupation(
+    frequencies: np.ndarray, temperature: float
+) -> np.ndarray:
+    """
+    Compute the Bose-Einstein phonon occupation number for each mode.
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Phonon frequencies in **eV**, shape ``(nmodes,)``.
+    temperature : float
+        Temperature in **Kelvin**.  Pass 0 to get an all-zero array (T = 0 limit).
+
+    Returns
+    -------
+    np.ndarray
+        Occupation numbers :math:`\\bar{n}_k(T)`, shape ``(nmodes,)``.
+
+    Notes
+    -----
+    Implements Jin *et al.* (2021), Eq. 9 / Alkauskas *et al.* (2014), Eq. 9:
+
+    .. math::
+
+        \\bar{n}_k(T) = \\frac{1}{e^{\\hbar\\omega_k / k_B T} - 1}
+
+    At T = 0 all occupation numbers are zero (no thermally excited phonons).
+    """
+    if temperature <= 0.0:
+        return np.zeros(len(frequencies))
+    x = np.asarray(frequencies, dtype=float) / (KB_EV * temperature)
+    return 1.0 / (np.expm1(x))
+
+
+def calc_C_omega(
+    frequencies: np.ndarray,
+    Sks: np.ndarray,
+    nks: np.ndarray,
+    omega_range: List[Union[float, int]],
+    sigma: Union[float, Tuple[float, float]] = 6e-3,
+) -> np.ndarray:
+    """
+    Build the thermal electron–phonon spectral density C(ℏω, T) on a uniform grid.
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Phonon frequencies in **eV**, shape ``(nmodes,)``.
+    Sks : np.ndarray
+        Partial Huang–Rhys factors, shape ``(nmodes,)``.
+    nks : np.ndarray
+        Bose-Einstein occupation numbers :math:`\\bar{n}_k(T)`, shape ``(nmodes,)``.
+        Pass an all-zero array for T = 0 (returns a zero grid immediately).
+    omega_range : list [ω_min, ω_max, n_points]
+        Energy grid parameters in **eV**.
+    sigma : float or (float, float), optional
+        Gaussian broadening in **eV**.  Scalar → uniform; 2-tuple → linearly
+        interpolated from lowest to highest frequency mode.  Default 6 meV.
+
+    Returns
+    -------
+    np.ndarray
+        :math:`C(\\hbar\\omega, T)` in eV\ :sup:`-1`, shape ``(n_points,)``.
+
+    Notes
+    -----
+    Implements Jin *et al.* (2021), Eq. 12:
+
+    .. math::
+
+        C(\\hbar\\omega, T) = \\sum_k \\bar{n}_k(T)\\, S_k\\,
+        \\delta(\\hbar\\omega - \\hbar\\omega_k)
+
+    with δ-functions replaced by Gaussians (with optional frequency-dependent
+    width σ(ω_k)).  At T = 0 the function returns a zero array without
+    allocating the FFT buffers.
+    """
+    if not np.any(nks):
+        return np.zeros(int(omega_range[2]))
+
+    weights = nks * Sks
+    sigmas = _sigma_per_mode(frequencies, sigma)
+
+    npts = int(omega_range[2])
+    omega_start, omega_stop = omega_range[0], omega_range[1]
+    dw = (omega_stop - omega_start) / (npts - 1)
+
+    # Per-mode sigma requires individual Gaussian placement rather than a
+    # single FFT-convolution kernel.  We build a padded grid, place each
+    # mode's Gaussian explicitly, then trim.
+    sigma_max = float(np.max(sigmas))
+    half_w = int(np.ceil(5.0 * sigma_max / dw))
+    npts_pad = npts + 2 * half_w
+    omega_start_pad = omega_start - half_w * dw
+    omega_pad = omega_start_pad + np.arange(npts_pad) * dw
+
+    C_grid = np.zeros(npts_pad)
+    for wk, ck, sk in zip(frequencies, weights, sigmas):
+        if ck == 0.0:
+            continue
+        gauss = np.exp(-0.5 * ((omega_pad - wk) / sk) ** 2) / (
+            sk * np.sqrt(2.0 * np.pi)
+        )
+        C_grid += ck * gauss
+
+    return C_grid[half_w: half_w + npts]
+
+
+def calc_Ct(C_omega: np.ndarray) -> np.ndarray:
+    """
+    Transform C(ℏω, T) to the time domain, returning the real cosine component.
+
+    Parameters
+    ----------
+    C_omega : np.ndarray
+        Thermal spectral density :math:`C(\\hbar\\omega, T)` on a uniform grid,
+        shape ``(npoints,)``.
+
+    Returns
+    -------
+    np.ndarray
+        Real-valued :math:`C(t, T) = \\sum_k \\bar{n}_k S_k \\cos(\\omega_k t)`,
+        shape ``(npoints,)``.
+
+    Notes
+    -----
+    Implements Jin *et al.* (2021), using the relation:
+
+    .. math::
+
+        C(t, T) = \\operatorname{Re}\\!\\left[
+            \\int_0^\\infty C(\\hbar\\omega, T)\\, e^{-i\\omega t}\\, d(\\hbar\\omega)
+        \\right]
+
+    which is the real part of the inverse Fourier transform of C(ω, T),
+    identical in structure to :func:`calc_St` but restricted to its real part.
+    """
+    return np.real(calc_St(C_omega))
+
+
+def calc_C_total(nks: np.ndarray, Sks: np.ndarray) -> float:
+    """
+    Compute the zero-time thermal correction C(0, T) = Σ_k n̄_k S_k.
+
+    Parameters
+    ----------
+    nks : np.ndarray
+        Bose-Einstein occupation numbers, shape ``(nmodes,)``.
+    Sks : np.ndarray
+        Partial Huang–Rhys factors, shape ``(nmodes,)``.
+
+    Returns
+    -------
+    float
+        :math:`C(0, T) = \\sum_k \\bar{n}_k(T)\\, S_k`.
+
+    Notes
+    -----
+    This is the thermal analogue of the total Huang–Rhys factor S = Σ_k S_k.
+    At T = 0 it evaluates to zero, keeping the generating function unchanged.
+    """
+    return float(np.dot(nks, Sks))
+
+
+def calc_effective_phonon_frequency(
+    frequencies: np.ndarray, delta_Q_k: np.ndarray
+) -> float:
+    """
+    Compute the effective phonon frequency for the 1D configurational coordinate model.
+
+    Parameters
+    ----------
+    frequencies : np.ndarray
+        Phonon frequencies in **eV**, shape ``(nmodes,)``.
+    delta_Q_k : np.ndarray
+        Mode-projected configurational displacements q_k in amu\\ :sup:`1/2`·Å,
+        shape ``(nmodes,)``.
+
+    Returns
+    -------
+    float
+        Effective phonon frequency :math:`\\Omega` in **eV**.
+
+    Notes
+    -----
+    Implements Jin *et al.* (2021), Eq. 16:
+
+    .. math::
+
+        \\Omega = \\frac{\\sum_k \\omega_k^2\\, \\Delta Q_k^2}{\\sum_k \\Delta Q_k^2}
+
+    This weighted average collapses the full phonon spectrum onto a single
+    representative mode for use in the 1D harmonic oscillator lineshape model
+    (:class:`~defectpl.defectpl.VibrationalSpectra1D`).
+    """
+    dq2 = delta_Q_k**2
+    denom = float(np.sum(dq2))
+    if denom == 0.0:
+        raise ValueError("All delta_Q_k values are zero; effective frequency is undefined.")
+    return float(np.sum(frequencies**2 * dq2) / denom)
+
+
 def calc_St(S_omega: np.ndarray) -> np.ndarray:
     """
     Transform the electron–phonon spectral density S(ω) to the time domain S(t).
@@ -518,10 +748,15 @@ def calc_St(S_omega: np.ndarray) -> np.ndarray:
 
 
 def calc_Gts(
-    Sts: np.ndarray, total_HR: float, gamma: float, resolution: float
+    Sts: np.ndarray,
+    total_HR: float,
+    gamma: float,
+    resolution: float,
+    Cts: np.ndarray = None,
+    C_total: float = 0.0,
 ) -> np.ndarray:
     """
-    Compute the generating function G(t) from the time-domain spectral function.
+    Compute the generating function G(t, T) from the time-domain spectral function.
 
     Parameters
     ----------
@@ -534,25 +769,33 @@ def calc_Gts(
         :math:`e^{-\\gamma|t|}` to reproduce finite ZPL linewidth.
     resolution : float
         Spectral grid density in points per eV (``resolution = npoints / max_energy``).
+    Cts : np.ndarray, optional
+        Real-valued time-domain thermal correction C(t, T) from :func:`calc_Ct`,
+        shape ``(npoints,)``.  Pass ``None`` (default) for the T = 0 limit.
+    C_total : float, optional
+        Zero-time thermal correction C(0, T) = Σ n̄_k S_k from :func:`calc_C_total`.
+        Ignored when ``Cts`` is ``None``.  Default 0.0.
 
     Returns
     -------
     np.ndarray
-        Complex generating function :math:`G(t)`, shape ``(npoints,)``.
+        Complex generating function :math:`G(t, T)`, shape ``(npoints,)``.
 
     Notes
     -----
-    Implements [Alkauskas 2014a, Eq. 8]:
+    Implements Jin *et al.* (2021), Eq. 8 / Eq. 10:
 
     .. math::
 
-        G(t) = e^{S(t) - S}\\, e^{-\\gamma|t|}
+        G(t, T) = e^{S(t) - S + 2C(t,T) - 2C(0,T)}\\, e^{-\\gamma|t|}
 
-    The Fourier transform of G(t) gives the optical spectral function A(ℏω).
+    At T = 0 (``Cts = None`` or all-zero) the thermal correction vanishes and
+    the expression reduces to the Alkauskas (2014) formula :math:`G(t) = e^{S(t)-S}`.
     """
     n = len(Sts)
     t = (1.0 / resolution) * (np.arange(n) - n / 2)
-    return np.exp(Sts - total_HR) * np.exp(-gamma * np.abs(t))
+    correction = (2.0 * Cts - 2.0 * C_total) if Cts is not None else 0.0
+    return np.exp(Sts - total_HR + correction) * np.exp(-gamma * np.abs(t))
 
 
 def calc_Spectrum_Intensity(
@@ -598,6 +841,60 @@ def calc_Spectrum_Intensity(
     A = A1[(shift_idx - j) % n]
     omega_3 = (j / resolution) ** 3
     return A, A * omega_3
+
+
+def calc_Absorption_Intensity(
+    Gts: np.ndarray, EZPL: float, resolution: float
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute the absorption spectral function and absorption intensity from G(t, T).
+
+    Parameters
+    ----------
+    Gts : np.ndarray
+        Complex PL generating function G(t, T) from :func:`calc_Gts`,
+        shape ``(npoints,)``.
+    EZPL : float
+        Zero-phonon line energy in eV.
+    resolution : float
+        Spectral grid density in points per eV.
+
+    Returns
+    -------
+    A_abs : np.ndarray
+        Absorption spectral function :math:`A_{abs}(\\hbar\\omega)`,
+        shape ``(npoints,)``.
+    intensity_abs : np.ndarray
+        Absorption intensity :math:`\\alpha(\\hbar\\omega) \\propto \\omega\\, A_{abs}`,
+        shape ``(npoints,)``.
+
+    Notes
+    -----
+    The absorption generating function is the complex conjugate of the PL
+    generating function (Jin *et al.* 2021; derivation from Eq. 8):
+
+    .. math::
+
+        G_{abs}(t, T) = G^*(t, T)
+
+    because replacing :math:`S(t) = \\sum_k S_k e^{i\\omega_k t}` with
+    :math:`S^*(t) = \\sum_k S_k e^{-i\\omega_k t}` while leaving the real
+    thermal correction :math:`C(t,T)` unchanged yields exactly
+    :math:`\\overline{G(t,T)}`.
+
+    The sideband appears on the **high-energy side** of the ZPL (energy axis
+    :math:`E_{ZPL} + E`), opposite to PL emission.  The prefactor is
+    :math:`\\omega` (linear) rather than :math:`\\omega^3`.
+    """
+    G_abs = np.conj(Gts)
+    A1_abs = np.fft.fft(G_abs)
+    n = len(A1_abs)
+    shift_idx = int(EZPL * resolution)
+    j = np.arange(n)
+    # Shift in the opposite direction vs PL: sideband at j > shift_idx (higher E)
+    A_abs = A1_abs[(j - shift_idx) % n]
+    omega_1 = j / resolution
+    return A_abs, A_abs * omega_1
 
 
 def calculate_hermite(n: int, x: float) -> float:

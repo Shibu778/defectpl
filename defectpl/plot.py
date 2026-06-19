@@ -73,8 +73,16 @@ class Plotter:
         Phonon IPR (Alkauskas eq. 12 convention) vs phonon energy.
     plot_S_omega_Sks_ipr_alkauskas_vs_penergy
         S(ω) + S_k scatter coloured by Alkauskas IPR.
+    plot_nk_vs_penergy
+        Bose-Einstein phonon occupation n̄_k(T) vs phonon energy.
+    plot_C_omega_vs_penergy
+        Thermal spectral density C(ℏω, T) vs phonon energy.
     plot_intensity_vs_penergy
         Normalised PL intensity spectrum vs photon energy.
+    plot_absorption_vs_penergy
+        Normalised absorption spectrum vs photon energy.
+    plot_pl_absorption_vs_penergy
+        PL and absorption overlaid on the same axes.
     """
 
     def __init__(self):
@@ -653,6 +661,197 @@ class Plotter:
         if iylim:
             ax.set_ylim(iylim[0], iylim[1])
         ax.set_yticks([])  # Clean look for publication spectra
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+
+    def plot_nk_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        nks: np.ndarray,
+        temperature: float = 0.0,
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "nk_vs_penergy",
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (3.3, 2.5),
+    ):
+        """
+        Scatter plot of Bose-Einstein phonon occupation n̄_k(T) vs phonon energy (meV).
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        nks : numpy.ndarray, shape (nmodes,)
+            Bose-Einstein occupation numbers per mode.
+        temperature : float, optional
+            Temperature in K, displayed in the axis label.  Default 0.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax = plt.subplots(figsize=figsize)
+        freq_mev = np.array(frequencies) * 1000.0
+
+        ax.scatter(freq_mev, nks, edgecolor="black", alpha=0.85)
+        ax.set_xlabel("Phonon Energy (meV)")
+        ax.set_ylabel(rf"$\bar{{n}}_k$ ({temperature:.0f} K)")
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+    def plot_C_omega_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        C_omega: Union[list, np.ndarray],
+        omega_range: List[Union[int, float]],
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "C_omega_vs_penergy",
+        max_freq: Optional[float] = None,
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (3.3, 2.5),
+    ):
+        """
+        Line plot of the thermal spectral density C(ℏω, T) in 1/meV vs energy (meV).
+
+        C(ω, T) = Σ_k n̄_k(T) S_k δ(ℏω − ℏω_k) broadened with Gaussians.
+        At T = 0 this plot is a flat zero line.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray, shape (nmodes,)
+            Phonon frequencies in **eV**.
+        C_omega : array-like, shape (n_grid,)
+            Thermal spectral density in **eV^(-1)**.
+        omega_range : list [ω_min, ω_max, n_points]
+            Energy grid parameters in **eV**.
+        max_freq : float, optional
+            Upper frequency cut-off in **eV**.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax = plt.subplots(figsize=figsize)
+        omega_set = np.linspace(omega_range[0], omega_range[1], int(omega_range[2]))
+
+        cutoff = max_freq if max_freq is not None else float(max(frequencies))
+        mask = omega_set <= cutoff
+
+        C_omega_mev = np.array(C_omega)[mask] / 1000.0
+        energies_mev = omega_set[mask] * 1000.0
+
+        ax.plot(energies_mev, C_omega_mev, color="black")
+        ax.set_xlabel("Phonon Energy (meV)")
+        ax.set_ylabel(r"$C(\hbar\omega,T)$ ($1/\mathrm{meV}$)")
+        ax.set_xlim(0, cutoff * 1000.0)
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+    def plot_absorption_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        absorption: np.ndarray,
+        resolution: int,
+        xlim: Tuple[float, float],
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "absorption_vs_penergy",
+        iylim: Optional[Tuple[float, float]] = None,
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (3.3, 2.5),
+    ):
+        """
+        Line plot of the normalised absorption spectrum vs photon energy (eV).
+
+        The sideband lies on the **high-energy side** of the ZPL (phonon
+        absorption raises the photon energy), opposite to PL emission.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray
+            Phonon frequencies in eV (unused directly; kept for API consistency).
+        absorption : numpy.ndarray
+            Complex or real absorption array from
+            :func:`~defectpl.utils.calc_Absorption_Intensity`.
+            Absolute value is taken and the result is normalised.
+        resolution : int
+            Number of grid points per eV.
+        xlim : tuple of float
+            ``(x_min, x_max)`` for the photon energy axis in eV.
+        iylim : tuple of float, optional
+            ``(y_min, y_max)`` for the intensity axis.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax = plt.subplots(figsize=figsize)
+
+        x_energy_ev = np.arange(len(absorption)) / float(resolution)
+        I_abs = np.abs(absorption)
+        I_norm = I_abs / np.max(I_abs) if np.max(I_abs) > 0 else I_abs
+
+        ax.plot(x_energy_ev, I_norm, color="black")
+        ax.set_ylabel("Absorption (arb. u.)")
+        ax.set_xlabel("Photon Energy (eV)")
+        ax.set_xlim(xlim[0], xlim[1])
+
+        if iylim:
+            ax.set_ylim(iylim[0], iylim[1])
+        ax.set_yticks([])
+
+        self._save_or_show(fig, out_dir, file_name, fig_format, plot)
+
+    def plot_pl_absorption_vs_penergy(
+        self,
+        frequencies: np.ndarray,
+        intensity: np.ndarray,
+        absorption: np.ndarray,
+        resolution: int,
+        xlim: Tuple[float, float],
+        plot: bool = False,
+        out_dir: Union[str, Path] = "./",
+        file_name: str = "pl_absorption_vs_penergy",
+        fig_format: str = "pdf",
+        figsize: Tuple[float, float] = (3.3, 2.5),
+    ):
+        """
+        Overlay of normalised PL (solid) and absorption (dashed) spectra.
+
+        Displays the Stokes shift between the PL emission peak and the
+        absorption onset on a shared photon-energy axis.
+
+        Parameters
+        ----------
+        frequencies : numpy.ndarray
+            Phonon frequencies in eV (unused directly; kept for API consistency).
+        intensity : numpy.ndarray
+            PL intensity array from :func:`~defectpl.utils.calc_Spectrum_Intensity`.
+        absorption : numpy.ndarray
+            Absorption array from :func:`~defectpl.utils.calc_Absorption_Intensity`.
+        resolution : int
+            Number of grid points per eV.
+        xlim : tuple of float
+            ``(x_min, x_max)`` for the photon energy axis in eV.
+        plot, out_dir, file_name, fig_format, figsize
+            See :meth:`plot_penergy_vs_pmode`.
+        """
+        fig, ax = plt.subplots(figsize=figsize)
+
+        x_ev = np.arange(len(intensity)) / float(resolution)
+
+        I_pl = np.abs(intensity)
+        I_pl = I_pl / np.max(I_pl) if np.max(I_pl) > 0 else I_pl
+
+        I_abs = np.abs(absorption)
+        I_abs = I_abs / np.max(I_abs) if np.max(I_abs) > 0 else I_abs
+
+        colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        ax.plot(x_ev, I_pl, color=colors[0], label="PL")
+        ax.plot(x_ev, I_abs, color=colors[1], linestyle="--", label="Absorption")
+
+        ax.set_ylabel("Intensity (arb. u.)")
+        ax.set_xlabel("Photon Energy (eV)")
+        ax.set_xlim(xlim[0], xlim[1])
+        ax.set_yticks([])
+        ax.legend(loc="best")
 
         self._save_or_show(fig, out_dir, file_name, fig_format, plot)
 
