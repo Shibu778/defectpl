@@ -331,6 +331,25 @@
   
   
   
+    <li class="md-tabs__item">
+      <a href="../../cite/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Citing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
     
     
       <li class="md-tabs__item">
@@ -1589,6 +1608,33 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../cite/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
     
@@ -1605,10 +1651,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
             
   
   
@@ -1626,8 +1672,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1835,7 +1881,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-55"> 55</a></span>
 <span class="normal"><a href="#__codelineno-0-56"> 56</a></span>
 <span class="normal"><a href="#__codelineno-0-57"> 57</a></span>
@@ -1964,7 +2010,7 @@
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
@@ -2036,7 +2082,7 @@
 
 
                   <details class="mkdocstrings-source">
-                    <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+                    <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
                     <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-331"><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
@@ -2109,7 +2155,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
@@ -2291,9 +2337,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
 <a href="#defectpl.io.vasp.get_final_structure_and_forces_from_outcar" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_final_structure_and_forces_from_outcar</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">outcar_path</span><span class="p">,</span> <span class="n">poscar_path</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_final_structure_and_forces_from_outcar</span><span class="p">(</span><span class="n">outcar_path</span><span class="p">,</span> <span class="n">poscar_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2302,7 +2346,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
@@ -2330,9 +2374,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
 <a href="#defectpl.io.vasp.get_first_structure_and_forces_from_outcar" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_first_structure_and_forces_from_outcar</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">outcar_path</span><span class="p">,</span> <span class="n">poscar_path</span><span class="o">=</span><span class="kc">None</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_first_structure_and_forces_from_outcar</span><span class="p">(</span><span class="n">outcar_path</span><span class="p">,</span> <span class="n">poscar_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2341,7 +2383,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-312">312</a></span>
 <span class="normal"><a href="#__codelineno-0-313">313</a></span>
 <span class="normal"><a href="#__codelineno-0-314">314</a></span>
@@ -2411,7 +2453,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-115">115</a></span>
 <span class="normal"><a href="#__codelineno-0-116">116</a></span>
 <span class="normal"><a href="#__codelineno-0-117">117</a></span>
@@ -2518,7 +2560,7 @@ forces : list of numpy.ndarray, shape (NIONS, 3), in eV/Å</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-159">159</a></span>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
@@ -2567,7 +2609,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-173">173</a></span>
 <span class="normal"><a href="#__codelineno-0-174">174</a></span>
 <span class="normal"><a href="#__codelineno-0-175">175</a></span>
@@ -2698,7 +2740,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
@@ -2808,7 +2850,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
@@ -2850,9 +2892,7 @@ aligning to the 'ions per type' array.</p>
 
 
 <a href="#defectpl.io.vasp.get_q_from_structure" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_q_from_structure</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">ground</span><span class="p">,</span> <span class="n">excited</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">nround</span><span class="o">=</span><span class="mi">4</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_q_from_structure</span><span class="p">(</span><span class="n">ground</span><span class="p">,</span> <span class="n">excited</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">nround</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2884,7 +2924,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
@@ -3012,7 +3052,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-481">481</a></span>
 <span class="normal"><a href="#__codelineno-0-482">482</a></span>
 <span class="normal"><a href="#__codelineno-0-483">483</a></span>
@@ -3050,12 +3090,7 @@ aligning to the 'ions per type' array.</p>
 
 
 <a href="#defectpl.io.vasp.prepare_dF_files" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">prepare_dF_files</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">ground_outcar</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">excited_outcar</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">ground_poscar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">excited_poscar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">prepare_dF_files</span><span class="p">(</span><span class="n">ground_outcar</span><span class="p">,</span> <span class="n">excited_outcar</span><span class="p">,</span> <span class="n">ground_poscar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">excited_poscar</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -3065,7 +3100,7 @@ aligning to the 'ions per type' array.</p>
 
 
             <details class="mkdocstrings-source">
-              <summary>Source code in <code>defectpl\io\vasp.py</code></summary>
+              <summary>Source code in <code>defectpl/io/vasp.py</code></summary>
               <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-495">495</a></span>
 <span class="normal"><a href="#__codelineno-0-496">496</a></span>
 <span class="normal"><a href="#__codelineno-0-497">497</a></span>
