@@ -1,5 +1,5 @@
 ===================================================
-                PROPERTIES SUMMARY                 
+                PROPERTIES SUMMARY
 ===================================================
 Calculation Run Mode         :   Force Mode
 Zero-Phonon Line (ZPL) Energy :        1.729 eV

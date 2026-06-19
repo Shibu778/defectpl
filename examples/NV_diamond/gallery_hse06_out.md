@@ -14,7 +14,7 @@ Automated quick-view gallery compiled for the `hse06_out` functional calculation
 
 ```text
 ===================================================
-                PROPERTIES SUMMARY                 
+                PROPERTIES SUMMARY  
 ===================================================
 Calculation Run Mode         :   Force Mode
 Zero-Phonon Line (ZPL) Energy :        1.991 eV
@@ -55,7 +55,7 @@ Energy Mesh Resolution        :         1000 points/eV
 
 ```text
 ===================================================
-                PROPERTIES SUMMARY                 
+                PROPERTIES SUMMARY  
 ===================================================
 Calculation Run Mode         : Displacement Mode
 Zero-Phonon Line (ZPL) Energy :        1.991 eV
@@ -98,7 +98,7 @@ Energy Mesh Resolution        :         1000 points/eV
 
 ```text
 ===================================================
-                PROPERTIES SUMMARY                 
+                PROPERTIES SUMMARY  
 ===================================================
 Calculation Run Mode         :   Force Mode
 Zero-Phonon Line (ZPL) Energy :        1.991 eV

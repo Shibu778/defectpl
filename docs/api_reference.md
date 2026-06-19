@@ -43,7 +43,7 @@ Classes
 
     `calc_Gts(self, Sts, S, gamma, resolution)`
     :   Calculates the G(t) function.
-        
+
         Parameters:
         =================
         Sts: list
@@ -56,7 +56,7 @@ Classes
             ZPL broadening factor.
         resolution: float
             resolution of the time-domain signal.
-        
+
         Returns:
         =================
         Gts: list
@@ -64,12 +64,12 @@ Classes
 
     `calc_HR_factor(self, Sks)`
     :   Calculate the Huang-Rhys factor.
-        
+
         Parameters:
         =================
         Sks: list
             List of Sk (partial HR factor) values corresponding to the phonon modes.
-        
+
         Returns:
         =================
         HR_factor: float
@@ -77,7 +77,7 @@ Classes
 
     `calc_I(self, Gts, EZPL, resolution)`
     :   Calculates the intensity of the spectrum.
-        
+
         Parameters:
         =================
         Gts: list
@@ -86,7 +86,7 @@ Classes
             Zero Phonon Line energy.
         resolution: float
             resolution of the time-domain signal
-        
+
         Returns:
         =================
         I: list
@@ -96,12 +96,12 @@ Classes
 
     `calc_IPR(self, eigenvectors)`
     :   Calculate the IPR (Inverse Participation Ratio) of phonon modes.
-        
+
         Parameters:
         =================
         eigenvectors: numpy array
             Eigenvectors of the bands at Gamma point.
-        
+
         Returns:
         =================
         IPRs: np.array
@@ -109,7 +109,7 @@ Classes
 
     `calc_S_omega(self, frequencies, Sks, omega_range, sigma=0.006)`
     :   Calculate the S(omega) function.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -120,7 +120,7 @@ Classes
             Range of omega values. [Start, End, Number of points]
         sigma: float
             Width of the gaussian. Default is 6e-3 eV.
-        
+
         Returns:
         =================
         S_omega: list
@@ -128,7 +128,7 @@ Classes
 
     `calc_Sk(self, k, qk, frequencies)`
     :   Calculates the Sk value corresponding to kth phonon mode.
-        
+
         Parameters:
         =================
         k: int
@@ -137,24 +137,24 @@ Classes
             qk value corresponding to the phonon mode.
         frequencies: list
             List of frequencies of the bands at Gamma point. Frequency in eV.
-        
+
         Returns:
         =================
         Sk: float
             Sk value corresponding to the phonon mode.
-        
+
         Note: HBAR_eVs is divided to convert the frequency from eV to Hz.
 
     `calc_Sks(self, qks, frequencies)`
     :   Calculates the partial HR factor for each phonon mode.
-        
+
         Parameters:
         =================
         qks: np.array
             qk array corresponding to the phonon mode.
         frequencies: np.array
             List of frequencies of the bands at Gamma point. Frequency in eV.
-        
+
         Returns:
         =================
         Sks: float
@@ -162,12 +162,12 @@ Classes
 
     `calc_St(self, S_omega)`
     :   Calculates the inverse discrete Fourier transform of S(omega) to get the time-domain signal.
-        
+
         Parameters:
         =================
         S_omega: list
             List of S(omega) values. Here omega is in eV.
-        
+
         Returns:
         =================
         St: list
@@ -176,14 +176,14 @@ Classes
     `calc_dR(self, constcar_gs, contcar_es)`
     :   This function calculates the difference in R between the excited state
         and ground state structures.
-        
+
         Parameters:
         =================
         constcar_gs: str
             Path to the CONTCAR file of the ground state.
         contcar_es: str
             Path to the CONTCAR file of the excited state.
-        
+
         Returns:
         =================
         dR : np.array
@@ -192,16 +192,16 @@ Classes
 
     `calc_delQ(self, mlist, dR)`
     :   This function calculates the delta-Q between given as follows:
-        
+
         $$\Delta Q = \sqrt{\sum_{\alpha j}{} m_{\alpha}(R_{es}_{\alpha j} - R_{gs}_{\alpha j})^2}$$
-        
+
         Parameters:
         =================
         mlist: list
             List of atomic masses in amu
         dR: np.array
             The dR between the excited state and ground state structure.
-        
+
         Returns:
         =================
         float
@@ -209,14 +209,14 @@ Classes
 
     `calc_delR(self, dR)`
     :   This function calculates the delta-R between given as follows:
-        
+
         $$\Delta R = \sqrt{\sum_{\\alpha j}{} (R_{es}_{\alpha j} - R_{gs}_{\alpha j})^2}$$
-        
+
         Parameters:
         =================
         dR: np.ndarray (natoms x 3)
             The difference in coordinate between the excited state and ground state structure.
-        
+
         Returns:
         =================
         float
@@ -224,14 +224,14 @@ Classes
 
     `calc_loc_rat(self, IPRs, nat)`
     :   Calculate the localization ratio of each phonon modes.
-        
+
         Parameters:
         =================
         IPRs: np.array
             Array of Inverse Participation Ratio for each phonon mode.
         nat: int
             Number of atoms in the unit cell.
-        
+
         Returns:
         =================
         localization_ratio: np.array
@@ -240,7 +240,7 @@ Classes
     `calc_qk(self, mlist, dR, eigenvectors, k)`
     :   Calculates the qk value (Vibrational Displacement) corresponding
         to kth phonon mode.
-        
+
         Parameters:
         =================
         mlist: list
@@ -252,7 +252,7 @@ Classes
             Eigenvectors of the bands at Gamma point.
         k: int
             Index of the phonon mode.
-        
+
         Returns:
         =================
         qk: float
@@ -261,7 +261,7 @@ Classes
     `calc_qks(self, mlist, dR, eigenvectors)`
     :   Calculates the qk values (Vibrational Displacements) corresponding
         to each phonon mode.
-        
+
         Parameters:
         =================
         mlist: np.array or list
@@ -271,7 +271,7 @@ Classes
             state structure.
         eigenvectors: np.ndarray
             Eigenvectors of the bands at Gamma point.
-        
+
         Returns:
         =================
         qks: np.array
@@ -279,7 +279,7 @@ Classes
 
     `gaussian(self, omega, omega_k, sigma)`
     :   This gaussian function is used to approximate the delta function.
-        
+
         Parameters:
         =================
         omega: float or np.array
@@ -288,7 +288,7 @@ Classes
             The frequency of the mode k. Mean of the gaussian.
         sigma: float
             The width of the gaussian.
-        
+
         Returns:
         =================
         float or np.array
@@ -296,7 +296,7 @@ Classes
 
     `plot_HR_factor_vs_penergy(self, frequencies, Sks, plot=False, out_dir='./', file_name='HR_factor_vs_penergy.pdf')`
     :   Plot the partial HR factor vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -313,7 +313,7 @@ Classes
 
     `plot_S_omega_Sks_Loc_rat_vs_penergy(self, frequencies, S_omega, omega_range, Sks, localization_ratio, plot=False, out_dir='./', file_name='S_omega_HRf_loc_rat_vs_penergy.pdf')`
     :   Plot the S(omega), partial HR factor and localization ratio vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -336,7 +336,7 @@ Classes
 
     `plot_S_omega_Sks_ipr_vs_penergy(self, frequencies, S_omega, omega_range, Sks, iprs, plot=False, out_dir='./', file_name='S_omega_HRf_ipr_vs_penergy.pdf')`
     :   Plot the S(omega), partial HR factor and IPR vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -359,7 +359,7 @@ Classes
 
     `plot_S_omega_Sks_vs_penergy(self, frequencies, S_omega, omega_range, Sks, plot=False, out_dir='./', file_name='S_omega_vs_penergy.pdf')`
     :   Plot the S(omega) vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -380,7 +380,7 @@ Classes
 
     `plot_S_omega_vs_penergy(self, frequencies, S_omega, omega_range, plot=False, out_dir='./', file_name='S_omega_vs_penergy.pdf')`
     :   Plot the S(omega) vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -399,7 +399,7 @@ Classes
 
     `plot_all(self, out_dir, iplot_xlim=None)`
     :   Plot all the properties.
-        
+
         Parameters:
         =================
         out_dir: str
@@ -407,7 +407,7 @@ Classes
 
     `plot_intensity_vs_penergy(self, frequencies, I, resolution, xlim, plot=False, out_dir='./', file_name='intensity_vs_penergy.pdf')`
     :   Plot the intensity vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -428,7 +428,7 @@ Classes
 
     `plot_ipr_vs_penergy(self, frequencies, iprs, plot=False, out_dir='./', file_name='ipr_vs_penergy.pdf')`
     :   Plot the IPR vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -445,7 +445,7 @@ Classes
 
     `plot_loc_rat_vs_penergy(self, frequencies, localization_ratio, plot=False, out_dir='./', file_name='loc_rat_vs_penergy.pdf')`
     :   Plot the localization ratio vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -462,7 +462,7 @@ Classes
 
     `plot_penergy_vs_pmode(self, frequencies, plot=False, out_dir='./', file_name='penergy_vs_pmode.pdf')`
     :   Plot the phonon energy vs phonon mode index.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -477,7 +477,7 @@ Classes
 
     `plot_qk_vs_penergy(self, frequencies, qks, plot=False, out_dir='./', file_name='qk_vs_penergy.pdf')`
     :   Plot the vibrational displacement vs phonon energy.
-        
+
         Parameters:
         =================
         frequencies: list
@@ -494,12 +494,12 @@ Classes
 
     `read_band_yaml(self, band_yaml)`
     :   Read the band.yaml file
-        
+
         Parameters:
         =================
         band_yaml : str
             Path to the band.yaml file
-        
+
         Returns:
         =================
         dict
@@ -509,12 +509,12 @@ Classes
     :   This function reads the band.yaml file from phonopy.
         It is assumed that the calculation is done in gamma point only.
         Hence, we will only consider the bands at Gamma point.
-        
+
         Parameters:
         =================
         band_yaml : str
             Path to the band.yaml file
-        
+
         Returns:
         =================
         dict

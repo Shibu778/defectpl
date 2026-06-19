@@ -79,7 +79,7 @@ pl_engine = Photoluminescence(
     max_energy=5.0,
     sigma=6e-3
 )
-        
+
 # 5. Dispatch processed arrays to the automated Plotter module to generate graphics
 print(f"Generating and exporting diagnostic plots as .{fig_format} files...")
 pl_engine.generate_plots(out_dir=outdir, fig_format=fig_format)
@@ -152,7 +152,7 @@ pl_engine = Photoluminescence(
     max_energy=5.0,
     sigma=6e-3
 )
-        
+
 # 4. Dispatch processed arrays to the automated Plotter module to generate graphics
 print(f"Generating and exporting diagnostic plots as .{fig_format} files...")
 pl_engine.generate_plots(out_dir=outdir, fig_format=fig_format)
@@ -252,10 +252,10 @@ from pathlib import Path
 out_directory = Path("./gallery_plots")
 out_directory.mkdir(exist_ok=True)
 
-# Generates all 10 diagnostic tracks (IPR, Mode Energy, HR-Spread, 
+# Generates all 10 diagnostic tracks (IPR, Mode Energy, HR-Spread,
 # S_omega spectral density profiles, and convoluted final intensities) automatically.
 pl_engine.generate_plots(
-    out_dir=out_directory, 
+    out_dir=out_directory,
     max_freq=None,       # Frequencies range limits (None defaults to automatic scaling)
     fig_format="svg"     # Target output format ("pdf", "png", "svg", etc.)
 )

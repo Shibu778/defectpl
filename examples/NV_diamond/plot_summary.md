@@ -11,7 +11,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :         2.19 eV
@@ -45,7 +45,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         : Displacement Mode
 > Zero-Phonon Line (ZPL) Energy :         2.19 eV
@@ -81,7 +81,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :         2.19 eV
@@ -118,7 +118,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :        1.729 eV
@@ -152,7 +152,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         : Displacement Mode
 > Zero-Phonon Line (ZPL) Energy :        1.729 eV
@@ -188,7 +188,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :        1.729 eV
@@ -225,7 +225,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :        1.991 eV
@@ -259,7 +259,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         : Displacement Mode
 > Zero-Phonon Line (ZPL) Energy :        1.991 eV
@@ -295,7 +295,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :        1.991 eV
@@ -332,7 +332,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :         1.75 eV
@@ -366,7 +366,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         : Displacement Mode
 > Zero-Phonon Line (ZPL) Energy :         1.75 eV
@@ -402,7 +402,7 @@ This file provides an organized overview of all generated high-throughput framew
 > **Important Properties Info:**
 >
 > ===================================================
->                 PROPERTIES SUMMARY                 
+>                 PROPERTIES SUMMARY  
 > ===================================================
 > Calculation Run Mode         :   Force Mode
 > Zero-Phonon Line (ZPL) Energy :         1.75 eV

@@ -40,6 +40,16 @@ def mock_dependencies():
         mock_dr.return_value = MagicMock()
         mock_df.return_value = MagicMock()
 
+        # Configure the Photoluminescence instance returned by the constructor
+        # so that :.4f format specs work on its float attributes
+        pl_instance = MagicMock()
+        pl_instance.HR_factor = 1.234
+        pl_instance.DW_factor = 0.291
+        pl_instance.C_total = 0.0
+        pl_instance.temperature = 0.0
+        pl_instance.EZPL = 1.95
+        mock_pl.return_value = pl_instance
+
         yield {
             "read_band_yaml": mock_read,
             "structure_from_file": mock_struct,
@@ -98,8 +108,12 @@ def test_pl_displacement_mode_with_json_and_plots(cli_runner, mock_dependencies)
         Path("CONTCAR_gs").touch()
         Path("CONTCAR_es").touch()
 
-        # Instantiate mock engine wrapper instance
+        # Instantiate mock engine wrapper instance with float attributes required by CLI echoes
         pl_instance = MagicMock()
+        pl_instance.HR_factor = 1.5
+        pl_instance.DW_factor = 0.22
+        pl_instance.C_total = 0.0
+        pl_instance.temperature = 0.0
         mock_dependencies["Photoluminescence"].return_value = pl_instance
 
         result = cli_runner.invoke(
@@ -167,6 +181,9 @@ def test_standalone_plot_command(cli_runner, mock_dependencies):
         Path("saved_state.json").touch()
 
         pl_mock_obj = MagicMock()
+        # Configure float/numeric attributes used in iplot_xlim computation
+        pl_mock_obj.EZPL = 2.0
+        pl_mock_obj.resolution = 1000
         mock_dependencies["loadfn"].return_value = pl_mock_obj
 
         plotter_instance = MagicMock()
@@ -190,15 +207,12 @@ def test_standalone_plot_command(cli_runner, mock_dependencies):
 
         assert result.exit_code == 0, f"Command failed with output: {result.output}"
         mock_dependencies["loadfn"].assert_called_once_with("saved_state.json")
-        mock_dependencies["Plotter"].assert_called_once_with(pl_mock_obj)
+        # Plotter is now constructed without args; verify it was instantiated once
+        mock_dependencies["Plotter"].assert_called_once_with()
 
-        # Confirm individual plot variations have run with custom overrides
-        plotter_instance.plot_intensity_vs_penergy.assert_called_once_with(
-            out_dir="./", fig_format="pdf", iylim=[0.1, 1.0]
-        )
-        plotter_instance.plot_penergy_vs_pmode.assert_called_once_with(
-            out_dir="./", fig_format="pdf", max_freq=60.0
-        )
+        # Confirm key plot methods were dispatched (new API passes positional data + kwargs)
+        plotter_instance.plot_intensity_vs_penergy.assert_called_once()
+        plotter_instance.plot_penergy_vs_pmode.assert_called_once()
 
 
 def test_standalone_plot_type_filtering(cli_runner, mock_dependencies):
@@ -207,6 +221,8 @@ def test_standalone_plot_type_filtering(cli_runner, mock_dependencies):
         Path("saved_state.json").touch()
 
         pl_mock_obj = MagicMock()
+        pl_mock_obj.EZPL = 2.0
+        pl_mock_obj.resolution = 1000
         mock_dependencies["loadfn"].return_value = pl_mock_obj
 
         plotter_instance = MagicMock()

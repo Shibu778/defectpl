@@ -1,0 +1,83 @@
+# .pre-commit-config.yaml
+#
+# Mirrors the CI pipeline defined in .github/workflows/ci.yml so that
+# lint, format, and test failures are caught locally before pushing.
+#
+# Setup (one-time):
+#   pip install pre-commit
+#   pre-commit install                      # installs the pre-commit hook
+#   pre-commit install --hook-type pre-push # installs the pre-push hook (runs pytest)
+#
+# Run manually on all files:
+#   pre-commit run --all-files
+#
+# Update hook versions:
+#   pre-commit autoupdate
+
+default_stages: [pre-commit]
+
+repos:
+  # ---------------------------------------------------------------------------
+  # General file hygiene
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        # SVG and example output files are not Python source; skip them
+        exclude: |
+          (?x)^(
+            docs/assets/.*\.svg |
+            examples/.*
+          )$
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        # SVGs can contain intentional whitespace; example outputs are read-only artifacts
+        exclude: |
+          (?x)^(
+            docs/assets/.*\.svg |
+            examples/.*
+          )$
+      - id: check-yaml
+        # mkdocs.yml uses Python-specific YAML constructors (e.g. !!python/name:)
+        # that the standard YAML parser rejects; exclude it here.
+        exclude: ^mkdocs\.yml$
+      - id: check-toml               # validate TOML syntax (pyproject.toml)
+      - id: check-merge-conflict     # block commits with unresolved merge markers
+      - id: check-added-large-files  # warn on accidental large file commits
+        args: [--maxkb=500]
+
+  # ---------------------------------------------------------------------------
+  # Ruff: lint + format  (mirrors CI exactly)
+  #   CI runs:  ruff check defectpl/ tests/
+  #             ruff format --check defectpl/ tests/
+  #
+  # When ruff auto-fixes something it exits 1, blocking the commit so you can
+  # review the auto-fixed changes before re-staging.
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.17   # keep in sync with `pip show ruff`; run `pre-commit autoupdate` to bump
+    hooks:
+      - id: ruff
+        name: ruff lint (auto-fix)
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^(defectpl|tests)/
+      - id: ruff-format
+        name: ruff format
+        files: ^(defectpl|tests)/
+
+  # ---------------------------------------------------------------------------
+  # Tests — run on pre-push only (not on every commit) because the suite
+  # takes ~15 s.  Requires the package to be installed in the active
+  # environment (`pip install -e ".[all]"`).
+  # ---------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        args: [tests/, -q, --tb=short]
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

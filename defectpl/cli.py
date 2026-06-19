@@ -45,6 +45,19 @@ def pl_group():
     pass
 
 
+def _parse_sigma(sigma_str: str):
+    """Parse '--sigma 6e-3' (scalar) or '--sigma 3e-3,8e-3' (tuple) into float or tuple."""
+    parts = [s.strip() for s in sigma_str.split(",")]
+    if len(parts) == 1:
+        return float(parts[0])
+    if len(parts) == 2:
+        return (float(parts[0]), float(parts[1]))
+    raise click.BadParameter(
+        "sigma must be a single float (e.g. '6e-3') or two comma-separated floats "
+        "(e.g. '3e-3,8e-3') for frequency-dependent broadening."
+    )
+
+
 @pl_group.command(name="displacement")
 @click.option(
     "--band_yaml",
@@ -79,7 +92,34 @@ def pl_group():
     "--gamma",
     default=2.0,
     type=float,
-    help="Broadening damping parameter managing electronic state correlation lifespans.",
+    help="Lorentzian ZPL broadening in meV.",
+)
+@click.option(
+    "--temperature",
+    default=0.0,
+    type=float,
+    help="Lattice temperature in K for Bose-Einstein thermal weighting (0 = T=0 limit).",
+)
+@click.option(
+    "--sigma",
+    "sigma_str",
+    default="6e-3",
+    help=(
+        "Gaussian broadening in eV: scalar '6e-3' for uniform, or two comma-separated "
+        "values '3e-3,8e-3' for frequency-dependent (low-freq,high-freq) broadening."
+    ),
+)
+@click.option(
+    "--resolution",
+    default=1000,
+    type=int,
+    help="Number of spectral grid points per eV.",
+)
+@click.option(
+    "--max_energy",
+    default=5.0,
+    type=float,
+    help="Upper energy axis limit in eV.",
 )
 @click.option(
     "--json_out",
@@ -115,6 +155,10 @@ def pl_displacement(
     out_dir,
     ezpl,
     gamma,
+    temperature,
+    sigma_str,
+    resolution,
+    max_energy,
     json_out,
     plot_all,
     fig_format,
@@ -129,6 +173,7 @@ def pl_displacement(
     from monty.serialization import dumpfn
 
     try:
+        sigma = _parse_sigma(sigma_str)
         click.echo("Initializing multi-mode PL calculation via Displacement Mode...")
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         struct_gs = Structure.from_file(contcar_gs)
@@ -143,10 +188,16 @@ def pl_displacement(
             dF=None,
             EZPL=ezpl,
             gamma=gamma,
-            max_energy=5.0,
-            sigma=6e-3,
+            resolution=resolution,
+            max_energy=max_energy,
+            sigma=sigma,
+            temperature=temperature,
         )
         click.echo("Photoluminescence engine data properties calculated successfully.")
+        click.echo(f"  HR factor      : {pl_engine.HR_factor:.4f}")
+        click.echo(f"  DW factor      : {pl_engine.DW_factor:.4f}")
+        click.echo(f"  Temperature    : {temperature} K")
+        click.echo(f"  C_total        : {pl_engine.C_total:.4f}")
 
         if json_out:
             dumpfn(pl_engine, json_out, indent=2)
@@ -156,12 +207,15 @@ def pl_displacement(
 
         if plot_all:
             parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            out_path = Path(out_dir)
+            out_path.mkdir(parents=True, exist_ok=True)
             pl_engine.generate_plots(
                 out_dir=out_dir,
                 fig_format=fig_format,
                 iylim=parsed_iylim,
                 max_freq=max_freq,
             )
+            click.echo(f"All plots written to {out_dir}")
 
     except Exception as exc:
         if _verbose:
@@ -203,7 +257,34 @@ def pl_displacement(
     "--gamma",
     default=2.0,
     type=float,
-    help="Broadening damping parameter managing electronic state correlation lifespans.",
+    help="Lorentzian ZPL broadening in meV.",
+)
+@click.option(
+    "--temperature",
+    default=0.0,
+    type=float,
+    help="Lattice temperature in K for Bose-Einstein thermal weighting (0 = T=0 limit).",
+)
+@click.option(
+    "--sigma",
+    "sigma_str",
+    default="6e-3",
+    help=(
+        "Gaussian broadening in eV: scalar '6e-3' for uniform, or two comma-separated "
+        "values '3e-3,8e-3' for frequency-dependent (low-freq,high-freq) broadening."
+    ),
+)
+@click.option(
+    "--resolution",
+    default=1000,
+    type=int,
+    help="Number of spectral grid points per eV.",
+)
+@click.option(
+    "--max_energy",
+    default=5.0,
+    type=float,
+    help="Upper energy axis limit in eV.",
 )
 @click.option(
     "--json_out",
@@ -239,6 +320,10 @@ def pl_force(
     out_dir,
     ezpl,
     gamma,
+    temperature,
+    sigma_str,
+    resolution,
+    max_energy,
     json_out,
     plot_all,
     fig_format,
@@ -252,6 +337,7 @@ def pl_force(
     from monty.serialization import dumpfn
 
     try:
+        sigma = _parse_sigma(sigma_str)
         click.echo("Initializing multi-mode PL calculation via Force Mode...")
         frequencies, eigenvectors, masses = read_band_yaml(band_yaml)
         dF = prepare_dF_files(outcar_gs, outcar_es)
@@ -264,10 +350,16 @@ def pl_force(
             dF=dF,
             EZPL=ezpl,
             gamma=gamma,
-            max_energy=5.0,
-            sigma=6e-3,
+            resolution=resolution,
+            max_energy=max_energy,
+            sigma=sigma,
+            temperature=temperature,
         )
         click.echo("Photoluminescence engine data properties calculated successfully.")
+        click.echo(f"  HR factor      : {pl_engine.HR_factor:.4f}")
+        click.echo(f"  DW factor      : {pl_engine.DW_factor:.4f}")
+        click.echo(f"  Temperature    : {temperature} K")
+        click.echo(f"  C_total        : {pl_engine.C_total:.4f}")
 
         if json_out:
             dumpfn(pl_engine, json_out, indent=2)
@@ -277,12 +369,15 @@ def pl_force(
 
         if plot_all:
             parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+            out_path = Path(out_dir)
+            out_path.mkdir(parents=True, exist_ok=True)
             pl_engine.generate_plots(
                 out_dir=out_dir,
                 fig_format=fig_format,
                 iylim=parsed_iylim,
                 max_freq=max_freq,
             )
+            click.echo(f"All plots written to {out_dir}")
 
     except Exception as exc:
         if _verbose:
@@ -290,9 +385,88 @@ def pl_force(
         raise click.ClickException(f"Calculation pipeline failure encountered: {exc}")
 
 
+@pl_group.command(name="from-json")
+@click.argument("json_file", type=click.Path(exists=True))
+@click.option(
+    "--out_dir",
+    default="./",
+    help="Directory to write plots.",
+)
+@click.option(
+    "--fig_format",
+    default="pdf",
+    help="Export graphic file extension (e.g., pdf, png, svg).",
+)
+@click.option(
+    "--iylim",
+    default=None,
+    help="Comma-separated y-axis limits for intensity plot (e.g., '0,1.2').",
+)
+@click.option(
+    "--max_freq",
+    default=None,
+    type=float,
+    help="Maximum phonon frequency for mode plots (meV).",
+)
+def pl_from_json(json_file, out_dir, fig_format, iylim, max_freq):
+    """Restore a saved Photoluminescence JSON and regenerate all plots.
+
+    \b
+        defectpl pl from-json pl_results.json --out_dir plots/ --fig_format png
+    """
+    from defectpl.defectpl import Photoluminescence
+    from monty.serialization import loadfn
+
+    try:
+        click.echo(f"Loading: {json_file}")
+        pl_engine = loadfn(json_file)
+        if not isinstance(pl_engine, Photoluminescence):
+            raise ValueError("JSON does not contain a Photoluminescence object.")
+
+        click.echo(
+            f"  HR factor : {pl_engine.HR_factor:.4f}  |  "
+            f"EZPL : {pl_engine.EZPL} eV  |  T : {pl_engine.temperature} K"
+        )
+        parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+        out_path = Path(out_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+        pl_engine.generate_plots(
+            out_dir=out_dir,
+            fig_format=fig_format,
+            iylim=parsed_iylim,
+            max_freq=max_freq,
+        )
+        click.echo(f"All plots written to {out_dir}")
+    except Exception as exc:
+        if _verbose:
+            raise
+        raise click.ClickException(str(exc))
+
+
 # =====================================================================
 # INDIVIDUAL PLOT CONTROLLER COMMAND
 # =====================================================================
+
+
+_PLOT_TYPES = [
+    "all",
+    "mode",
+    "ipr",
+    "ipr_alkauskas",
+    "loc_ratio",
+    "qk",
+    "hr_factor",
+    "s_omega",
+    "s_omega_sk",
+    "s_omega_locrat",
+    "s_omega_ipr",
+    "s_omega_ipr_alkauskas",
+    "nk",
+    "c_omega",
+    "intensity",
+    "absorption",
+    "pl_absorption",
+]
 
 
 @main.command(name="plot")
@@ -301,85 +475,290 @@ def pl_force(
     "--type",
     "-t",
     "plot_type",
-    type=click.Choice(
-        ["intensity", "mode", "partial_energy", "all"], case_sensitive=False
-    ),
+    type=click.Choice(_PLOT_TYPES, case_sensitive=False),
     required=True,
-    help="The specific individual graphic component layout to plot from the data file.",
+    help=(
+        "Plot to render.  Use 'all' to generate every figure.\n\n\b\n"
+        "  mode              phonon energy vs mode index\n"
+        "  ipr               traditional IPR vs phonon energy\n"
+        "  ipr_alkauskas     Alkauskas-convention IPR vs phonon energy\n"
+        "  loc_ratio         localization ratio vs phonon energy\n"
+        "  qk                mode displacement q_k vs phonon energy\n"
+        "  hr_factor         partial HR factor S_k vs phonon energy\n"
+        "  s_omega           broadened spectral density S(omega)\n"
+        "  s_omega_sk        S(omega) with S_k scatter overlay\n"
+        "  s_omega_locrat    S(omega) coloured by localization ratio\n"
+        "  s_omega_ipr       S(omega) coloured by traditional IPR\n"
+        "  s_omega_ipr_alkauskas  S(omega) coloured by Alkauskas IPR\n"
+        "  nk                Bose-Einstein phonon occupation vs phonon energy\n"
+        "  c_omega           thermal spectral density C(omega,T)\n"
+        "  intensity         normalised PL emission spectrum\n"
+        "  absorption        normalised absorption spectrum\n"
+        "  pl_absorption     PL and absorption overlaid\n"
+    ),
 )
 @click.option(
     "--out_dir",
     default="./",
-    help="Output destination path mapping location to dump the generated graphic.",
+    help="Output destination directory for generated figures.",
 )
 @click.option(
     "--fmt",
     default="pdf",
-    help="Export graphic file standard extension layout (e.g., pdf, png, svg).",
+    help="Figure file format (e.g., pdf, png, svg).",
 )
 @click.option(
     "--iylim",
     default=None,
-    help="Comma-separated limits for the intensity plot y-axis (e.g., '0,1.2').",
+    help="Comma-separated y-axis limits for the intensity plot (e.g., '0,1.2').",
 )
 @click.option(
     "--max_freq",
     default=None,
     type=float,
-    help="Maximum phonon frequency limit for mode analysis plots (in meV).",
+    help="Upper phonon-frequency cut-off for mode/S(omega) plots (meV).",
 )
 def plot_individual(json_file, plot_type, out_dir, fmt, iylim, max_freq):
-    """Deserialize a saved property JSON file and render standalone visualization metrics plots."""
+    """Deserialize a saved Photoluminescence JSON and render one or all plots.
+
+    \b
+    Examples:
+      defectpl plot pl.json -t intensity
+      defectpl plot pl.json -t absorption --fmt png
+      defectpl plot pl.json -t all --out_dir figs/
+      defectpl plot pl.json -t nk
+    """
     from defectpl.defectpl import Photoluminescence
     from defectpl.plot import Plotter
     from monty.serialization import loadfn
 
     try:
-        click.echo(f"Loading data profile records from: {json_file}")
-        # Deserializes complex data patterns seamlessly via MSONable schema hooks
+        click.echo(f"Loading: {json_file}")
         pl_engine = loadfn(json_file)
         if not isinstance(pl_engine, Photoluminescence):
-            raise ValueError(
-                "The deserialized records did not resolve into a standard Photoluminescence engine."
-            )
+            raise ValueError("JSON does not contain a Photoluminescence object.")
 
-        plotter = Plotter(pl_engine)
+        plotter = Plotter()
         parsed_iylim = [float(x) for x in iylim.split(",")] if iylim else None
+        freq_limit = (max_freq / 1000.0) if max_freq else None
+        iplot_xlim = (max(0.0, pl_engine.EZPL - 2.0), pl_engine.EZPL + 1.0)
 
         out_path = Path(out_dir)
         out_path.mkdir(parents=True, exist_ok=True)
 
-        if plot_type.lower() in ["intensity", "all"]:
-            plotter.plot_intensity_vs_penergy(
-                out_dir=out_dir, fig_format=fmt, iylim=parsed_iylim
-            )
-            click.echo(f"Rendered Intensity vs Photon Energy plot in {out_dir}")
+        pt = plot_type.lower()
 
-        if plot_type.lower() in ["mode", "all"]:
-            plotter.plot_penergy_vs_pmode(
-                out_dir=out_dir, fig_format=fmt, max_freq=max_freq
-            )
-            click.echo(
-                f"Rendered Partial Energy / S_k distribution vs Mode plot in {out_dir}"
+        def _do(name, fn, *args, **kwargs):
+            fn(*args, **kwargs)
+            click.echo(f"  Saved: {name}")
+
+        if pt in ("mode", "all"):
+            _do(
+                "mode",
+                plotter.plot_penergy_vs_pmode,
+                frequencies=pl_engine.frequencies,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
             )
 
-        if plot_type.lower() in ["partial_energy", "all"]:
-            # Check if specialized plot engine components exist in local module
-            if hasattr(plotter, "plot_partial_energy_vs_penergy"):
-                plotter.plot_partial_energy_vs_penergy(out_dir=out_dir, fig_format=fmt)
-                click.echo(f"Rendered Partial Energy vs Energy plot in {out_dir}")
-            elif plot_type.lower() == "partial_energy":
-                click.echo(
-                    "Warning: 'plot_partial_energy_vs_penergy' method not found in Plotter engine.",
-                    err=True,
-                )
+        if pt in ("ipr", "all"):
+            _do(
+                "ipr",
+                plotter.plot_ipr_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.iprs,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("ipr_alkauskas", "all"):
+            _do(
+                "ipr_alkauskas",
+                plotter.plot_ipr_alkauskas_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.iprs_alkauskas,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("loc_ratio", "all"):
+            _do(
+                "loc_ratio",
+                plotter.plot_loc_rat_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.localization_ratio,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("qk", "all"):
+            _do(
+                "qk",
+                plotter.plot_qk_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.qks,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("hr_factor", "all"):
+            _do(
+                "hr_factor",
+                plotter.plot_HR_factor_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.Sks,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("s_omega", "all"):
+            _do(
+                "s_omega",
+                plotter.plot_S_omega_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.S_omega,
+                pl_engine.omega_range,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("s_omega_sk", "all"):
+            _do(
+                "s_omega_sk",
+                plotter.plot_S_omega_Sks_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.S_omega,
+                pl_engine.omega_range,
+                pl_engine.Sks,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("s_omega_locrat", "all"):
+            _do(
+                "s_omega_locrat",
+                plotter.plot_S_omega_Sks_Loc_rat_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.S_omega,
+                pl_engine.omega_range,
+                pl_engine.Sks,
+                pl_engine.localization_ratio,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("s_omega_ipr", "all"):
+            _do(
+                "s_omega_ipr",
+                plotter.plot_S_omega_Sks_ipr_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.S_omega,
+                pl_engine.omega_range,
+                pl_engine.Sks,
+                pl_engine.iprs,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("s_omega_ipr_alkauskas", "all"):
+            _do(
+                "s_omega_ipr_alkauskas",
+                plotter.plot_S_omega_Sks_ipr_alkauskas_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.S_omega,
+                pl_engine.omega_range,
+                pl_engine.Sks,
+                pl_engine.iprs_alkauskas,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("nk", "all"):
+            _do(
+                "nk",
+                plotter.plot_nk_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.nks,
+                pl_engine.temperature,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("c_omega", "all"):
+            _do(
+                "c_omega",
+                plotter.plot_C_omega_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.C_omega,
+                pl_engine.omega_range,
+                plot=False,
+                out_dir=out_dir,
+                max_freq=freq_limit,
+                fig_format=fmt,
+            )
+
+        if pt in ("intensity", "all"):
+            _do(
+                "intensity",
+                plotter.plot_intensity_vs_penergy,
+                pl_engine.frequencies,
+                pl_engine.intensity,
+                pl_engine.resolution,
+                iplot_xlim,
+                plot=False,
+                out_dir=out_dir,
+                iylim=parsed_iylim,
+                fig_format=fmt,
+            )
+
+        if pt in ("absorption", "all"):
+            _do(
+                "absorption",
+                plotter.plot_absorption_vs_penergy,
+                frequencies=pl_engine.frequencies,
+                absorption=pl_engine.absorption,
+                resolution=pl_engine.resolution,
+                xlim=iplot_xlim,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
+
+        if pt in ("pl_absorption", "all"):
+            _do(
+                "pl_absorption",
+                plotter.plot_pl_absorption_vs_penergy,
+                frequencies=pl_engine.frequencies,
+                intensity=pl_engine.intensity,
+                absorption=pl_engine.absorption,
+                resolution=pl_engine.resolution,
+                xlim=iplot_xlim,
+                plot=False,
+                out_dir=out_dir,
+                fig_format=fmt,
+            )
 
     except Exception as exc:
         if _verbose:
             raise
-        raise click.ClickException(
-            f"Failed to generate custom standalone graphic: {exc}"
-        )
+        raise click.ClickException(f"Failed to generate plot: {exc}")
 
 
 # =====================================================================

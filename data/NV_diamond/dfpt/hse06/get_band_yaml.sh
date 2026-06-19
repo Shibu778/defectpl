@@ -13,4 +13,3 @@ defectpl phonon-band --poscar POSCAR --fc FORCE_CONSTANTS --dim "1 1 1"
 gzip band.yaml
 gzip POSCAR
 gzip FORCE_CONSTANTS
-

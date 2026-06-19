@@ -66,13 +66,13 @@ $$S = \int_{0}^{\infty} S(\hbar\omega) d(\hbar\omega) = \sum_{k} S_{k}$$
 
 ## 3. The Generating Function Approach
 
-Rather than calculating explicitly convoluted multi-phonon combination states term by term, `defectpl` resolves $A(\hbar\omega)$ using the time-dependent generating function approach developed by Lax, Kubo, and Toyozawa [1]. 
+Rather than calculating explicitly convoluted multi-phonon combination states term by term, `defectpl` resolves $A(\hbar\omega)$ using the time-dependent generating function approach developed by Lax, Kubo, and Toyozawa [1].
 
 The optical spectral function is calculated via the Fourier transform of a time-domain generating function $G(t)$ [1]:
 
 $$A(E_{\text{ZPL}} - \hbar\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} G(t) e^{i\omega t - \gamma |t|} dt$$
 
-where $\gamma$ is a semi-empirical broadening parameter applied to reproduce the finite experimental width of the Zero-Phonon Line (arising from homogeneous thermal interactions or inhomogeneous sample strain) [1]. 
+where $\gamma$ is a semi-empirical broadening parameter applied to reproduce the finite experimental width of the Zero-Phonon Line (arising from homogeneous thermal interactions or inhomogeneous sample strain) [1].
 
 The generating function $G(t)$ is computed directly from the electron-phonon coupling spectrum [1]:
 

@@ -1,139 +1,222 @@
 # Command Line Interface (CLI) Manual: `defectpl`
 
-The `defectpl` suite features a unified command-line application layer managed via `click`. This utility handles tasks ranging from raw VASP force parsing and phonon symmetry reduction to full multi-mode photoluminescence lineshape synthesis and Configuration Coordinate Diagram (CCD) mapping.
+The `defectpl` suite features a unified command-line application layer managed via `click`. This utility handles tasks ranging from raw VASP force parsing and phonon symmetry reduction to full multi-mode photoluminescence lineshape synthesis, temperature-dependent PL/absorption spectra, and Configuration Coordinate Diagram (CCD) mapping.
 
 ---
 
-## 1. Global Application entry Point
+## 1. Global Application Entry Point
 
 Once installed, the root command hook can be executed directly from your terminal:
 
 ```bash
 defectpl --help
+```
 
+The global `--verbose` / `-v` flag prints the full Python traceback on any error instead of a condensed message:
+
+```bash
+defectpl -v pl displacement ...
 ```
 
 ---
 
 ## 2. Multi-Mode Photoluminescence (`defectpl pl`)
 
-The `pl` group executes high-level multi-phonon spectral sideband convolutions. It exposes two sub-commands corresponding to the available physical data-collection frameworks.
+The `pl` group executes high-level multi-phonon spectral sideband convolutions using the generating-function formalism (Alkauskas 2014; Jin 2021). It exposes three sub-commands.
 
 ### A. Displacement Mode (`defectpl pl displacement`)
 
 Evaluates vibronic profiles from converged ground-state and excited-state geometry coordinates (`CONTCAR` structures).
 
-**Usage and Parameters:**
-
 ```bash
 defectpl pl displacement \
-  --band_yaml ./band.yaml \
-  --contcar_gs ./CONTCAR_gs \
-  --contcar_es ./CONTCAR_es \
-  --ezpl 1.95 \
-  --gamma 2.0 \
-  --out_dir ./output_data/ \
-  --json_out properties.json \
+  --band_yaml     ./band.yaml \
+  --contcar_gs    ./CONTCAR_gs \
+  --contcar_es    ./CONTCAR_es \
+  --ezpl          1.95 \
+  --gamma         2.0 \
+  --temperature   300 \
+  --sigma         "3e-3,8e-3" \
+  --resolution    1000 \
+  --max_energy    5.0 \
+  --out_dir       ./output_data/ \
+  --json_out      properties.json \
   --plot_all \
-  --fig_format svg
-
+  --fig_format    svg \
+  --iylim         "0,1.2" \
+  --max_freq      120.0
 ```
 
-* `--band_yaml`: Path to the Phonopy structural `band.yaml` file *(Default: `./band.yaml`)*.
-* `--contcar_gs`: Ground-state equilibrium geometry structure file *(Default: `./CONTCAR_gs`)*.
-* `--contcar_es`: Excited-state equilibrium geometry structure file *(Default: `./CONTCAR_es`)*.
-* `--ezpl`: Zero-Phonon Line transition energy threshold in eV *(Default: `1.95`)*.
-* `--gamma`: Homogeneous Lorentzian broadening damping metric in meV *(Default: `2.0`)*.
-* `--json_out`: Optional path to dump the serialized `Photoluminescence` object state using Monty JSON hooks.
-* `--plot_all`: Boolean flag. When invoked, it automatically generates all 10 standard diagnostic plots.
-* `--fig_format`: Graphics layout vector standard extension (e.g., `pdf`, `png`, `svg`) *(Default: `pdf`)*.
-* `--max_freq`: Frequency range limit override for spectral density charts (in meV).
-* `--iylim`: Y-axis limits override passed as a comma-separated string (e.g., `--iylim 0,1.5`).
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--band_yaml` | `./band.yaml` | Phonopy `band.yaml` file. |
+| `--contcar_gs` | `./CONTCAR_gs` | Ground-state equilibrium geometry. |
+| `--contcar_es` | `./CONTCAR_es` | Excited-state equilibrium geometry. |
+| `--ezpl` | `1.95` | Zero-Phonon Line energy in eV. |
+| `--gamma` | `2.0` | Lorentzian ZPL broadening in meV. |
+| `--temperature` | `0.0` | Lattice temperature in K. `0` reproduces the T = 0 K limit exactly. |
+| `--sigma` | `"6e-3"` | Gaussian broadening in eV. Scalar `"6e-3"` applies uniform broadening; two comma-separated values `"3e-3,8e-3"` interpolate linearly from the lowest to the highest phonon frequency (frequency-dependent broadening, Jin 2021). |
+| `--resolution` | `1000` | Spectral grid density in points per eV. |
+| `--max_energy` | `5.0` | Upper energy axis limit in eV. |
+| `--json_out` | — | Path to serialize the `Photoluminescence` object as a Monty JSON file for later use. |
+| `--plot_all` | off | Generate all 16 standard diagnostic plots and write them to `--out_dir`. |
+| `--out_dir` | `./` | Output directory for plots. |
+| `--fig_format` | `pdf` | Figure format: `pdf`, `png`, `svg`. |
+| `--iylim` | — | Y-axis limits for the intensity plot, e.g. `"0,1.2"`. |
+| `--max_freq` | — | Upper frequency cut-off for mode/S(ω) plots in meV. |
+
+After a successful run the command prints a short summary:
+
+```
+Photoluminescence engine data properties calculated successfully.
+  HR factor      : 3.4521
+  DW factor      : 0.0318
+  Temperature    : 300.0 K
+  C_total        : 0.1842
+```
 
 ### B. Force Mode (`defectpl pl force`)
 
-Evaluates vibronic coupling paths via vertical forces acting on atoms from unrelaxed, fixed-geometry electronic manifolds (`OUTCAR` inputs).
-
-**Usage and Parameters:**
+Evaluates vibronic coupling via vertical forces on atoms from unrelaxed, fixed-geometry electronic manifolds (`OUTCAR` inputs). Accepts the same calculation parameters as displacement mode.
 
 ```bash
 defectpl pl force \
-  --band_yaml ./band.yaml \
-  --outcar_gs ./OUTCAR_gs \
-  --outcar_es ./OUTCAR_es \
-  --ezpl 1.95 \
-  --gamma 2.0 \
-  --json_out force_properties.json \
+  --band_yaml     ./band.yaml \
+  --outcar_gs     ./OUTCAR_gs \
+  --outcar_es     ./OUTCAR_es \
+  --ezpl          1.95 \
+  --gamma         2.0 \
+  --temperature   300 \
+  --sigma         "6e-3" \
+  --json_out      force_properties.json \
   --plot_all \
-  --fig_format png
-
+  --fig_format    png
 ```
 
-* Parameters match the displacement mode command, substituting `--contcar_*` path options for VASP `--outcar_gs` and `--outcar_es` force vectors. Spatial metrics like $\Delta Q$ and $\Delta R$ are omitted automatically in the backend during generation sweeps to enforce force-mode consistency.
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--outcar_gs` | `./OUTCAR_gs` | VASP OUTCAR for the ground-state forces. |
+| `--outcar_es` | `./OUTCAR_es` | VASP OUTCAR for the excited-state vertical forces. |
+
+All other options (`--ezpl`, `--gamma`, `--temperature`, `--sigma`, `--resolution`, `--max_energy`, `--json_out`, `--plot_all`, `--out_dir`, `--fig_format`, `--iylim`, `--max_freq`) are identical to displacement mode.
+
+### C. Restore from JSON (`defectpl pl from-json`)
+
+Restores a previously saved `Photoluminescence` JSON and regenerates all 16 diagnostic plots without re-running any phonon calculation.
+
+```bash
+defectpl pl from-json properties.json \
+  --out_dir  ./figs/ \
+  --fig_format png \
+  --max_freq   120.0
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `JSON_FILE` | *(required)* | Path to a Monty-serialized `Photoluminescence` JSON. |
+| `--out_dir` | `./` | Directory to write the regenerated plots. |
+| `--fig_format` | `pdf` | Figure format. |
+| `--iylim` | — | Y-axis limits for the intensity plot. |
+| `--max_freq` | — | Upper frequency cut-off for mode plots in meV. |
 
 ---
 
 ## 3. Standalone Plotting (`defectpl plot`)
 
-Deserializes previously cached `properties.json` data files to regenerate or customize visual layouts without re-executing the underlying Fourier transforms.
-
-**Usage:**
+Deserializes a saved `properties.json` and renders any individual figure or the full set, without re-running the generating function.
 
 ```bash
-defectpl plot ./properties.json --type intensity --out_dir ./plots/ --fmt png
-
+defectpl plot ./properties.json --type intensity
+defectpl plot ./properties.json --type all --out_dir figs/ --fmt png
+defectpl plot ./properties.json --type absorption --fmt pdf
+defectpl plot ./properties.json --type nk
 ```
 
-* **Argument:** Path to a serialized JSON file containing a valid MSONable `Photoluminescence` configuration.
-* `--type` (`-t`): Specific graphic layout configuration target. Must be one of: `intensity`, `mode`, `partial_energy`, or `all`.
-* `--fmt`: Graphic layout format selection (`pdf`, `png`, `svg`).
+**Argument:** Path to a Monty JSON file containing a valid `Photoluminescence` object.
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--type`, `-t` | *(required)* | Plot to render — see table below. |
+| `--out_dir` | `./` | Output directory for the generated figure. |
+| `--fmt` | `pdf` | Figure format: `pdf`, `png`, `svg`. |
+| `--iylim` | — | Y-axis limits for the intensity plot (e.g. `"0,1.2"`). |
+| `--max_freq` | — | Upper phonon-frequency cut-off for mode/S(omega) plots in meV. |
+
+### Available plot types
+
+| `--type` | Output file | Description |
+|----------|-------------|-------------|
+| `mode` | `penergy_vs_pmode.*` | Phonon energy vs mode index scatter. |
+| `ipr` | `ipr_vs_penergy.*` | Traditional IPR vs phonon energy. |
+| `ipr_alkauskas` | `ipr_alkauskas_vs_penergy.*` | Alkauskas-convention IPR (range [1, N]) vs phonon energy. |
+| `loc_ratio` | `loc_rat_vs_penergy.*` | Localization ratio β_k = N × IPR vs phonon energy. |
+| `qk` | `qk_vs_penergy.*` | Mode displacement q_k vs phonon energy. |
+| `hr_factor` | `HR_factor_vs_penergy.*` | Partial HR factor S_k vs phonon energy. |
+| `s_omega` | `S_omega_vs_penergy.*` | Broadened spectral density S(ω). |
+| `s_omega_sk` | `S_omega_Sks_vs_penergy.*` | S(ω) line + S_k scatter (dual-axis). |
+| `s_omega_locrat` | `S_omega_HRf_loc_rat_vs_penergy.*` | S(ω) + S_k scatter coloured by localization ratio. |
+| `s_omega_ipr` | `S_omega_HRf_ipr_vs_penergy.*` | S(ω) + S_k scatter coloured by traditional IPR. |
+| `s_omega_ipr_alkauskas` | `S_omega_HRf_ipr_alkauskas_vs_penergy.*` | S(ω) + S_k scatter coloured by Alkauskas IPR. |
+| `nk` | `nk_vs_penergy.*` | Bose-Einstein phonon occupation n̄_k(T) vs phonon energy. |
+| `c_omega` | `C_omega_vs_penergy.*` | Thermal spectral density C(ω, T). Zero at T = 0. |
+| `intensity` | `intensity_vs_penergy.*` | Normalised PL emission spectrum L(ħω). |
+| `absorption` | `absorption_vs_penergy.*` | Normalised absorption spectrum α(ħω). Sideband on the high-energy side. |
+| `pl_absorption` | `pl_absorption_vs_penergy.*` | PL (solid) and absorption (dashed) overlaid on one axis. |
+| `all` | all of the above | Generate every figure in one call. |
 
 ---
 
 ## 4. Generalized Displacements (`defectpl dq`)
 
-Calculates the raw, mass-weighted configuration coordinate vector offset ($\Delta Q$) across any two matching structural geometry supercells.
-
-**Usage:**
+Calculates the mass-weighted configuration coordinate vector offset (ΔQ) across any two matching structural geometry supercells.
 
 ```bash
 defectpl dq ./CONTCAR_GS ./CONTCAR_ES --format json --out delta_q.json
-
 ```
 
-* **Arguments:** Paths to the initial (`structure1`) and final (`structure2`) VASP structure files.
-* `--format` (`-f`): Output representation format. Select `plain` (prints raw float string to standard output stream) or `json`.
-* `--out` (`-o`): Optional file path to dump the compiled structural displacement metadata records.
+| Option | Default | Description |
+|--------|---------|-------------|
+| `structure1` | *(required)* | Path to the first structure file. |
+| `structure2` | *(required)* | Path to the second structure file. |
+| `--format`, `-f` | `plain` | Output format: `plain` (raw float) or `json`. |
+| `--out`, `-o` | — | Optional file path to write the displacement metadata. |
 
 ---
 
 ## 5. Analytical 1D Lineshapes (`defectpl spectra1d`)
 
-Simulates a decoupled 1D displaced-distorted harmonic oscillator spectrum without assuming identical Hessians ($\omega_1 \neq \omega_2$).
-
-**Usage:**
+Simulates a decoupled 1D displaced-distorted harmonic oscillator spectrum without assuming identical Hessians (ω₁ ≠ ω₂). Boltzmann-weighted Franck–Condon overlaps are summed explicitly over vibrational quantum numbers.
 
 ```bash
 defectpl spectra1d \
-  --ezpl 2.60 \
-  --w1 35.75 \
-  --w2 41.56 \
-  --dq_val 1.5476 \
-  --temp 300.0 \
-  --points 5000 \
+  --ezpl       2.60 \
+  --w1         35.75 \
+  --w2         41.56 \
+  --dq_val     1.5476 \
+  --temp       300.0 \
+  --e0         1.8 \
+  --de         0.001 \
+  --points     5000 \
+  --nn1        22 \
+  --nn2        52 \
   --plot \
   --save_prefix tracking_1d
-
 ```
 
-* `--ezpl`: ZPL transition energy center in eV *(Required)*.
-* `--w1`: Ground-state effective vibrational frequency in meV *(Required)*.
-* `--w2`: Excited-state effective vibrational frequency in meV *(Required)*.
-* `--dq_val`: Configuration coordinate shift $\Delta Q$ in $\text{amu}^{1/2}\cdot\text{Å}$ *(Required)*.
-* `--temp`: Physical target evaluation temperature in Kelvin *(Default: `300.0`)*.
-* `--points`: Linear sampling integration rows count dimension for the grid array *(Default: `5000`)*.
-* `--plot`: Flag enabling immediate rendering of the output PDF visual spectrum sideband chart.
-* `--save_prefix`: Prefix appended to generated data output records (`*_overlap.json`, `*_lineshape.json`).
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--ezpl` | *(required)* | ZPL transition energy in eV. |
+| `--w1` | *(required)* | Ground-state effective vibrational frequency in meV. |
+| `--w2` | *(required)* | Excited-state effective vibrational frequency in meV. |
+| `--dq_val` | *(required)* | Configuration coordinate shift ΔQ in amu½·Å. |
+| `--temp` | `300.0` | Temperature in K (sets Boltzmann weights). |
+| `--e0` | `0.0` | Energy grid starting point in eV. |
+| `--de` | `0.001` | Energy grid step in eV. |
+| `--points` | `5000` | Number of energy grid points. |
+| `--nn1` | `22` | Maximum ground-state vibrational quantum number. |
+| `--nn2` | `52` | Maximum excited-state vibrational quantum number. |
+| `--plot` | off | Save a PDF plot of the normalised lineshape. |
+| `--save_prefix` | `vibrational_1d` | Prefix for `*_overlap.json` and `*_lineshape.json` output files. |
 
 ---
 
@@ -141,132 +224,130 @@ defectpl spectra1d \
 
 Automates linear structure interpolation tasks across structural potential surfaces to map the classical harmonic potential energy curves.
 
-### A. Initialization Script (`setup-ccd`)
+### A. Initialization (`defectpl setup-ccd`)
 
-Generates structural interpolation arrays scaling across specific configuration displacement grid targets.
+Generates interpolated structural task directories scaled across a displacement grid.
 
 ```bash
 defectpl setup-ccd \
-  --gs ./CONTCAR_GS \
-  --es ./CONTCAR_ES \
+  --gs      ./CONTCAR_GS \
+  --es      ./CONTCAR_ES \
   --tmpl_gs ./template_GS_dir/ \
   --tmpl_es ./template_ES_dir/ \
   --out_dir ./ccd_workspace/ \
-  --steps "-0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2"
-
+  --steps   "-0.2,0.0,0.2,0.4,0.6,0.8,1.0,1.2"
 ```
 
-### B. Curvature Analysis Script (`analyze-ccd`)
+### B. Curvature Analysis (`defectpl analyze-ccd`)
 
-Parses completed calculations across the interpolated task trees to fit potential curvatures and resolve corresponding frequencies.
+Parses completed calculations to fit parabolic potential energy surfaces and report effective phonon frequencies.
 
 ```bash
 defectpl analyze-ccd \
-  --gs ./CONTCAR_GS \
-  --es ./CONTCAR_ES \
+  --gs      ./CONTCAR_GS \
+  --es      ./CONTCAR_ES \
   --gs_runs "./run_0/vasprun.xml ./run_1/vasprun.xml" \
   --es_runs "./run_0/vasprun.xml ./run_1/vasprun.xml" \
-  --de 1.95 \
+  --de      1.95 \
   --save_plot ccd_fit.pdf
-
 ```
 
 ---
 
 ## 7. Comparative Benchmark Suites (`defectpl compare-json` / `compare-yaml`)
 
-Compiles and plots multiple calculated datasets side-by-side to benchmark modeling parameters.
+Compiles and plots multiple calculated datasets side-by-side to benchmark modelling parameters.
 
-### A. JSON Spectra Comparisons (`compare-json`)
+### A. JSON Spectra Comparisons (`defectpl compare-json`)
 
 ```bash
 defectpl compare-json \
-  --files "run1/properties.json run2/properties.json" \
+  --files   "run1/properties.json run2/properties.json" \
   --legends "Functional-A,Functional-B" \
   --xmin 1.2 --xmax 2.2 \
   --out_dir ./comparisons/
-
 ```
 
-### B. Raw Phonopy Input Comparisons (`compare-yaml`)
+### B. Raw Phonopy Input Comparisons (`defectpl compare-yaml`)
 
-Useful for evaluating lineshape variations against different phonon datasets without running separate pipeline loops manually.
+Evaluate lineshape variations against different phonon datasets without running separate pipeline loops.
 
 ```bash
 defectpl compare-yaml \
   --yamls "phonon_90_atoms/band.yaml phonon_216_atoms/band.yaml" \
-  --gs ./CONTCAR_GS --es ./CONTCAR_ES \
-  --ezpl 1.945 --xmin 1.0 --xmax 2.5
-
+  --gs    ./CONTCAR_GS \
+  --es    ./CONTCAR_ES \
+  --ezpl  1.945 \
+  --xmin  1.0 \
+  --xmax  2.5
 ```
 
 ---
 
 ## 8. Phonon and Lattice Utilities
 
-Exposes administrative shortcuts for mapping Gamma-point lattice frequencies directly within your processing directories.
+Exposes administrative shortcuts for mapping Gamma-point lattice frequencies within your processing directories.
 
-### A. Extract Force Constants (`phonon-fc`)
+### A. Extract Force Constants (`defectpl phonon-fc`)
 
-Parses VASP XML traces to generate standard Phonopy force tracking files.
+Parses a `vasprun.xml` file and writes Phonopy force constants.
 
 ```bash
 defectpl phonon-fc ./vasprun.xml --hdf5
-
 ```
 
-### B. Extract Phonon Irreducible Representations (`phonon-symm`)
+### B. Phonon Irreducible Representations (`defectpl phonon-symm`)
 
-Identifies the point-group irreducible representation labels for calculated Gamma-point modes.
+Identifies point-group irreducible representation labels for Gamma-point modes.
 
 ```bash
 defectpl phonon-symm --poscar ./POSCAR --fc ./FORCE_CONSTANTS --dim "1 1 1"
-
 ```
 
-### C. Compile Band Target Structural Outputs (`phonon-band`)
+### C. Compute `band.yaml` (`defectpl phonon-band`)
 
-Evaluates eigenvalues at the Gamma point using standard force constants matrices, converting outputs natively into eV energy metrics.
+Evaluates eigenvalues at the Gamma point from a `FORCE_CONSTANTS` file and writes `band.yaml`.
 
 ```bash
 defectpl phonon-band --poscar ./POSCAR --fc ./FORCE_CONSTANTS --dim "1 1 1" --out band.yaml
-
 ```
 
-### D. Re-serialize Band Properties (`phonon-parse`)
+### D. Re-serialize Phonon Data (`defectpl phonon-parse`)
 
-Converts standard Phonopy configurations to eV and writes them to an MSONable JSON data model file.
+Converts a `band.yaml` to eV and writes an MSONable JSON data model.
 
 ```bash
 defectpl phonon-parse ./band.yaml --json_out parsed_phonons.json
-
 ```
 
 ---
 
 ## 9. Kohn-Sham Level Visualization (`defectpl ksplot`)
 
-Parses a VASP `EIGENVAL` file to screen degeneracies, handle spin-polarization tracks, and plot single-particle electronic defect states within the bandgap.
+Parses a VASP `EIGENVAL` file to resolve degeneracies, handle spin polarization, and plot single-particle defect states within the bandgap.
 
 ```bash
 defectpl ksplot ./EIGENVAL \
-  --vbm 9.6747 \
-  --cbm 13.7934 \
-  --espan 1.5 \
-  --kidx 0 \
+  --vbm     9.6747 \
+  --cbm     13.7934 \
+  --espan   1.5 \
+  --kidx    0 \
   --out_img bandgap_levels.png \
   --out_json defect_states.json
-
 ```
 
-* `--vbm`: Calculated energy value of the Valence Band Maximum in eV *(Required)*.
-* `--cbm`: Calculated energy value of the Conduction Band Minimum in eV *(Required)*.
-* `--espan`: Energy canvas buffer padding depth evaluated above and below the band edges in eV *(Default: `1.0`)*.
-* `--kidx`: Sequence array index tracking target k-point coordinates *(Default: `0`)*.
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--vbm` | *(required)* | Valence Band Maximum energy in eV. |
+| `--cbm` | *(required)* | Conduction Band Minimum energy in eV. |
+| `--espan` | `1.0` | Energy padding above/below band edges in eV. |
+| `--kidx` | `0` | 0-based k-point index. |
+| `--out_img` | `ks_plot.png` | Output image path. |
+| `--out_json` | — | Optional path to export the KS data as JSON. |
 
 ---
 
-## 10. `pr` — Participation Ratio
+## 10. Participation Ratio (`defectpl pr`)
 
 The `pr` group computes electronic-state **P-ratio** and **IPR** from VASP PROCAR data, and provides utilities to generate all prerequisite JSON files without pydefect.
 
@@ -329,8 +410,8 @@ defectpl pr calc \
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--procar`, `-p` | `PROCAR` | VASP PROCAR file. Needs `LORBIT=11` or `12`. |
-| `--entry`, `-e` | `defect_entry.json` | Path to defect_entry.json. |
-| `--dsi`, `-s` | auto-detect | Path to defect_structure_info.json. |
+| `--entry`, `-e` | `defect_entry.json` | Path to `defect_entry.json`. |
+| `--dsi`, `-s` | auto-detect | Path to `defect_structure_info.json`. |
 | `--poscar` | auto-detect | POSCAR/CONTCAR for distance-based fallback. |
 | `--cutoff`, `-c` | `3.5` | Neighbour cut-off radius in Å (fallback only). |
 | `--out`, `-o` | `.` | Output directory. |
@@ -344,8 +425,7 @@ defectpl pr calc \
 defectpl pr batch --dir defects/Va_O1/ --cutoff 4.0
 ```
 
-Walks all immediate subdirectories of `--dir`, runs `pr calc` in each one
-that contains `PROCAR` + `defect_entry.json`, and writes a combined CSV.
+Walks all immediate subdirectories of `--dir`, runs `pr calc` in each one that contains `PROCAR` + `defect_entry.json`, and writes a combined CSV.
 
 ### E. Inspect results (`defectpl pr summary` / `defectpl pr top`)
 
@@ -382,22 +462,19 @@ defectpl pr plot Va_O1_2/participation_ratio.json \
 | `--xaxis`, `-x` | `energy` | X-axis: `energy` (eV) or `band` (index). |
 | `--metric`, `-m` | `p_ratio` | Y-axis quantity: `p_ratio` or `ipr`. |
 | `--threshold`, `-t` | `0.2` | Dashed horizontal threshold line. |
-| `--vbm` | — | VBM energy in eV — orange dotted vertical line (energy mode). |
-| `--cbm` | — | CBM energy in eV — green dotted vertical line (energy mode). |
+| `--vbm` | — | VBM energy in eV (orange dotted vertical line, energy mode). |
+| `--cbm` | — | CBM energy in eV (green dotted vertical line, energy mode). |
 | `--emin` | — | Lower energy filter (eV). |
 | `--emax` | — | Upper energy filter (eV). |
 | `--kpt` | `0` | 0-based k-point index. |
-| `--out`, `-o` | auto | Output image (default: `pr_energy.png` or `pr_band.png`). |
+| `--out`, `-o` | auto | Output image (`pr_energy.png` or `pr_band.png`). |
 | `--title` | defect name | Plot title. |
 
-Filled markers = occupied (occ ≥ 0.5); open = empty.
-Spin channels: blue = spin ↑, red = spin ↓.
+Filled markers = occupied (occ ≥ 0.5); open = empty. Spin channels: blue = spin up, red = spin down.
 
 ### G. KS level diagram with P-ratio colour code (`defectpl pr ksplot`)
 
-Renders the standard Kohn-Sham level diagram where each horizontal bar
-is coloured by the P-ratio or IPR of that state (instead of plain black).
-A colorbar is added on the right.
+Renders the standard Kohn-Sham level diagram where each horizontal bar is coloured by the P-ratio or IPR of that state. A colorbar is added on the right.
 
 ```bash
 defectpl pr ksplot \

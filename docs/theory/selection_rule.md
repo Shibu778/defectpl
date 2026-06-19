@@ -1,2 +1,1 @@
 # Understanding Selection Rules
-
