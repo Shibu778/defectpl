@@ -155,12 +155,14 @@ If you use DefectPL in published work please cite:
 > [doi:10.1103/PhysRevB.111.104109](https://doi.org/10.1103/PhysRevB.111.104109)
 
 > Shibu Meher *et al.*,
-> **High-throughput Computational Search for Group-IV-related Quantum Defects as
-> Spin-photon Interfaces in 4H-SiC**,
+> **High-throughput Computational Search for Group-IV-related Quantum Defects as Spin-photon Interfaces in 4H-SiC**,
 > *Phys. Rev. B* **112**, 184112 (2025).
-> [doi:10.1103/PhysRevB.112.184112](https://doi.org/10.1103/PhysRevB.112.184112)
+> [doi:10.1103/10.1103/lsxj-nvhw](https://doi.org/10.1103/lsxj-nvhw)
 
 ---
+## Studies using DefectPL
+- S. Meher, M. Dey, A. K. Singh, Origin of Bright Quantum Emissions with a High Debye–Waller Factor in Silicon Nitride, [Nano Lett. 26, 4348 (2026)](https://pubs.acs.org/doi/10.1021/acs.nanolett.5c06190)
+- Mari O. Klimova, Konstantin V. Larionov, Sergey V. Erohin, Pavel B. Sorokin, Engineering Electronic Properties of Diamane: Possible Candidate for Diamond Electronics, [J. Phys. Chem. C, Just Accepted (2026)](https://doi.org/10.1021/acs.jpcc.6c03243)
 
 ## Acknowledgements
 
