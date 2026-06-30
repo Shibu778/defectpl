@@ -2753,5 +2753,842 @@ def pr_ksplot(
 main.add_command(pr_group)
 
 
+# ===========================================================================
+# TDM / WAVECAR CLI commands
+# ===========================================================================
+
+
+@click.group("tdm")
+@click.pass_context
+def tdm_group(ctx):
+    """Transition Dipole Moment calculations from VASP WAVECAR files.
+
+    \b
+    Sub-commands
+    ------------
+      calc       Compute TDM between two band indices.
+      all        Compute TDMs for all occ→unocc pairs (BZ average).
+      cross      Cross-state TDM between two different WAVECARs.
+      trim       Write a compact or trimmed WAVECAR for selected bands.
+      export     Export WAVECAR metadata to JSON or HDF5.
+      plot       Plot TDM results (heatmap / bubble / dashboard / absorption).
+    """
+
+
+@tdm_group.command("calc")
+@click.option(
+    "--wavecar",
+    "wavecar",
+    default="WAVECAR",
+    show_default=True,
+    help="Path to WAVECAR (compressed .gz/.bz2 supported).",
+)
+@click.option("--ispin", default=1, show_default=True, help="Spin channel (1 or 2).")
+@click.option(
+    "--iband-i",
+    "iband_i",
+    required=True,
+    type=int,
+    help="Initial band index (1-based).",
+)
+@click.option(
+    "--iband-j", "iband_j", required=True, type=int, help="Final band index (1-based)."
+)
+@click.option("--ibzkpt", default=None, help="IBZKPT file for k-weighting.")
+@click.option(
+    "--all-kpoints",
+    "all_kpoints",
+    is_flag=True,
+    default=False,
+    help="Print TDM at every k-point.",
+)
+@click.option("--out", default=None, help="Save result JSON to this path.")
+@click.pass_context
+def tdm_calc(ctx, wavecar, ispin, iband_i, iband_j, ibzkpt, all_kpoints, out):
+    """Compute TDM between two specific bands.
+
+    \b
+      defectpl tdm calc --iband-i 638 --iband-j 639
+      defectpl tdm calc --iband-i 638 --iband-j 639 --ibzkpt IBZKPT --out tdm.json
+    """
+    from defectpl.physics.tdm import WavecarReader, read_ibzkpt_weights
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(f"Cannot open WAVECAR: {exc}")
+
+    res = wfc.get_tdm_all_kpoints(ispin, iband_i, iband_j)
+
+    if ibzkpt:
+        try:
+            kw = read_ibzkpt_weights(ibzkpt)
+            avg = wfc.get_weighted_avg_tdm(ispin, iband_i, iband_j, kw)
+            click.echo(f"\n  BZ-averaged |TDM| = {avg['avg_tdm_magnitude']:.6f} Debye")
+            click.echo(
+                "  Components (|x|, |y|, |z|) = "
+                + "  ".join(f"{v:.4f}" for v in avg["avg_tdm_components"])
+                + " Debye"
+            )
+            click.echo(f"  avg ΔE = {avg['avg_dE']:.4f} eV")
+        except Exception as exc:
+            click.secho(f"  [warning] Could not k-weight: {exc}", fg="yellow")
+    else:
+        click.echo(f"\n  Bands: {iband_i} → {iband_j}")
+        click.echo(f"  Mean |TDM| = {res['tdm_magnitude'].mean():.6f} Debye")
+        click.echo(f"  Max  |TDM| = {res['tdm_magnitude'].max():.6f} Debye")
+
+    if all_kpoints:
+        click.echo("\n  k-point breakdown:")
+        for i, (mag, dE_val) in enumerate(
+            zip(res["tdm_magnitude"], res["dE"]), start=1
+        ):
+            click.echo(f"    k{i:4d}  |TDM|={mag:.4f} D   ΔE={dE_val:.4f} eV")
+
+    if out:
+        import json
+        import numpy as np
+
+        def _ser(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return obj
+
+        with open(out, "w") as fh:
+            json.dump({k: _ser(v) for k, v in res.items()}, fh, indent=2)
+        click.secho(f"  Result written to: {out}", fg="green")
+
+
+@tdm_group.command("all")
+@click.option("--wavecar", default="WAVECAR", show_default=True)
+@click.option("--ispin", default=1, show_default=True)
+@click.option(
+    "--ibzkpt", default="IBZKPT", show_default=True, help="IBZKPT for k-point weights."
+)
+@click.option(
+    "--mode",
+    default="occupation",
+    show_default=True,
+    type=click.Choice(
+        [
+            "occupation",
+            "energy",
+            "band_range",
+            "band_list",
+            "near_fermi",
+            "homo_lumo_range",
+            "energy_window",
+        ]
+    ),
+    help="Band selection strategy.",
+)
+@click.option(
+    "--n-occ",
+    "n_occ",
+    default=10,
+    show_default=True,
+    help="Number of occupied bands (near_fermi mode).",
+)
+@click.option(
+    "--n-unocc",
+    "n_unocc",
+    default=10,
+    show_default=True,
+    help="Number of unoccupied bands (near_fermi mode).",
+)
+@click.option(
+    "--occ-bands",
+    "occ_bands",
+    default=None,
+    help="Occupied band range, e.g. '630-638' (band_range mode).",
+)
+@click.option(
+    "--unocc-bands",
+    "unocc_bands",
+    default=None,
+    help="Unoccupied band range, e.g. '639-650' (band_range mode).",
+)
+@click.option(
+    "--fermi-level",
+    "fermi_level",
+    default=None,
+    type=float,
+    help="Fermi level in eV (overrides occupancy from WAVECAR).",
+)
+@click.option(
+    "--min-tdm",
+    "min_tdm",
+    default=0.0,
+    show_default=True,
+    type=float,
+    help="Discard pairs with |TDM| < this value (Debye).",
+)
+@click.option(
+    "--top",
+    "top_n",
+    default=10,
+    show_default=True,
+    type=int,
+    help="Number of strongest transitions to print.",
+)
+@click.option(
+    "--out", default="all_tdm.json", show_default=True, help="Output JSON file."
+)
+@click.pass_context
+def tdm_all(
+    ctx,
+    wavecar,
+    ispin,
+    ibzkpt,
+    mode,
+    n_occ,
+    n_unocc,
+    occ_bands,
+    unocc_bands,
+    fermi_level,
+    min_tdm,
+    top_n,
+    out,
+):
+    """Compute TDMs for all occupied→unoccupied band pairs.
+
+    \b
+      defectpl tdm all --mode occupation --top 10 --out all_tdm.json
+      defectpl tdm all --mode band_range --occ-bands 630-638 --unocc-bands 639-650
+    """
+    import json
+    import numpy as np
+    from defectpl.physics.tdm import WavecarReader, read_ibzkpt_weights
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(f"Cannot open WAVECAR: {exc}")
+
+    try:
+        kw = read_ibzkpt_weights(ibzkpt)
+    except Exception as exc:
+        click.secho(
+            f"  [warning] Could not read IBZKPT: {exc}. Using equal weights.",
+            fg="yellow",
+        )
+        kw = np.ones(wfc.nkpts)
+
+    occ_range = unocc_range = None
+    if occ_bands:
+        lo, hi = (int(x) for x in occ_bands.split("-"))
+        occ_range = (lo, hi)
+    if unocc_bands:
+        lo, hi = (int(x) for x in unocc_bands.split("-"))
+        unocc_range = (lo, hi)
+
+    click.echo(f"  Computing all transitions (mode={mode})…")
+    result = wfc.get_all_transitions(
+        ispin=ispin,
+        kweights=kw,
+        mode=mode if mode != "near_fermi" else "occupation",
+        occ_bands=occ_range,
+        unocc_bands=unocc_range,
+        fermi_level=fermi_level if fermi_level is not None else 0.0,
+        min_tdm=min_tdm,
+    )
+
+    click.echo(f"\n  Unique band pairs: {result['metadata']['n_unique_pairs']}")
+    click.echo(f"\n  Top-{top_n} transitions:")
+    for entry in result["strongest_transitions"][:top_n]:
+        click.echo(
+            f"    {entry['iband_i']:4d} → {entry['iband_j']:4d}  "
+            f"|TDM|={entry['avg_tdm_magnitude']:.4f} D  "
+            f"ΔE={entry['avg_dE']:.4f} eV"
+        )
+
+    def _ser(obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, dict):
+            return {k: _ser(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_ser(v) for v in obj]
+        return obj
+
+    with open(out, "w") as fh:
+        json.dump(_ser(result), fh, indent=2)
+    click.secho(f"\n  Full result written to: {out}", fg="green")
+
+
+@tdm_group.command("cross")
+@click.option(
+    "--wavecar-gs",
+    "wavecar_gs",
+    default="WAVECAR",
+    show_default=True,
+    help="Ground-state WAVECAR.",
+)
+@click.option(
+    "--wavecar-es", "wavecar_es", required=True, help="Excited-state WAVECAR."
+)
+@click.option("--ispin", default=1, show_default=True)
+@click.option("--iband-i", "iband_i", required=True, type=int)
+@click.option("--iband-j", "iband_j", required=True, type=int)
+@click.option("--ibzkpt", default=None, help="IBZKPT for k-weighting.")
+@click.option("--out", default=None, help="Output JSON.")
+@click.pass_context
+def tdm_cross(ctx, wavecar_gs, wavecar_es, ispin, iband_i, iband_j, ibzkpt, out):
+    """Compute cross-state TDM (ΔSCF) between two WAVECARs.
+
+    \b
+      defectpl tdm cross --wavecar-gs WAVECAR_gs --wavecar-es WAVECAR_es \\
+          --iband-i 638 --iband-j 639
+    """
+    import json
+    import numpy as np
+    from defectpl.physics.tdm import WavecarReader, read_ibzkpt_weights
+
+    try:
+        wfc_gs = WavecarReader(wavecar_gs)
+        wfc_es = WavecarReader(wavecar_es)
+    except Exception as exc:
+        raise click.ClickException(f"Cannot open WAVECAR: {exc}")
+
+    res = wfc_gs.get_tdm_cross_state_all_kpoints(wfc_es, ispin, iband_i, iband_j)
+
+    if ibzkpt:
+        kw = read_ibzkpt_weights(ibzkpt)
+        w = kw / kw.sum()
+        avg = float(np.dot(w, res["tdm_magnitude"]))
+        click.echo(f"  BZ-averaged cross-state |TDM| = {avg:.6f} Debye")
+    else:
+        click.echo(
+            f"  Mean cross-state |TDM| = {res['tdm_magnitude'].mean():.6f} Debye"
+        )
+        click.echo(f"  Max  cross-state |TDM| = {res['tdm_magnitude'].max():.6f} Debye")
+
+    if out:
+
+        def _ser(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return obj
+
+        with open(out, "w") as fh:
+            json.dump({k: _ser(v) for k, v in res.items()}, fh, indent=2)
+        click.secho(f"  Result written to: {out}", fg="green")
+
+
+@tdm_group.command("trim")
+@click.option("--wavecar", default="WAVECAR", show_default=True)
+@click.option(
+    "--bands",
+    required=True,
+    help="Band indices to keep, comma-separated or range, e.g. '635-639' or '635,636,637'.",
+)
+@click.option("--out", default="WAVECAR_trim", show_default=True)
+@click.option(
+    "--compact",
+    is_flag=True,
+    default=False,
+    help="Write compact WAVECAR (only selected band records; auto-detected on read).",
+)
+@click.pass_context
+def tdm_trim(ctx, wavecar, bands, out, compact):
+    """Write a trimmed or compact WAVECAR with selected bands only.
+
+    \b
+      defectpl tdm trim --bands 635-639 --out WAVECAR_trim
+      defectpl tdm trim --bands 630,635,638,639 --compact --out WAVECAR_compact
+    """
+    from defectpl.physics.tdm import WavecarReader
+
+    if "-" in bands and "," not in bands:
+        lo, hi = (int(x) for x in bands.split("-"))
+        band_list = list(range(lo, hi + 1))
+    else:
+        band_list = [int(x) for x in bands.replace("-", ",").split(",") if x.strip()]
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(str(exc))
+
+    kept = wfc.trim_save_wavecar(band_list, outfile=out, compact=compact)
+    click.secho(f"  Written {out}  (bands: {sorted(kept)})", fg="green")
+
+
+@tdm_group.command("export")
+@click.option("--wavecar", default="WAVECAR", show_default=True)
+@click.option(
+    "--bands",
+    default=None,
+    help="Band indices, e.g. '635-639' or '635,636'. All if omitted.",
+)
+@click.option(
+    "--format",
+    "fmt",
+    default="json",
+    type=click.Choice(["json", "h5"]),
+    show_default=True,
+)
+@click.option(
+    "--save-coeffs",
+    "save_coeffs",
+    is_flag=True,
+    default=False,
+    help="Include plane-wave coefficients in JSON export.",
+)
+@click.option("--out", default=None, help="Output file path.")
+@click.pass_context
+def tdm_export(ctx, wavecar, bands, fmt, save_coeffs, out):
+    """Export WAVECAR metadata (and optionally coefficients) to JSON or HDF5.
+
+    \b
+      defectpl tdm export --format json --bands 635-640 --out bands.json
+      defectpl tdm export --format h5   --bands 635,638,639 --out trim.h5
+    """
+    from defectpl.physics.tdm import WavecarReader
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(str(exc))
+
+    band_list = None
+    if bands is not None:
+        if "-" in bands and "," not in bands:
+            lo, hi = (int(x) for x in bands.split("-"))
+            band_list = list(range(lo, hi + 1))
+        else:
+            band_list = [int(x) for x in bands.split(",") if x.strip()]
+
+    if fmt == "json":
+        out = out or "wavecar_info.json"
+        wfc.save_to_json(bands=band_list, outfile=out, save_coeffs=save_coeffs)
+    else:
+        out = out or "wavecar_trim.h5"
+        wfc.save_to_h5(bands=band_list, outfile=out)
+    click.secho(f"  Written: {out}", fg="green")
+
+
+@tdm_group.command("plot")
+@click.option(
+    "--tdm-json",
+    "tdm_json",
+    required=True,
+    help="JSON file from 'tdm calc' or 'tdm all' command.",
+)
+@click.option(
+    "--plot-type",
+    "plot_type",
+    default="dashboard",
+    type=click.Choice(
+        ["dashboard", "heatmap", "bubble", "components", "strip", "absorption"]
+    ),
+    show_default=True,
+)
+@click.option(
+    "--component",
+    default="magnitude",
+    type=click.Choice(["magnitude", "x", "y", "z"]),
+    help="TDM component for heatmap plot.",
+)
+@click.option(
+    "--sigma",
+    default=0.05,
+    type=float,
+    show_default=True,
+    help="Gaussian broadening in eV for absorption plot.",
+)
+@click.option("--out", default=None, help="Output image file. Display if omitted.")
+@click.pass_context
+def tdm_plot(ctx, tdm_json, plot_type, component, sigma, out):
+    """Plot TDM results from a previously saved JSON file.
+
+    \b
+      defectpl tdm plot --tdm-json tdm.json --plot-type dashboard --out dash.pdf
+      defectpl tdm plot --tdm-json tdm.json --plot-type absorption --sigma 0.03
+    """
+    import json
+    from defectpl.physics.tdm_viz import (
+        plot_tdm_dashboard,
+        plot_tdm_heatmap,
+        plot_tdm_bubble,
+        plot_tdm_components,
+        plot_tdm_kpoint_strip,
+        plot_tdm_absorption,
+    )
+
+    with open(tdm_json) as fh:
+        data = json.load(fh)
+
+    import numpy as np
+
+    for key in ("tdm_magnitude", "tdm_components", "E_i", "E_j", "dE", "kvecs"):
+        if key in data:
+            data[key] = np.array(data[key])
+
+    dispatch = {
+        "dashboard": lambda: plot_tdm_dashboard(data, sigma=sigma, outfile=out),
+        "heatmap": lambda: plot_tdm_heatmap(data, component=component, outfile=out),
+        "bubble": lambda: plot_tdm_bubble(data, outfile=out),
+        "components": lambda: plot_tdm_components(data, outfile=out),
+        "strip": lambda: plot_tdm_kpoint_strip(data, outfile=out),
+        "absorption": lambda: plot_tdm_absorption(data, sigma=sigma, outfile=out),
+    }
+    dispatch[plot_type]()
+
+
+main.add_command(tdm_group)
+
+
+# ---------------------------------------------------------------------------
+# IPR commands
+# ---------------------------------------------------------------------------
+
+
+@click.group("ipr")
+@click.pass_context
+def ipr_group(ctx):
+    """Inverse Participation Ratio (IPR) of Kohn-Sham states from WAVECAR.
+
+    \b
+    Sub-commands
+    ------------
+      calc    Compute IPR for selected bands.
+      plot    Plot IPR results.
+    """
+
+
+@ipr_group.command("calc")
+@click.option("--wavecar", default="WAVECAR", show_default=True)
+@click.option("--ispin", default=1, show_default=True)
+@click.option("--ibzkpt", default="IBZKPT", show_default=True)
+@click.option(
+    "--bands",
+    default=None,
+    help="Band indices, e.g. '635-650' or '635,638,639'. All near-Fermi if omitted.",
+)
+@click.option(
+    "--mode",
+    default="near_fermi",
+    show_default=True,
+    type=click.Choice(
+        [
+            "all",
+            "near_fermi",
+            "homo_lumo_range",
+            "energy_window",
+            "band_range",
+            "band_list",
+        ]
+    ),
+)
+@click.option("--n-occ", "n_occ", default=10, show_default=True)
+@click.option("--n-unocc", "n_unocc", default=10, show_default=True)
+@click.option("--fermi-level", "fermi_level", default=None, type=float)
+@click.option("--out-json", "out_json", default="ipr_result.json", show_default=True)
+@click.option("--out-csv", "out_csv", default="ipr_summary.csv", show_default=True)
+@click.pass_context
+def ipr_calc(
+    ctx,
+    wavecar,
+    ispin,
+    ibzkpt,
+    bands,
+    mode,
+    n_occ,
+    n_unocc,
+    fermi_level,
+    out_json,
+    out_csv,
+):
+    """Compute IPR for all selected Kohn-Sham states.
+
+    \b
+      defectpl ipr calc --wavecar WAVECAR --mode near_fermi --n-occ 10 --n-unocc 10
+      defectpl ipr calc --bands 635-645 --out-json ipr.json --out-csv ipr.csv
+    """
+    import numpy as np
+    from defectpl.physics.tdm import (
+        WavecarReader,
+        compute_ipr_all,
+        save_ipr_json,
+        save_ipr_csv,
+        read_ibzkpt_weights,
+    )
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(str(exc))
+
+    try:
+        kw = read_ibzkpt_weights(ibzkpt)
+    except Exception:
+        kw = np.ones(wfc.nkpts)
+
+    band_list = None
+    if bands is not None:
+        if "-" in bands and "," not in bands:
+            lo, hi = (int(x) for x in bands.split("-"))
+            band_list = list(range(lo, hi + 1))
+        else:
+            band_list = [int(x) for x in bands.split(",") if x.strip()]
+
+    click.echo("  Computing IPR…")
+    result = compute_ipr_all(
+        wfc,
+        ispin=ispin,
+        kweights=kw,
+        bands=band_list,
+        select_mode=mode,
+        n_occ=n_occ,
+        n_unocc=n_unocc,
+        fermi_level=fermi_level,
+    )
+
+    save_ipr_json(result, out_json)
+    save_ipr_csv(result, out_csv)
+
+    top = sorted(
+        result["band_summary"], key=lambda r: r["weighted_avg_ipr"], reverse=True
+    )[:5]
+    click.echo("\n  Top-5 most-localised bands (by k-weighted IPR):")
+    for r in top:
+        click.echo(
+            f"    Band {r['iband']:4d}  IPR={r['weighted_avg_ipr']:.4e}  "
+            f"E={r['avg_energy']:.3f} eV"
+        )
+    click.secho(f"\n  JSON: {out_json}   CSV: {out_csv}", fg="green")
+
+
+@ipr_group.command("plot")
+@click.option("--ipr-json", "ipr_json", required=True)
+@click.option(
+    "--plot-type",
+    "plot_type",
+    default="scatter",
+    type=click.Choice(["scatter", "bar", "heatmap"]),
+    show_default=True,
+)
+@click.option(
+    "--fermi-level", "fermi_level", default=0.0, type=float, show_default=True
+)
+@click.option(
+    "--top-n",
+    "top_n",
+    default=20,
+    type=int,
+    show_default=True,
+    help="Number of bands for bar chart.",
+)
+@click.option("--out", default=None)
+@click.pass_context
+def ipr_plot(ctx, ipr_json, plot_type, fermi_level, top_n, out):
+    """Plot IPR results from a saved JSON file.
+
+    \b
+      defectpl ipr plot --ipr-json ipr_result.json --plot-type scatter
+      defectpl ipr plot --ipr-json ipr_result.json --plot-type bar --top-n 15
+    """
+    import json
+    from defectpl.physics.tdm_viz import (
+        plot_ipr_scatter,
+        plot_ipr_bar,
+        plot_ipr_kpoint_heatmap,
+    )
+
+    with open(ipr_json) as fh:
+        result = json.load(fh)
+
+    if plot_type == "scatter":
+        plot_ipr_scatter(result, fermi_level=fermi_level, outfile=out)
+    elif plot_type == "bar":
+        plot_ipr_bar(result, top_n=top_n, outfile=out)
+    else:
+        plot_ipr_kpoint_heatmap(result, outfile=out)
+
+
+main.add_command(ipr_group)
+
+
+# ---------------------------------------------------------------------------
+# ZPL / optical-properties command
+# ---------------------------------------------------------------------------
+
+
+@click.group("zpl")
+@click.pass_context
+def zpl_group(ctx):
+    """Zero-phonon line and radiative lifetime from VASP directories.
+
+    \b
+    Sub-commands
+    ------------
+      calc    Compute ZPL, dQ, Einstein A, and radiative lifetime.
+    """
+
+
+@zpl_group.command("calc")
+@click.option("--ground", required=True, help="Ground-state directory.")
+@click.option("--excited", required=True, help="Excited-state directory.")
+@click.option(
+    "--tdm-gg",
+    "tdm_gg",
+    default=None,
+    type=float,
+    help="Same-state BZ-averaged |TDM| in Debye.",
+)
+@click.option(
+    "--tdm-ge",
+    "tdm_ge",
+    default=None,
+    type=float,
+    help="Cross-state BZ-averaged |TDM| in Debye.",
+)
+@click.option(
+    "--nr", default=2.42, type=float, show_default=True, help="Refractive index."
+)
+@click.option(
+    "--prefer",
+    default="oszicar",
+    type=click.Choice(["oszicar", "outcar", "vasprun"]),
+    show_default=True,
+)
+@click.option("--out", default=None, help="Save JSON to this path.")
+@click.pass_context
+def zpl_calc(ctx, ground, excited, tdm_gg, tdm_ge, nr, prefer, out):
+    """Compute ZPL, dQ, Einstein A, and radiative lifetime.
+
+    \b
+      defectpl zpl calc --ground /data/gs/ --excited /data/es/ --nr 2.65
+      defectpl zpl calc --ground /data/gs/ --excited /data/es/ \\
+          --tdm-gg 1.5 --tdm-ge 1.3 --nr 2.65 --out optical.json
+    """
+    import json
+    from defectpl.physics.tdm import compute_optical_properties
+
+    try:
+        props = compute_optical_properties(
+            g_path=ground,
+            e_path=excited,
+            tdm_gg=tdm_gg,
+            tdm_ge=tdm_ge,
+            nr=nr,
+            prefer_energy=prefer,
+        )
+    except Exception as exc:
+        raise click.ClickException(str(exc))
+
+    click.echo(f"\n  E_ground  = {props['E_ground']:.6f} eV")
+    click.echo(f"  E_excited = {props['E_excited']:.6f} eV")
+    click.echo(f"  ZPL       = {props['ZPL']:.6f} eV")
+    if props["dQ"] is not None:
+        click.echo(f"  dQ        = {props['dQ']:.6f} amu^0.5·Å")
+    click.echo(f"  n_r       = {nr}")
+    for tag, label in [("gg", "Same-state (GG)"), ("ge", "Cross-state (GE)")]:
+        tdm = props[f"tdm_{tag}"]
+        if tdm is not None:
+            A = props[f"A_{tag}"]
+            lt = props[f"lifetime_{tag}"]
+            click.echo(f"\n  [{label}]")
+            click.echo(f"    |TDM|    = {tdm:.6f} Debye")
+            click.echo(f"    A        = {A:.4f} MHz")
+            click.echo(f"    Lifetime = {lt:.4f} ns")
+
+    if out:
+        with open(out, "w") as fh:
+            json.dump(
+                {k: (float(v) if v is not None else None) for k, v in props.items()},
+                fh,
+                indent=2,
+            )
+        click.secho(f"\n  Optical properties saved to: {out}", fg="green")
+
+
+main.add_command(zpl_group)
+
+
+# ---------------------------------------------------------------------------
+# WFC export command
+# ---------------------------------------------------------------------------
+
+
+@click.group("wfc")
+@click.pass_context
+def wfc_group(ctx):
+    """Real-space wavefunction export from WAVECAR.
+
+    \b
+    Sub-commands
+    ------------
+      save    Export to CHGCAR (.vasp) and/or VESTA project (.vesta).
+    """
+
+
+@wfc_group.command("save")
+@click.option("--wavecar", default="WAVECAR", show_default=True)
+@click.option(
+    "--poscar",
+    default=None,
+    help="POSCAR/CONTCAR for structure. Auto-detected if omitted.",
+)
+@click.option("--ispin", default=1, show_default=True)
+@click.option("--ikpt", default=1, show_default=True)
+@click.option("--iband", required=True, type=int)
+@click.option(
+    "--quantity",
+    default="density",
+    type=click.Choice(["density", "real", "imag"]),
+    show_default=True,
+)
+@click.option(
+    "--vesta",
+    "write_vesta",
+    is_flag=True,
+    default=False,
+    help="Also write a .vesta project file.",
+)
+@click.option(
+    "--out", default=None, help="Output basename (default: wfc_band{iband}.vasp)."
+)
+@click.pass_context
+def wfc_save(ctx, wavecar, poscar, ispin, ikpt, iband, quantity, write_vesta, out):
+    """Export a real-space KS state to CHGCAR + optional VESTA project.
+
+    \b
+      defectpl wfc save --iband 638 --vesta
+      defectpl wfc save --iband 639 --quantity real --out psi_re.vasp
+    """
+    from defectpl.physics.tdm import WavecarReader
+    from defectpl.physics.tdm_viz import save_wfc_vasp, save_wfc_vesta
+    from defectpl.io.wavecar import get_structure, read_poscar
+    from pathlib import Path
+
+    try:
+        wfc = WavecarReader(wavecar)
+    except Exception as exc:
+        raise click.ClickException(str(exc))
+
+    try:
+        if poscar:
+            structure = read_poscar(poscar)
+        else:
+            structure = get_structure(".", relaxed=True)
+    except Exception as exc:
+        raise click.ClickException(f"Cannot read structure: {exc}")
+
+    out_vasp = Path(out) if out else Path(f"wfc_band{iband}.vasp")
+    save_wfc_vasp(
+        wfc, ispin, ikpt, iband, structure, outfile=out_vasp, quantity=quantity
+    )
+    if write_vesta:
+        out_vesta = out_vasp.with_suffix(".vesta")
+        save_wfc_vesta(
+            wfc, ispin, ikpt, iband, structure, vasp_file=out_vasp, outfile=out_vesta
+        )
+
+
+main.add_command(wfc_group)
+
+
 if __name__ == "__main__":
     main()
