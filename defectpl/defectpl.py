@@ -39,8 +39,9 @@ class Photoluminescence(MSONable):
 
     * **Displacement mode** — supply ``dR`` (atomic displacements between
       ground and excited equilibrium geometries).
-    * **Force mode** — supply ``dF`` (forces on the ground-state atoms when
-      the system is in the excited-state charge state).
+    * **Force mode** — supply ``dF`` (differences in forces on atoms when
+      in excited and ground state electronic configuration either at ground
+      or excited state equilibrium configuration).
 
     Parameters
     ----------

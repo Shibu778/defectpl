@@ -60,7 +60,8 @@ def read_eigenval_file(filename: Union[str, Path], k_idx: int = 0) -> Dict[str, 
     ----------
     filename : str or Path
     k_idx : int
-        Zero-based k-point index (default 0, i.e. Γ-point).
+        Zero-based k-point index (default 0, i.e. Γ-point or the first
+        k-point at the beginning of the file).
 
     Returns
     -------

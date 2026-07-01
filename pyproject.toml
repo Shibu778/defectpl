@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "defectpl"
-version = "0.3.0"
+version = "0.3.1"
 description = "A unified Python package for the optical properties of point defects in solids."
 authors = ["Shibu Meher <shibumeher@iisc.ac.in>"]
 readme = "README.md"

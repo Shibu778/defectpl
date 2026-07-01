@@ -72,9 +72,10 @@ def execute_pipeline(
     ezpl: float = 1.945,
     gamma: float = 2.0,
     fig_format: str = "svg",
+    dump_json: bool = True,
 ):
     """Executes a single Photoluminescence pipeline, exports diagnostic plots,
-    summaries, and gz-compressed JSON configurations.
+    summaries, and optionally gz-compressed JSON configurations.
     """
     print(f"\n--- Running PL calculations for {pipeline_name} pipeline ---")
     outdir = out_path / pipeline_name
@@ -102,22 +103,25 @@ def execute_pipeline(
         pl_engine, filename=str(outdir / "important_properties.txt")
     )
 
-    # 1. Write the raw JSON structure
-    output_json_path = outdir / "properties.json"
-    dumpfn(pl_engine, str(output_json_path), indent=4)
+    if dump_json:
+        # 1. Write the raw JSON structure
+        output_json_path = outdir / "properties.json"
+        dumpfn(pl_engine, str(output_json_path), indent=4)
 
-    # 2. Compress the JSON file into a .gz archive
-    output_gz_path = outdir / "properties.json.gz"
-    print(f"Compressing state record tracking matrix to: {output_gz_path.name}")
-    with open(output_json_path, "rb") as f_in:
-        with gzip.open(output_gz_path, "wb") as f_out:
-            shutil.copyfileobj(f_in, f_out)
+        # 2. Compress the JSON file into a .gz archive
+        output_gz_path = outdir / "properties.json.gz"
+        print(f"Compressing state record tracking matrix to: {output_gz_path.name}")
+        with open(output_json_path, "rb") as f_in:
+            with gzip.open(output_gz_path, "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out)
 
-    # 3. Remove the uncompressed file to save space
-    output_json_path.unlink()
-    print(
-        f"Data state records successfully exported and compressed to: {output_gz_path}"
-    )
+        # 3. Remove the uncompressed file to save space
+        output_json_path.unlink()
+        print(
+            f"Data state records successfully exported and compressed to: {output_gz_path}"
+        )
+    else:
+        print("Skipping JSON properties export as per user configuration.")
 
 
 def run_pl_analysis(
@@ -132,6 +136,7 @@ def run_pl_analysis(
     ezpl: float = 1.945,
     gamma: float = 2.0,
     fig_format: str = "svg",
+    dump_json: bool = True,
 ):
     """Orchestrates data unzipping and pipeline executions with configurable
     internal system subdirectories. Handles automatic cleanup.
@@ -204,6 +209,7 @@ def run_pl_analysis(
             ezpl=ezpl,
             gamma=gamma,
             fig_format=fig_format,
+            dump_json=dump_json,
         )
 
         # ==========================================
@@ -224,6 +230,7 @@ def run_pl_analysis(
             ezpl=ezpl,
             gamma=gamma,
             fig_format=fig_format,
+            dump_json=dump_json,
         )
 
         # ==========================================
@@ -241,6 +248,7 @@ def run_pl_analysis(
             ezpl=ezpl,
             gamma=gamma,
             fig_format=fig_format,
+            dump_json=dump_json,
         )
 
     finally:
@@ -263,6 +271,7 @@ if __name__ == "__main__":
     # EXAMPLES_BASE keeps outputs localized to the current directory
     EXAMPLES_BASE = SCRIPT_DIR
 
+    SAVE_JSON = False
     # --------------------------------------------------------------------------
     # PBE Functional Examples
     # --------------------------------------------------------------------------
@@ -280,6 +289,7 @@ if __name__ == "__main__":
         zpl_dir="zpl",
         ems_dir="ems",
         ezpl=1.750,
+        dump_json=SAVE_JSON,  # Set to False to skip JSON generation
     )
 
     # Example 2: Calculation with PBE functional and fractional electron excitation
@@ -295,6 +305,7 @@ if __name__ == "__main__":
         zpl_dir="frac_zpl",
         ems_dir="frac_ems",
         ezpl=1.729,
+        dump_json=SAVE_JSON,  # This example won't output JSON
     )
 
     # --------------------------------------------------------------------------
@@ -314,6 +325,7 @@ if __name__ == "__main__":
         zpl_dir="zpl/hse06",
         ems_dir="ems/hse06",
         ezpl=1.991,
+        dump_json=SAVE_JSON,
     )
 
     # Example 4: Calculation with HSE06 functional and fractional electron excitation
@@ -329,4 +341,5 @@ if __name__ == "__main__":
         zpl_dir="frac_zpl/hse06",
         ems_dir="frac_ems/hse06",
         ezpl=2.190,
+        dump_json=SAVE_JSON,
     )
